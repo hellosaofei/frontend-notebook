@@ -1,0 +1,780 @@
+# es6 扩展
+
+## 对象扩展
+
+### 属性简洁写法
+
+- 在大括号内直接写入变量和函数作为对象的属性和方法
+
+```js
+const str = "hello world";
+/*变量直接写在大括号中，属性名就是变量名，属性值就是变量值*/
+const obj = { str };
+console.log(obj); //{str:'hello world'}
+```
+
+# Promise 对象
+
+- promise 对象代表一个异步操作
+- promise 对象有三种状态：pending（进行中）、fulfilled（已成功）、rejected（已失败）
+
+- 异步操作的结果，可决定当前状态
+
+- promise 对象的状态改变只有两种：pending>>fulfilled 、 pending>>rejected
+
+## 基本用法
+
+Promise 构造函数接受一个函数作为参数，该函数的两个参数分别为 resolve 和 reject,两者也是函数
+
+```js
+new Promise(function (resolve, reject) {
+  // 要做的事情...
+});
+```
+
+resolve 函数：将 Promise 对象的状态从 pending 转化为 fulfilled,异步操作成功时调用，并将异步操作结果作为参数传递出来
+==异步操作成功需要调用 resolve 函数传递成功的结果==
+
+rejected 函数：将 Promise 对象的状态从 pending 转化为 rejected,异步操作失败时调用，并作为异步操作报出的错误作为参数传递出来
+
+==异步操作失败，调用 reject 函数传递失败的原因==
+
+## then 函数
+
+实例化过的 promise 对象可调用 then 方法，为 Promise 实例添加状态改变时的回调函数
+
+```js
+promise.then(onFulfilled, onRejected);
+//或
+promise.then(onFulfilled).catch(onRejected);
+```
+
+- 第一个参数：promise 对象的状态变为 resolved 状态时应执行的回调函数
+- 第二个参数：promise 对象的状态变为 rejected 状态时应执行的回调函数
+- 返回值：一个新的 Promise 实例
+
+```js
+
+```
+
+```js
+getJSON("./post/1.json")
+  .then(function (post) {
+    return getJSON(post.commentURL);
+  })
+  .then(
+    function (comments) {
+      console.log("resolved: ", comments);
+    },
+    function (err) {
+      console.log("rejected: ", err);
+    }
+  );
+```
+
+第一个 then 方法返回一个 promise 对象
+第二个 then 方法定义了两个回调函数，等待这个新的 promise 对象的状态发生变化，如果变为 resolved 就调用第一个回调函数，变为 rejected 就调用第二个回调函数
+
+then 方法用于处理 Promise 成功状态回调函数，使用 catch 方法处理 Prmoise 失败状态的回调函数
+
+## catch 方法
+
+- 指定发生错误时(包括 Promise 对象的异步操作中的错误，then 回调方法中的错误)的回调
+-
+
+```js
+//getJOSN()方法返回一个promise对象
+// 异步操作成功，该promise对象状态将会变为resolved，调用then方法指定的回调函数
+// 异步操作失败，该promise对象状态将会变为rejected，调用catch方法指定的回调来处理该错误
+getJSON()
+  .then(function (data) {
+    //
+  })
+  .catch(function (error) {
+    //
+  });
+```
+
+- then 方法的等价写法
+
+```js
+Promise().catch((error)=>console.log('rejected'，error))
+//等价于
+//一般不要在then方法中定义rejected状态的回调函数，即不要在then方法中定义第二个参数用于错误处理，而是将其放在catch方法中
+Promise().then(null,(error)=>console.log('rejected',error))
+```
+
+# class 类
+
+- es6 以前，生成实例对象的方法是通过构造函数，这与传统面向对象语言的差异很大，于是 es6 引入了 class 类的概念作为对象模板
+
+- es6 的 class 可看做一个语法糖，其绝大部分功能，es5 都能做到，它的引入只是让对象原型的写法更加清晰、更像面向对象编程的语法
+
+```js
+//es5写法
+function Point(x, y) {
+  this.x = x;
+  this.y = y;
+}
+Point.portotype.toString = function () {
+  return `(${this.x},${this.y})`;
+};
+
+//es6写法
+class Point {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+  toString() {
+    return `(${this.x},${this.y})`;
+  }
+}
+
+//实例化对象
+var p = new Point(1, 2);
+```
+
+## constructor 方法
+
+- 类的默认方法，通过 new 命令生成对象实例时自动调用该方法。每个类都有 constructor 方法，如果没有显式定义，js 引擎会默认添加一个空的 constructor 方法
+
+- class 类必须使用 new 调用，但普通构造函数不需要 new 就可以执行
+
+# Symbol
+
+- 引入背景：es5 的对象属性名都是字符串，容易造成属性名冲突。比如，使用别人提供的对象时想要为该对象添加新的方法，新方法名可能与原有方法名产生冲突。此时就需要一种机制来保证每个属性名都是独一无二的，这就是 es6 引入 Symbol 的原因
+
+- 引入 symbol 数据结构之后，js 对象的属性名现在可以有两种类型：字符串或 symbol 类型
+
+- js 原生数据类型：undefined、null、boolean、string、Number、BigInt、Object、Symbol
+
+## 实例属性
+
+## 作为属性名
+
+```js
+let mySymbol = Symbol();
+
+// 第一种写法
+let a = {};
+a[mySymbol] = "Hello!";
+
+// 第二种写法
+let a = {
+  [mySymbol]: "Hello!",
+};
+
+// 第三种写法
+let a = {};
+Object.defineProperty(a, mySymbol, { value: "Hello!" });
+
+// 以上写法都得到同样结果
+a[mySymbol]; // "Hello!"
+```
+
+## 消除魔术字符串
+
+- 魔术字符串：在代码中多次出现，与代码形成强耦合的某个具体的字符串或数值
+- 风格良好的代码，应尽量消除魔术字符串，由含义清晰的变量代替
+
+```js
+function printName(name) {
+  switch (name) {
+    case "张三": //魔术字符串
+      console.log("我是张三");
+      break;
+  }
+}
+printName("张三");
+/*上面代码中，字符串"张三"就是魔术字符串，它多次出现与代码形成“强耦合”，不利于修改维护*/
+```
+
+- 解决方法一：将字符串写成变量
+
+```js
+const name = "张三";
+printName(name);
+```
+
+# Iterator 遍历器
+
+- 引入背景：es6 以前能够表示“集合”的数据结构有：数组 Array 和对象 Object；es6 新增了 Map 和 Set 两种数据结构，这就需要一种统一的接口机制处理所有不同的数据结构
+
+- 遍历器 Iterator 作为一种接口，为各种不同的数据结构提供统一的访问机制，任何部署了 Iterator 接口的数据结构都可以完成遍历操作
+
+- 作用：使数据结构成员按照某种次序排列；作为 es6 新的遍历命令`for... of`的基础
+
+> 遍历过程
+
+1. 创建一个指针对象指向当前数据结构的起始位置，遍历器对象本质就是一个指针对象
+2. 调用指针对象的 next 方法，将指针指向数据结构的第一个成员
+3. 再次调用指针对象的 next 方法，将指针指向数据结构的第二个成员
+4. 重复上述过程，直到在指针指向数据结构的结束位置
+
+```js
+//每次调用next()方法，都会返回数据结构当前成员的信息，即一个包含value和done两个属性的对象
+
+var iterator = makeIterator(["a", "b"]);
+
+iterator.next(); // { value: "a", done: false }
+iterator.next(); // { value: "b", done: false }
+iterator.next(); // { value: undefined, done: true }
+//定义一个遍历器生成函数，作用是返回一个遍历器对象
+function makeIterator(arr) {
+  var index = 0;
+  return {
+    next: function () {
+      return index < arr.length
+        ? { value: arr[index++], done: false }
+        : { value: undefined, done: true };
+    },
+  };
+}
+```
+
+## 默认 Iterator 接口
+
+- es6 引入 Iterator 接口的目的，就是为所有数据结构提供一种统一的访问机制：`for...of`循环，某数据结构只要部署了 Iterator 接口，就称该数据结构是可遍历的(iterable)
+
+- 默认的 Iterator 接口部署在数据结构的 `Symbol.iterator` 属性,该属性本身是一个函数，当前数据结构默认的遍历器生成函数，执行该函数将返回一个遍历器
+
+```js
+/*
+下面的对象obj是可遍历的，指向概
+
+*/
+let obj = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () {
+        return { value: 1, done: true };
+      },
+    };
+  },
+};
+```
+
+- es6 的有些数据结构（`Array/Map/Set/String/TypedArray/arguments/Nodelist`）原生具备 Iterator 接口，可以被`for...of`循环，
+
+```js
+let arr = ["a", "b", "c"];
+//数组具有与原生的遍历器接口，部署在数组对象的Symbol.iterator属性上，调用该属性就能得到一个遍历器对象
+let iter = arr[Symbol.iterator]();
+
+iter.next(); // { value: 'a', done: false }
+iter.next(); // { value: 'b', done: false }
+iter.next(); // { value: 'c', done: false }
+iter.next(); // { value: undefined, done: true }
+```
+
+- 不具有原生 Iterator 接口的数据结构需要自己的`Symbol.iterator`属性上部署
+
+```js
+class RangeIterator {
+  constructor(start, stop) {
+    this.start = start;
+    this.stop = stop;
+  }
+  [Symbol.iterator]() {
+    return this;
+  }
+  next() {
+    let index = this.start;
+    return index < this.stop
+      ? { value: this.start++, done: false }
+      : { value: undefined, done: true };
+  }
+}
+function range(start, stop) {
+  return new RangeIterator(start, stop);
+}
+for (let item of range(0, 3)) {
+  console.log(item);
+}
+```
+
+- js 对象 Object 没有原生的的 Iterator 接口，因为对象的哪个属性先遍历哪个属性后遍历是不确定的，
+
+## js 遍历语法
+
+- for 循环
+- 缺点：不够简洁
+
+```js
+for (let index = 0; index < arr.length; index++) {
+  console.log(arr[index]);
+}
+```
+
+- forEach()
+- 缺点：无法中途跳出 forEach 循环，break 命令或 return 命令均不能奏效
+
+```js
+arr.forEach((value, index) => {
+  console.log(value);
+});
+```
+
+- for...in 循环
+- 作用：遍历键名，更适合遍历对象
+- 缺点：1. 数组的键名是数字 2. 遍历顺序不确定 3. 会遍历手动添加的其他键甚至包括原型链上的键
+
+```js
+for (let index in arr) {
+  console.log(arr[index]);
+}
+```
+
+- for...of 循环
+- 优点：解决了上述便利语法存在的问题：简洁，可与 break 等配合使用以中途退出遍历，经配置后 所有数据结构均可使用
+- 遍历数组时，只返回具有数组索引的属性
+
+```js
+let arr = [3, 5, 7];
+arr.desc = "hello";
+//此时数组arr变为：Array(3)[3,5,7]
+//数组的对象写法为：{0:3,1:5,2:7,desc:'hello',length:3}
+
+for (let i in arr) {
+  console.log(i); // "0", "1", "2", "desc"
+}
+
+for (let i of arr) {
+  console.log(i); //  "3", "5", "7"
+}
+```
+
+## 默认调用
+
+- 对 Array 和 Set 的解构赋值，会默认调用 Symbol.iterator
+
+```js
+
+```
+
+- 扩展运算符
+
+- yield
+
+## 遍历器对象的其他方法
+
+- return() 方法
+- 调用时机：`for...of`循环提前退出时调用 return()方法
+- 应用场景：对象在完成遍历之前需要清理或释放资源
+
+```js
+
+function readLines(file){
+  return {
+    [Symbol.iterator](){
+      return {
+        next(){
+          return {done:false}
+        }
+        return(){
+          //文件对象遍历过程中异常退出，关闭文件
+          file.close();
+          return {done:true}
+        }
+      }
+    }
+  }
+}
+```
+
+- 会触发`return()`方法的情况
+
+```js
+//输出文件的第一行后，break退出遍历，后关闭文件
+for (let line of readLinesSync(fileName)) {
+  console.log(line);
+  break;
+}
+
+// 关闭文件后再抛出错误
+for (let line of readLinesSync(fileName)) {
+  console.log(line);
+  throw new Error();
+}
+```
+
+# Proxy 代理
+
+- 用于修改某些操作的默认行为
+
+- 作用：在目标对象前架设一层拦截外界对该对象的访问，都必须先通过这层拦截，因而提供了一种机制对外界的访问进行过滤盒改写
+
+## Proxy 实例
+
+- 利用 proxy 构造函数生成 Proxy 实例
+- 语法：`new Proxy(targetObj,handlerObj)`
+- 参数：targetObj 表示要拦截的目标对象，handlerObj 对象用来定制拦截行为
+
+```js
+
+```
+
+## Proxy 方法
+
+- get()用于拦截某个属性的读操作，可接受三个参数，依次为
+
+| 方法                                  | 描述                                                             |
+| ------------------------------------- | ---------------------------------------------------------------- |
+| get(target, propKey, receiver)：      | 拦截对象属性的读取                                               |
+| set(target, propKey, value, receiver) | 拦截对象属性的设置                                               |
+| has(target, propKey)                  | 拦截 propKey in proxy 的操作，返回一个布尔值。                   |
+| deleteProperty(target, propKey)       | 拦截对象属性的删除操作                                           |
+| apply(target, object, args)：         | 拦截 Proxy 实例作为函数调用的操作                                |
+| construct(target, args)               | ：拦截 Proxy 实例作为构造函数调用的操作，比如 new proxy(...args) |
+
+# Reflect 对象
+
+- 将 Object 对象的一些属于语言内部的方法放在 Reflect 对象上，从 Reflect 对象上拿到语言内部的方法
+- 修改某些 Object 方法的返回结果是变得合理
+- 将某些命令式 Object 操作（如`property in Obj/delete obj[name]`）变为函数行为`(Reflect.has(Obj,name))/Reflect.deleteProperty(Obj, property)`
+- 与 es6 的新增方法等更方便灵活地编程
+
+## 与 Proxy 对象
+
+## Reflect 对象静态方法
+
+- Reflect 对象的方法与 Proxy 对象的方法一一对应，后者的方法都能在前者上找到对应的方法，这就让 Proxy 对选哪个更加方便的调用对应的 Reflect 方法完成默认行为
+
+|                                                 |                                                                 |                        |
+| ----------------------------------------------- | --------------------------------------------------------------- | ---------------------- |
+| apply(target,Arg,args)                          |
+| construct()                                     |
+| get(target, name, receiver)                     | 查找并返回 target 对象的 name 属性，如果没有就返回 undefined    |
+| set(target, name, value, receiver)              |
+| has(obj, name)                                  |
+| deleteProperty(obj, name)                       |
+| defineProperty(target, propertyKey, attributes) |
+| isExtensible(targetObj)                         | Object.isExtensible(targetObj)                                  | 判断当前对象是否可扩展 |
+| preventExtensions(targetObj)                    | Object.preventExtensions(targetObj)                             | 将一个对象变为不可扩展 |
+| ownKeys (target)                                | Object.getOwnPropertyNames 与 Object.getOwnPropertySymbols 之和 | 返回对象的所有属性     |
+
+### get()方法
+
+- 语法：get(target, name, receiver)
+- 作用：查找并返回 target 对象的 name 属性，如果没有就返回 undefined
+
+```js
+let Obj = {
+  name: "张三",
+  age: 10,
+  get say() {
+    return `我是${this.name},今年${this.age}岁`;
+  },
+};
+Reflect.get(Obj, "name"); //10
+Reflect.get(Obj, "age"); //张三
+console.log(Reflect.get(Obj, "say")); //我是张三，今年10岁
+```
+
+### set()方法
+
+- 语法：set(target, name, value,receiver)
+- 作用：设置 target 对象的 name 属性值为 value
+
+```js
+let Obj = {
+  age: 10,
+  set resetAge(value) {
+    return (this.age = value);
+  },
+};
+Obj.age; //10
+
+Reflect.set(Obj, "age", 20);
+Obj.age; //20
+```
+
+### has()方法
+
+- 语法：has(target, name)
+- 作用：相当于`name in obj`中的`in`运算符，判断对象中是否有指定的属性
+
+```js
+let Obj = {
+  age: 10,
+};
+"age" in Obj; //true
+//相当于
+Reflect.has(Obj, "age"); //true
+```
+
+### deleteProperty()方法
+
+- 语法：deleteProperty(target, name, receiver)
+- 作用：相当于`delete obj[name]`，用于删除对象的属性
+- 返回值：Boolean 值。删除成功或被删除的属性不存在则返回 true，删除失败返回 false
+
+```js
+let Obj = {
+  age: 10,
+};
+delete Obj.age;
+//相当于
+Reflect.deleteProperty(Obj, "age");
+```
+
+## 实例：观察者模式
+
+```js
+//
+const observe = (Fun) => {
+  queueObservers.add(Fun);
+};
+const observable = (obj) => {
+  //返回一个原始对象的Proxy代理，拦截赋值操作
+  return new Proxy(obj, { set });
+};
+function set(targetObj, key, value, receiver) {
+  const result = Reflect.set(targetObj, key, value, receiver);
+  queuedObservers.forEach((observer) => {
+    observers();
+  });
+  return result;
+}
+```
+
+```js
+const queueObservers=new Set();
+
+function observer(Fn){
+  queueObservers.add(Fn)
+}
+function observable(obj){
+  return new Proxy()obj,{set}
+}
+
+```
+
+# Generator 函数
+
+- Generator 函数返回一个遍历器对象，也就是
+
+Generator 函数
+
+1. 是一个普通函数
+2. function 关键字与函数名之间有一个星号
+3. 函数体内部使用 yield 表达式以定义不同的内部状态
+4. 调用与普通函数的写法一样，在函数名后面加一对圆括号，但必须调用遍历器对象的 next 方法使指针移向下一个状态
+
+```js
+/*下面定义一个Generator函数，其内部有两个yield表达式，带上return语句，该函数有三个状态：NO1/NO2/ending*/
+function* myGenerator() {
+  yield "NO1";
+  yield "NO2";
+  return "ending";
+}
+//实例化一个遍历器对象
+let obj = myGenerator();
+
+/*
+每次调用next()方法，内部指针就从函数头部或上一次停下来的地方开始执行，直到遇到下一个yield表达式；也就是说，Generator函数是分段执行的，yield表达式是暂停执行的标志
+
+*/
+```
+
+## for...of 循环
+
+- 使用 for...of 循环自动遍历 Generator 函数运行时生成的 Iterator 对象，且此时不再需要调用 next 方法
+
+- 一旦 next 方法的返回对象的 done 属性为 true，for...of 循环就会终止且不包含返回对象，
+
+- 利用 Generator 函数可以对任意对象完成遍历。原生 js 对象没有遍历接口，无法使用`for...of`循环
+
+```js
+function* objEntries(obj){
+  let propKeys=
+}
+```
+
+## 异步
+
+- js 语言的执行环境是单线程的，故异步编程对于 js 语言很重要
+  es6 前的异步编程方法
+
+1. 回调函数
+2. 事件监听
+3. 发布/订阅
+4. Promise 对象
+
+# 模块语法
+
+- es6 以前，js 已知没有模块体系，无法将一个大工程拆分为互相依赖的小文件在用简单的方法拼接起来，但其他语言都有这项功能（如 python 的 import、Ruby 的 require），这对开发大型复杂的项目形成了巨大的障碍
+
+- es6 前社区制定了一些模块加载方案主要是 commonJS（用于服务器）和 AMD（用于浏览器），es6 实现了模块功能并可以完全替代上面两种规范，成为浏览器和服务器通用的模块解决方案
+
+- es6 的
+
+## 严格模式
+
+- 变量先声明再使用
+- 函数参数不能有同名属性，负责报错
+- 不能使用 with 语句
+- 不能赋值只读属性
+
+## export 命令
+
+- es6 模块主要由两个命令构成`export`(灰顶模块的对外接口)和`import`(输入其他模块提供的功能)
+
+- 一个模块就是一个独立文件，该文件内部所有变量没有经过 export 暴露，外界就无法获取
+
+```js
+//test.js
+/*
+export写法：
+*/
+export var name = "Tom";
+export var age = 10;
+export var year = 1999;
+
+//等价于
+//一般优先考虑使用下面的写法，因为这样就可以在脚本尾部一眼看出该文件向外暴露了哪些变量
+var name = "Tom";
+var age = 10;
+var year = 1999;
+
+export { name, age, year };
+```
+
+- export 命令规定的对外接口必须与模块内部变量建立一一对应关系，
+
+```js
+//报错
+export 1;
+//报错
+var m=1;
+export m;
+
+//正确写法一：
+export var m=1;
+//正确写法二：
+var m=1;
+export {m}
+
+//正确性写法三：
+var n=1;
+export {n as m}
+
+```
+
+- 使用 as 关键字重命名
+
+- export 命令能够向外暴露三种接口：函数 Function、类 Class、变量 variable
+
+```js
+export function printName(){
+  console.log('张三')
+}
+export class Person(){
+  constructor(){
+    this.name="person"
+  }
+}
+```
+
+- export 命令可出现在模块的任何位置，但如果位于块级作用域内就会报错。因为处于条件代码块中就没法做静态优化，违背了 es6 模块的设计初衷
+
+```js
+//export语句放在了块级作用域之中，将会报语法错误
+function emptyFunction() {
+  export default "xx";
+}
+// import语句同样不能放在块级作用域中
+if (x === 1) {
+  import { foo } from "module1";
+} else {
+  import { foo } from "module2";
+}
+```
+
+### es6 模块设计初衷
+
+- 静态化：使编译时就能确定模块的依赖关系以及输入输出的变量
+- 代码组织问题：随着代码量不断增加，将所有代码写进一个文件中会难以组织和维护，将代码从一个大文件拆分为若干个相互依赖的小文件
+- 浏览器和服务器的通用模块解决方案：es6 之前，js 没有官方的模块系统，社区中存在 commonJS 和 AMD 两种模块规范，但两者都有各自的局限，分别是用于浏览器和服务器
+- 简洁性：es6 通过 export 和 import 两个关键字就能完成模块的输入输出操作，使模块的使用非常直观和方便
+
+## import 语句
+
+- 使用 export 命令定义了模块的对外接口后，其他 js 文件就可以通过 import 命令加载改模块
+
+```js
+//大括号中的变量名必须与被导入模块对外接口的名称相同
+//这就需要使用该模块的开发者事先知道这些接口名称，可使用export default命令解除该限制
+import { name, age } from "./test.js";
+//为输入的变量重命名
+import { name as myName } from "./test.js";
+```
+
+- 使用 import 命令导入的变量（只读）不允许被修改
+
+```js
+import { a } from "./test.js";
+//a作为其他文件向外暴露的接口，如果对齐重新赋值就会报错，
+a = {};
+```
+
+- import 语句具有提升效果
+
+## export default 命令
+
+- 指定模块的默认输出
+- 一个模块只能有一个默认输出，因此`export default`命令一个模块中只能使用一次
+
+- `export default`命令其实只是输出了一个叫做 default 的变量，
+
+```js
+/*test.js*/
+var name = "张三";
+export {name as default};
+//相当于
+export default name
+
+/*main.js*/
+import {default as name} from './text.js'
+//等价于：import
+import name from './test.js'
+```
+
+- `export default`命令后面不能跟变量声明语句，因为`export default variable`的含义是将变量 variable 的值赋给变量 default，这与 export 语句的用法不同
+
+```js
+//错误写法
+export default var a=1;
+
+//正确写法
+var a=1;
+export default a;
+
+//export语句正确写法
+export var a=1;
+```
+
+## 模块整体加载
+
+- 使用星号（\*）指定一个对象将所有输出值都加载在该对象上
+
+```js
+/*test.js*/
+export function printName(name) {
+  console.log(`我的名字是${name}`);
+}
+export var name_1 = "张三";
+
+/*main.js */
+//逐一加载写法
+import { name_1, printName } from "./test.js";
+printName(name_1); //我的名字是张三
+//整体加载写法
+import * as Obj from "./test.js";
+Obj.printName(Obj.name_1); //我的名字是张三
+
+//不允许对其再次赋值,下面两个赋值操作将会报错
+Obj.printName = function () {};
+Obj.name_1 = "李四";
+```
