@@ -1,8 +1,6 @@
-## Array 数组
+# Array 数组
 
-### 原型方法
-
-#### 数组常规方法：增删改查
+## 数组常规方法：增删改查
 
 | 数组方法  | 说明                                               | 使用举例                                      |
 | --------- | -------------------------------------------------- | --------------------------------------------- | ------------------------------ |
@@ -14,7 +12,7 @@
 | find      | 返回通过测试（函数内判断）的数组的第一个元素的值   |
 | findIndex | 返回通过测试（函数内判断）的数组的第一个元素的索引 |
 
-#### 其他元素转换为数组
+## 其他元素转换为数组
 
 | 数组方法     | 说明                                                 | 使用举例                                   |
 | ------------ | ---------------------------------------------------- | ------------------------------------------ |
@@ -41,14 +39,48 @@ let myArr2 = Array.from(["   ss \n", "sjoa   "], (x) => x.replace(/\s+/, ""));
 console.log(myArr2); //['ss \n', 'sjoa']
 ```
 
-#### 排序与翻转
+## 排序与翻转
 
-| 数组方法  | 说明           | 使用举例 |
-| --------- | -------------- | -------- |
-| sort()    | 对数组进行排序 |          |
+| 数组方法  | 说明           | 其他       |
+| --------- | -------------- | ---------- |
+| sort()    | 对数组进行排序 | 改变原数组 |
 | reverse() | 翻转数组       |
 
-#### 遍历专用
+- sort()方法默认按照字典顺序进行比较，即将数值转成字符串，再按照字典顺序比较。比如`[101,11].sort()`数组中的两个元素都将会被转为字符串，故 101 最终会在 11 的前面
+
+- sort(sortFunction)可接受一个函数作为参数，`sortFunction(a,b)`接受两个参数分别表示两个数组成员，如果其返回值大于 0，表示第一个成员排在后面，否则，第一个成员排在前面
+
+```js
+let arr = [2, 10, 3, 1];
+let arr1 = arr.sort();
+console.log(arr, arr1, arr === arr1); // [ 1, 10, 2, 3 ] [ 1, 10, 2, 3 ] true
+arr.sort((a, b) => a - b); //[ 1, 2, 3, 10 ]
+```
+
+## 其他方法
+
+### 数组扁平化 flat()
+
+- 语法：Array.flat(depth)
+- 参数：depth 表示要提取嵌套数组的深度，默认为 1
+- 注意：flat() 方法会移除数组中的空项
+- 不改变原数组
+
+```js
+// flat()默认只展开一层
+var arr1 = [1, 2, [3, 4]];
+arr1.flat(); // [1, 2, 3, 4]
+
+// flat()默认只展开一层
+var arr2 = [1, 2, [3, 4, [5, 6]]];
+arr2.flat(); // [1, 2, 3, 4, [5, 6]]
+
+// 使用 Infinity，可展开任意深度的嵌套数组
+var arr4 = [1, 2, [3, 4, [5, 6, [7, 8, [9, 10]]]]];
+arr4.flat(Infinity); // [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+```
+
+## 遍历专用
 
 | 数组方法      | 说明                                               | 使用举例 |
 | ------------- | -------------------------------------------------- | -------- |
@@ -105,17 +137,22 @@ function checkAdult(age) {
   return age >= 18;
 }
 ages.every(checkAdult); //FALSE
+```
 
-/*
-some()函数
-检测数组元素中是否有元素符合指定条件。
-每个元素调用一次callbackFn回调函数，只要有一个符合（返回true），立即停止其余元素的回调执行并返回true
-*/
+#### 是否有元素满足指定条件 some()
+
+- 语法：arr.some(function(currentValue,index,arr),thisValue)
+- 作用：检测数组元素中是否有元素符合指定条件。
+- 原理：每个元素调用一次 callbackFn 回调函数，只要有一个符合（返回 true），立即停止其余元素的回调执行并返回 true
+
+```js
 let arr = [12, 23, 14, 43, 22];
 arr.some((val, index) => {
   return val % 2 == 0; //是偶数则返回true，arr中只要有一个是偶数就返回true
 });
+```
 
+```js
 /*
 map()函数
 通过指定函数处理数组的每个元素，并返回处理后的数组。
@@ -144,20 +181,21 @@ function checkAdult(age) {
   return age >= 18;
 }
 let newArr = ages.filter(checkAdult); //[32,33,40]
+```
 
-/*
-reduce()函数
-reduce() 方法接收一个函数作为累加器，数组中的每个值（从左到右）开始计算，最终计算为一个值。
-array.reduce(function(previousValue, currentValue, currentIndex, arr), initialValue)
-initialValue	: 传递给函数的初始值  如果提供了该参数，将会赋值给回调函数的previousValue参数，并且reduce将会从数组的第一个元素开始为每个元素调用一次回调函数。如果未提供该参数，reduce函数将会把数组的第一个元素赋值为previousValue参数，并从数组第二个为元素开始为每个元素调用一次回调函数
-*/
+#### 依次处理数组元素累计为一个值 reduce()
 
+- 语法：arr.reduce(function(previousValue, currentValue, currentIndex, arr), initialValue)
+- 作用：接收一个函数作为累加器，数组中的每个值（从左到右）开始计算，最终计算为一个值。
+- 参数：`initialValue` 传递给函数的初始值
+- 注意：如果==提供了参数 initialValue==，将会赋值给回调函数的 previousValue 参数，并且 reduce 将会从数组的第一个元素开始为每个元素调用一次回调函数。如果==未提供该参数==，reduce 函数将会把数组的第一个元素赋值为 previousValue 参数，并从数组第二个为元素开始为每个元素调用一次回调函数
+
+```js
 let arr = [2, 3, 4, 1, 5];
-let newArr = arr.reduce((total, val, index) => {
-  return total + val;
-}, 1);
-alert(newArr); //16
+let result = arr.reduce((preVal, curVal) => preVal + curVal, 10); // 25
+```
 
+```js
 /*
 reduceRight() 函数
 从数组的末尾向前将数组中的数组项进行计算
@@ -168,22 +206,6 @@ let newArr = myarr.reduceRight((preVal, val, index) => {
   return preval + "---->" + val + `${index}`;
 });
 alert(newArr); //1000---->李四1---->张三0
-```
-
-### 数组排序
-
-> array.sort(sortfunction)
-> sort 方法可以对数字或者字母进行排序
-> 对于字母，默认按照字母顺序进行排序
-> 不生成副本，对原数组进行修改
-
-```js
-// 当对数字进行排序时，需要传递一个函数作为参数
-let arr=[2,10,3,1]
-let arr1=arr.sort()
-console.log(arr,arr1,arr===arr1)        Array(4) [ 1, 10, 2, 3 ]Array(4) [ 1, 10, 2, 3 ]true
-arr.sort((a,b)=>a-b)[ 1, 2, 3, 10 ]
-
 ```
 
 ## String 字符串
