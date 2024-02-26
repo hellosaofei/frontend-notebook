@@ -1,3 +1,10 @@
+# 全局函数
+
+## setTimeout()
+
+- 语法：setTimeout(functionRef, delay, param1, param2,...)
+- 参数：回调函数，延迟 ms，传递给回调的参数
+
 # Array 数组
 
 ## 数组常规方法：增删改查
@@ -26,17 +33,19 @@ Array.of(e1,...,en)
 */
 let myArr = Array.of("张三", 11, "李四", [], { 名字: "王五" });
 console.log(myArr); // ['张三', 11, '李四', Array(0), {…}]
-/*
-Array.from(obj,mapFunction,thisValue)
-  obj:要转化为数组的对象，可以是数组，字符串等等
-  mapFunction:数组中每个元素要调用的函数
-  thisValue:指明mapFunction的this对象
-*/
+```
 
-let myArr = Array.from([1, 2, 3], (x) => x * 10);
-console.log(myArr); //[10,20,30]
-let myArr2 = Array.from(["   ss \n", "sjoa   "], (x) => x.replace(/\s+/, ""));
-console.log(myArr2); //['ss \n', 'sjoa']
+### Array.from()
+
+- 语法：Array.from(obj,mapFunction,thisValue)
+- 作用：通过拥有 length 属性的对象或可迭代的对象来返回一个数组
+- 参数：obj：要转化为数组的可迭代对象，mapFunction:数组中每个元素要调用的函数
+
+```js
+// 可迭代对象  >>  数组
+let myArr = Array.from([1, 2, 3], (x) => x * 10); //[10,20,30]
+// 拥有 length 属性的对象  >>>  数组
+let arr1 = Array.from({ length: 4 }); //[undefined,undefined,undefined,undefined]
 ```
 
 ## 排序与翻转
@@ -152,30 +161,24 @@ arr.some((val, index) => {
 });
 ```
 
-```js
-/*
-map()函数
-通过指定函数处理数组的每个元素，并返回处理后的数组。
-array.map(function(currentValue,index,arr), thisValue)
-*/
+#### 依次处理数组元素得到新数组 map()
 
+- 语法：arr.map(function(currentValue,index,arr),thisValue)
+- 作用：通过指定函数处理数组的每个元素，并返回处理后的数组
+- 原理：回调函数对每个数组元素都进行一次处理并添加到待返回的新数组中
+
+```js
 var arr = [4, 9, 16, 25];
 let newArr = arr.map(Math.sqrt); //[2,3,4,5]
+```
 
-//thisValue参数，当对象作为该回调时，修改this指向
-let obj = {
-  remainder: function (value) {
-    return value + 1;
-  },
-};
-let arr = [1, 2, 3, 4];
-let newArr = arr.map(obj.remainder, obj); //  [2,3,4,5]     > 测试了一下，此处传不传 thisValue 结果都一样
+#### 数组元素过滤函数 filter()
 
-/*filter()函数
- 	检测数值元素，并返回符合条件所有元素的数组。
-  array.filter(function(currentValue,index,arr), thisValue)
-*/
+- 语法：arr.filter(function(currentValue,index,arr),thisValue)
+- 作用：返回数组中符合条件的元素
+- 原理：每个元素调用一次 回调函数，对于以当前元素为参数的回调函数，如果返回 true，则将当前元素添加到待返回的新数组中
 
+```js
 var ages = [32, 33, 16, 40];
 function checkAdult(age) {
   return age >= 18;

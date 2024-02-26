@@ -1,48 +1,3 @@
-# 树算法
-
-## 深度优先遍历
-
-```js
-let nodeList = [];
-
-function deepTraversal(node, nodeList) {
-  if (node != null) {
-    nodeList.push(node);
-    let children = node.children;
-    for (let i = 0; i < children.length; i++) {
-      deepTraversal(children[i], nodelist);
-    }
-  }
-  return nodeList;
-}
-```
-
-## 广度优先遍历
-
-```js
-let widthTraversal2 = (node) => {
-  let nodes = [];
-  let stack = [];
-  if (node) {
-    stack.push(node);
-    while (stack.length) {
-      let item = stack.shift();
-      let children = item.children;
-      nodes.push(item);
-      // 队列，先进先出
-      // nodes = [] stack = [parent]
-      // nodes = [parent] stack = [child1,child2,child3]
-      // nodes = [parent, child1] stack = [child2,child3,child1-1,child1-2]
-      // nodes = [parent,child1,child2]
-      for (let i = 0; i < children.length; i++) {
-        stack.push(children[i]);
-      }
-    }
-  }
-  return nodes;
-};
-```
-
 # 将两个数组合并
 
 ```js
@@ -160,7 +115,109 @@ function throttle() {
 }
 ```
 
+# 手写代码
+
+## 实现一个 Promise.finally
+
+```js
+Promise.prototype.finally = function (callback) {
+  let P = this.constructor;
+  return this.then(
+    (value) => {
+      callback();
+      return value;
+    },
+    (error) => {
+      callback();
+      throw error;
+    }
+  );
+};
+```
+
+> 上面代码，为什么需要 Promise.resolve(callback()).then(() => value)，而不能直接执行 callback, return value？
+> 因为 callback 如果是个异步操作，返回 promise 呢.希望等 callback 执行完再接着执行
+
+## 实现一个 sleep 函数
+
+- Promise 实现
+
+```js
+
+```
+
+- async/await 实现
+
+```js
+
+```
+
+- Generator 实现
+
+```js
+
+```
+
+## 对象转数组
+
+- 原始对象：{1:222, 2:123, 5:888}
+- 目的数组：[222, 123, null, null, 888, null, null, null, null, null, null, null]
+
+```js
+let obj = { 1: 222, 2: 123, 5: 888 };
+const result = Array.from({ length: 12 }).map(
+  (_, index) => obj[index + 1] || null
+);
+// 或者直接  Array.from({ length: 12 },(_, index) => obj[index + 1] || null)
+console.log(result);
+```
+
 # 算法
+
+## 树算法
+
+### 深度优先遍历
+
+```js
+let nodeList = [];
+
+function deepTraversal(node, nodeList) {
+  if (node != null) {
+    nodeList.push(node);
+    let children = node.children;
+    for (let i = 0; i < children.length; i++) {
+      deepTraversal(children[i], nodelist);
+    }
+  }
+  return nodeList;
+}
+```
+
+### 广度优先遍历
+
+```js
+let widthTraversal2 = (node) => {
+  let nodes = [];
+  let stack = [];
+  if (node) {
+    stack.push(node);
+    while (stack.length) {
+      let item = stack.shift();
+      let children = item.children;
+      nodes.push(item);
+      // 队列，先进先出
+      // nodes = [] stack = [parent]
+      // nodes = [parent] stack = [child1,child2,child3]
+      // nodes = [parent, child1] stack = [child2,child3,child1-1,child1-2]
+      // nodes = [parent,child1,child2]
+      for (let i = 0; i < children.length; i++) {
+        stack.push(children[i]);
+      }
+    }
+  }
+  return nodes;
+};
+```
 
 ## 数组扁平化（一）
 
@@ -233,6 +290,31 @@ let a3 = [...a1, ...a2].sort().map((item) => {
   }
   return item;
 });
+```
+
+## 两个数组的交集
+
+- 思路：空间换时间，使用一个 hash 存储第一个数组中每个元素的出现次数，然后遍历数组 2
+
+```js
+function func(list1, list2) {
+  let map = new Map();
+  let result = [];
+  for (let item of list1) {
+    if (map[item]) {
+      map[item]++;
+    } else {
+      map[item] = 1;
+    }
+  }
+  for (let n of list2) {
+    if (map[n] > 0) {
+      result.push(n);
+      map[n]--;
+    }
+  }
+  return result;
+}
 ```
 
 # 其它问题
