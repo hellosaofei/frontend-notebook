@@ -13,6 +13,8 @@ const obj = { str };
 console.log(obj); //{str:'hello world'}
 ```
 
+# Generator
+
 # Promise 对象
 
 - promise 对象实质上是一个容器，代表一个异步操作，其具有三种状态：pending（进行中）、fulfilled（已成功）、rejected（已失败），异步操作的结果，决定当前状态，其他任何操作都不能改变该状态

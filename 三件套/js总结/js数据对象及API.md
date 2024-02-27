@@ -9,15 +9,53 @@
 
 ## 数组常规方法：增删改查
 
-| 数组方法  | 说明                                               | 使用举例                                      |
-| --------- | -------------------------------------------------- | --------------------------------------------- | ------------------------------ |
-| pop()     | 删除并返回数组最后一个元素                         | pop()==无参数==                               |
-| shift     | 删除并返回数组的第一个元素。                       | shift()==无参数==                             |
-| unshift() | 向数组的开头添加若干元素                           |                                               | unshift(element1,...,elementn) |
-| push()    | 向数组的末尾添加若干元素                           | push(element1,...,elementn)                   |
-| splice()  | 删除数组中的若干元素并添加若干元素                 | array.splice(index,howmany,item1,.....,itemX) |
-| find      | 返回通过测试（函数内判断）的数组的第一个元素的值   |
+| 数组方法 | 说明 | 使用举例 |
+| -------- | ---- | -------- |
+
+| splice() | 删除数组中的若干元素并添加若干元素 | array.splice(index,howmany,item1,.....,itemX) |
+| find | 返回通过测试（函数内判断）的数组的第一个元素的值 |
 | findIndex | 返回通过测试（函数内判断）的数组的第一个元素的索引 |
+
+### 数组末尾 删除 并返回 pop()
+
+- 语法：arr.pop()
+- 返回值：被删除的元素
+
+### 数组末尾 添加 push()
+
+- 语法：arr.push(item1,item2, ..., itemX)
+- 返回值：返回数组新长度
+
+### 数组头部 删除 shift()
+
+- 语法：arr.shift()
+- 返回值：被删除的元素
+
+### 数组头部 添加 unshift()
+
+- 语法：arr.unshift(item1,item2, ..., itemX)
+- 返回值：返回数组新长度
+
+## 数组切片 slice()
+
+- 语法：arr.slice(start, end)，不包含 end
+  > start:开始位置，负数表示从倒数位置开始提取
+  > end:结束位置，
+- 作用：返回原数组指定区间内的子数组，即数组切片
+
+> 注意：
+>
+> 1. start、end 参数都为可选参数
+> 2. 不改变原数组
+
+```js
+// 返回原数组的副本
+arr.slice();
+// 返回原数组  倒数第二个元素  到  最后一个元素
+arr.slice(-2);
+//  抽取原数组中的倒数第二个元素 到 最后一个元素(不包含最后一个元素)
+arr.slice(-2, -1);
+```
 
 ## 其他元素转换为数组
 
@@ -89,25 +127,28 @@ var arr4 = [1, 2, [3, 4, [5, 6, [7, 8, [9, 10]]]]];
 arr4.flat(Infinity); // [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 ```
 
-## 遍历专用
+## 数组连接 concat
 
-| 数组方法      | 说明                                               | 使用举例 |
-| ------------- | -------------------------------------------------- | -------- |
-| forEach       | 判断一个对象是否为数组                             |          |
-| every         | 删除并返回数组最后一个元素                         |          |
-| some()        | 检测数组元素中是否有元素符合指定条件。             |          |
-| map()         | 通过指定函数处理数组的每个元素，并返回处理后的数组 |          |
-| filter()      | 检测并返回符合条件所有元素的数组。                 |
-| reduce()      | 将数组元素计算为一个值（从左到右）                 |          |
-| reduceRight() | 将数组元素计算为一个值（从右到左）                 |
+- 语法：arr.concat(arr1,arr2,arr3,...)
+- 作用：连接多个 array 数组
+
+> 不改变原数组
+
+```js
+const array1 = ["a", "b", "c"];
+const array2 = ["d", "e", "f"];
+const array3 = array1.concat(array2);
+
+console.log(array3); // 输出：['a', 'b', 'c', 'd', 'e', 'f']
+```
+
+## 遍历专用
 
 #### 数组转字符串
 
 | 数组方法 | 说明                                                     | 使用举例       |
 | -------- | -------------------------------------------------------- | -------------- |
 | join()   | 将数组中所有元素放到一个字符串中，并通过指定的分隔符分隔 | join(sepector) |
-
-### 数组对象遍历
 
 ```js
 //方法一：直接遍历数组元素
@@ -119,7 +160,9 @@ for (let item in arr) {
 for (let i = 0; i < arr.length; i++) {
   console.log(arr[i]);
 }
+```
 
+```js
 /*
  forEach()方法
 用于调用数组的每个元素，并将元素传递给回调函数。
@@ -135,20 +178,23 @@ thisValue:对象作为该执行回调时使用，传递给函数，用作 "this"
 array.forEach((val, index) => {
   console.log(val);
 });
-/*
-every()方法
-判断数组元素是否都符合指定条件
-每个元素调用一次callbackFn回调函数，如果都符合（返回true），则every()函数返回true，只要有一个不符合，立即停止其余元素的回调执行并返回false
-array.every(function(currentValue,index,arr), thisValue)
-*/
+```
+
+### 是否所有元素都满足指定条件
+
+- 语法：arr.every(function(currentValue,index,arr),thisValue)
+- 作用：检测数组元素中是否所有元素都符合指定条件。
+- 原理：每个元素调用一次 回调函数，如果都符合（返回 true），则 every()函数返回 true，只要有一个不符合，立即停止其余元素的回调执行并返回 false
+
+```js
 var ages = [32, 33, 16, 40];
 function checkAdult(age) {
   return age >= 18;
 }
-ages.every(checkAdult); //FALSE
+ages.every(checkAdult);
 ```
 
-#### 是否有元素满足指定条件 some()
+### 是否有元素满足指定条件 some()
 
 - 语法：arr.some(function(currentValue,index,arr),thisValue)
 - 作用：检测数组元素中是否有元素符合指定条件。
@@ -161,7 +207,7 @@ arr.some((val, index) => {
 });
 ```
 
-#### 依次处理数组元素得到新数组 map()
+### 依次处理数组元素得到新数组 map()
 
 - 语法：arr.map(function(currentValue,index,arr),thisValue)
 - 作用：通过指定函数处理数组的每个元素，并返回处理后的数组
@@ -172,7 +218,7 @@ var arr = [4, 9, 16, 25];
 let newArr = arr.map(Math.sqrt); //[2,3,4,5]
 ```
 
-#### 数组元素过滤函数 filter()
+### 数组元素过滤函数 filter()
 
 - 语法：arr.filter(function(currentValue,index,arr),thisValue)
 - 作用：返回数组中符合条件的元素
@@ -186,7 +232,7 @@ function checkAdult(age) {
 let newArr = ages.filter(checkAdult); //[32,33,40]
 ```
 
-#### 依次处理数组元素累计为一个值 reduce()
+### 依次处理数组元素累计为一个值 reduce()
 
 - 语法：arr.reduce(function(previousValue, currentValue, currentIndex, arr), initialValue)
 - 作用：接收一个函数作为累加器，数组中的每个值（从左到右）开始计算，最终计算为一个值。
@@ -211,16 +257,15 @@ let newArr = myarr.reduceRight((preVal, val, index) => {
 alert(newArr); //1000---->李四1---->张三0
 ```
 
-## String 字符串
+# String 字符串
 
-### 对象方法
+## 对象方法
 
-#### substring()方法
+### substring()方法
 
 > 语法：string.substring(from, to)
 > 描述：提取字符串中介于两个指定下标之间的字符
-> 参数：from:必需参数，非负整数，
-> to:可选参数，非负整数
+> 参数：from:必需参数，非负整数，to:可选参数，非负整数
 > 注意：范围为左闭右开
 
 ```js
@@ -228,11 +273,41 @@ var str = "Hello world!";
 str.substring(3); //lo world!
 ```
 
-## Set 集合
+### replace
+
+- 语法：str.replace(pattern,replacement)
+- 参数：pattern：要匹配的子字符串或正则对象，replacement：替换文本或函数
+
+> replacement
+>
+> - 如果是字符串，它将替换由 pattern 匹配的子字符串。
+> - 如果是函数，将为每个匹配调用该函数，并将其返回值用作替换文本
+
+```js
+//replacement为函数时,语法如下
+function replacer(match, p1, p2, /* …, */ pN, offset, string, groups) {
+  return replacement;
+}
+```
+
+> 注意：
+>
+> 1. 字符串默认只被替换一次，要进行全局替换应使用**带有 g 标志的正则**或 **replaceAll()函数**
+> 2. 不改变原字符串
+
+```js
+var str = "Mr Blue has a blue house and a blue car";
+var n = str.replace(/blue/gi, "red");
+// Mr red has a red house and a red car
+```
+
+# async/await
+
+# Set 集合
 
 Set 本身是一个构造函数，用于生成 Set 数据结构，成员值是唯一的
 
-### 原型方法
+## 原型方法
 
 | 原型方法                      | 描述                                           | 其他 |
 | ----------------------------- | ---------------------------------------------- | ---- |
@@ -246,7 +321,7 @@ Set.prototype.values()：|返回键值的遍历器
 Set.prototype.entries()：|返回键值对的遍历器
 Set.prototype.forEach()：|使用回调函数遍历每个成员
 
-### 应用：实现交集、并集、差集
+## 应用：实现交集、并集、差集
 
 ```js
 let a = new Set([1, 2, 3]);
@@ -259,13 +334,13 @@ let intersect = new Set([...a].filter((x) => b.has(x)));
 let difference = new Set([...a].filter((x) => !b.has(x)));
 ```
 
-## Map 哈希
+# Map 哈希
 
 js 的对象本质上就是键值对的集合，但只能使用字符串作为键
 
 ES6 提供的 Map 数据结构，使得各种类型的值都可作为键
 
-### 原型方法
+## 原型方法
 
 | 原型方法                      | 描述 | 使用示例 |
 | ----------------------------- | ---- | -------- |
@@ -297,7 +372,7 @@ var res = new_a(1);
 console.log(res);
 ```
 
-## 立即执行函数
+# 立即执行函数
 
 immeidate invoked function expression IIFE
 只执行一次，执行完毕立即释放，而不是一直在 GO 中

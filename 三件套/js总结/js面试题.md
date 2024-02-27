@@ -117,6 +117,19 @@ function throttle() {
 
 # 手写代码
 
+## 判断输入是否为网址
+
+```js
+function isUrl(url) {
+  try {
+    new URL(url);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+```
+
 ## 实现一个 Promise.finally
 
 ```js
@@ -315,6 +328,78 @@ function func(list1, list2) {
   }
   return result;
 }
+```
+
+## 字符串大小写取反
+
+- split()+join 方法
+
+```js
+function processing(str) {
+  let arr = str.split("");
+  let newArr = arr.map((val) => {
+    //是大写字符，返回小写字符
+    //是小写字符，返回大写字符
+    return val === val.toUpperCase() ? val.toLowerCase() : val.toUpperCase();
+  });
+  return newArr.join("");
+}
+```
+
+- 正则替换
+
+```js
+let str = "AbCdEf";
+str.replace(
+  /[a-zA-Z]/g,
+  (item) => /[a-z].test(a)?a.toUpperCase():a.toLowerCase()/
+);
+```
+
+## 旋转数组
+
+> 输入: [1, 2, 3, 4, 5, 6, 7] k = 3
+> 输出: [5, 6, 7, 1, 2, 3, 4]
+
+> 输入: [-1, -100, 3, 99] 和 k = 2
+> 输出: [3, 99, -1, -100]
+
+- pop 和 slice 实现
+
+```js
+function rotate(arr, k) {
+  for (let i = 0; i < k; i++) {
+    nums.unshift(nums.pop());
+  }
+  return nums;
+}
+```
+
+- 索引实现
+
+```js
+function rotate(arr, k) {
+  const step = k % arr.length;
+  return arr.slice(-step).concat(arr.slice(0, arr.length - step));
+}
+```
+
+## 数组模拟
+
+- 模拟栈结构,后进先出
+  > pop()末尾删除，push()末尾添加
+
+```js
+
+```
+
+- 模拟队列结构，先进先出
+  > pop()末尾删除，unshift()头部添加
+  > 或
+  > push()末尾添加，shift()头部删除
+
+```js
+
 ```
 
 # 其它问题
