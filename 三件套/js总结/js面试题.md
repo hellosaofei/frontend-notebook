@@ -258,7 +258,7 @@ const flatten = (array) =>
   );
 ```
 
-## 数组扁平化
+## 数组扁平化（二）
 
 - 去除数组中的重复数据，得到一个升序且不重复的数组
 
@@ -551,6 +551,18 @@ obj.hasOwnProperty("toString"); // true
 Object.prototype.hasOwnProperty.call(obj, "toString"); // false
 ```
 
+- `Object.prototype.toString.call()`判断 js 对象的数据类型
+
+```js
+Object.prototype.toString.call("An"); // "[object String]"
+Object.prototype.toString.call(1); // "[object Number]"
+Object.prototype.toString.call(Symbol(1)); // "[object Symbol]"
+Object.prototype.toString.call(null); // "[object Null]"
+Object.prototype.toString.call(undefined); // "[object Undefined]"
+Object.prototype.toString.call(function () {}); // "[object Function]"
+Object.prototype.toString.call({}); // "[object Object]"
+```
+
 ### Function.prototype.apply()
 
 - 语法：func.apply(thisArg, argsArray)
@@ -687,3 +699,88 @@ slice([1, 2, 3], 0, 1);
 
 - 一样快
 - 所有的数组其实是对象，其“索引”看起来是数字，其实会被转换成字符串，作为属性名（对象的 key）来使用。所以无论是取第 1 个还是取第 10 万个元素，都是用 key 精确查找哈希表的过程，其消耗时间大致相同
+
+## 判断是否为数组的几种方法
+
+### Object.prototype.toString.call()
+
+**关于 Object.prototype.toString()**
+每一个继承 Object 的对象都有`toString`方法，该方法没有被重写时，会返回`object Type`(其中 type 为对象的 js 类型)，但是除了 Object 对象能够返回`[object Object]`外，很多内置对象（如数组 Array、日期 Date 等）都重写了 toString() 方法以返回特定的字符串格式。
+
+```js
+let a = {};
+let b = [1, 2];
+a.toString(); //"[object Object]"
+a.toString(); //"1,2"
+```
+
+- 使用 call 或者 apply 方法来改变 toString 方法的执行上下文
+- 该方法能够判断所有 js 数据类型
+
+```js
+let arr = [1, 2, 3];
+Object.prototype.toString.call(arr);
+//相当于arr调用了未被重写过的toString()方法，也就是arr.toString(),
+//此处的toString()!==Array.prototype.toString()        toString()===Object.prototype.toString()
+```
+
+### instanceof
+
+**关于原型链**
+
+- prototype:构造函数的一个属性
+- \__proto_\_:实例对象的一个属性
+- 每个 JavaScript 对象都有一个内部链接，指向它的原型对象。这个原型对象也是一个普通对象，也有自己的原型，层层递进，直到一个对象的原型为 null。这个 null 就是原型链的终点。
+
+- 每个构造函数都有一个 prototype 属性，这个属性是一个指针，指向一个对象，该对象的用途是包含可以由特定类型的所有实例共享的属性和方法。当创建了一个新的对象实例后，这个实例的**proto**属性（在非规范中，但大多数浏览器支持）会指向构造函数的 prototype 对象。
+
+- 当一个对象试图访问一个属性时，如果这个对象内部不存在这个属性，那么 JavaScript 会在这个对象的原型（也就是**proto**指向的对象）上寻找这个属性，然后是原型的原型，依此类推，直到找到这个属性或者到达原型链的终点 null
+
+```js
+function Test() {
+  this.a = 1;
+}
+let test = new Test();
+console.log(Test.prototype === test.__proto__); //true
+
+console.log(Object.prototype === Test.prototype.__proto__); //true
+
+console.log(Object.prototype.__proto__); //null
+
+Test.prototype.b = 2;
+Object.prototype.c = 3;
+
+console.log(test);
+
+/**
+ * 以对象为基准，以__proto__为连接的直到object.prototype的链条就称原型链
+ * test{
+ *  a:1,
+ *  __proto__: Test.prototype={
+ *    b:2,
+ *    __proto__:Object.prototype={
+ *      c:3
+ *    }
+ *  }
+ * }
+ *
+ *
+ *
+ *
+ */
+```
+
+<img src="../../pic/js学习/原型链示例.png">
+
+- instanceof 的内部机制是通过判断对象的原型链中是不是能找到类型的 prototype
+
+- instanceof 只能用来判断对象类型，原始类型不可以。`所有对象类型 instanceof Object` 都是 true。
+
+```js
+[] instanceof Array; // true
+[] instanceof Object; // true
+```
+
+### Array.isArray()
+
+- 只能判断对象是否为数组

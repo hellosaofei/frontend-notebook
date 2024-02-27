@@ -1,8 +1,60 @@
-# es6 扩展
+# 函数扩展
 
-## 对象扩展
+## 函数参数 的默认值
 
-### 属性简洁写法
+- es6 之前函数参数默认值的写法
+- 缺点：如果为参数 name 赋值为 false，该赋值不会起作用，为此，可改进代码写法：检查参数 name 是否为 undefined
+
+```js
+function say(name) {
+  name = name || "张三";
+  //改进写法
+  // if(typeof name==="undefined"){name="张三"}
+  console.log(`我的名字是${name}`);
+}
+```
+
+- es6 之后，可以直接将值写在函数参数的后面作为其默认值
+
+```js
+function say(name = "张三") {
+  console.log(`我的名字是${name}`);
+}
+```
+
+- 函数参数是默认声明的,不允许使用`let、const`再次声明
+
+```js
+function foo(x = 5) {
+  let x = 1; // error
+  const x = 2; // error
+}
+```
+
+- 与解构赋值结合使用
+
+```js
+function foo({ name, age = 10 }) {
+  console.log(name, age);
+}
+```
+
+> 上面代码中只有当函数 foo()的实参是一个对象时，变量 name/age 才能够通过解构赋值生成
+
+> 如果 foo()调用没有提供参数，变量 name/age 就不会生成,从而报错。因此可以给函数参数设置一个空对象作为默认值，来避免报错
+
+```js
+function foo({ name, age = 10 } = {}) {
+  console.log(name, age);
+}
+```
+
+> 上面代码中，如果调用 foo 函数时提供了一个对象作为参数，并且该对象有一个 age 属性，那么 age 变量将被赋值为该属性的值。
+> 如果调用 foo 函数时没有提供任何参数，或者提供的对象没有 age 属性，那么 age 变量将被赋值为 10
+
+# 对象扩展
+
+## 属性简洁写法
 
 - 在大括号内直接写入变量和函数作为对象的属性和方法
 
@@ -23,7 +75,7 @@ console.log(obj); //{str:'hello world'}
 
 - 有了 Promise 对象，异步操作就可以以同步操作的流程表达出来，避免了嵌套的回调函数
 
-## 基本用法
+# 基本用法
 
 - Promise 构造函数接受一个函数作为参数，该函数的两个参数分别为 resolve 和 reject,两者也是函数
 
@@ -97,7 +149,7 @@ p2.then((result) => console.log("执行了then", result)).catch((error) =>
 > 从头分析，1s 之后，由于调用 resolve 函数，p2 的状态变为 resolved,但是由于 p2 返回的是另一个 Promise，导致 p2 自己的状态无效了，p1 的状态决定 p2 的状态，p1 此时状态为 pending，p2 的回调函数就会等待 p1 的状态改变。
 > 3s 时，p1 变为 rejected，导致触发 catch 方法指定的回调函数
 
-## then 函数
+# then 函数
 
 实例化过的 promise 对象可调用 then 方法，为 Promise 实例添加状态改变时的回调函数
 
@@ -173,7 +225,7 @@ getJSON("./post/1.json")
 
 then 方法用于处理 Promise 成功状态回调函数，使用 catch 方法处理 Prmoise 失败状态的回调函数
 
-## catch 方法
+# catch 方法
 
 - 指定发生错误时(包括 Promise 对象的异步操作中的错误，then 回调方法中的错误)的回调
 
@@ -244,6 +296,29 @@ var p = new Point(1, 2);
 
 - class 类必须使用 new 调用，但普通构造函数不需要 new 就可以执行
 
+## 实例属性
+
+- es2022 规定，实例属性除了可以写在`coustructor()`的`this`上面，也可以定义在类内部的最顶层
+
+```js
+//原写法
+class IncreasingCounter {
+  constructor() {
+    this._count = 0;
+  }
+  increment() {
+    this._count++;
+  }
+}
+//新写法
+class IncreasingCounter {
+  _count = 0;
+  increment() {
+    this._count++;
+  }
+}
+```
+
 # Symbol
 
 - 引入背景：es5 的对象属性名都是字符串，容易造成属性名冲突。比如，使用别人提供的对象时想要为该对象添加新的方法，新方法名可能与原有方法名产生冲突。此时就需要一种机制来保证每个属性名都是独一无二的，这就是 es6 引入 Symbol 的原因
@@ -252,9 +327,9 @@ var p = new Point(1, 2);
 
 - js 原生数据类型：undefined、null、boolean、string、Number、BigInt、Object、Symbol
 
-## 实例属性
+# 实例属性
 
-## 作为属性名
+# 作为属性名
 
 ```js
 let mySymbol = Symbol();
@@ -276,7 +351,7 @@ Object.defineProperty(a, mySymbol, { value: "Hello!" });
 a[mySymbol]; // "Hello!"
 ```
 
-## 消除魔术字符串
+# 消除魔术字符串
 
 - 魔术字符串：在代码中多次出现，与代码形成强耦合的某个具体的字符串或数值
 - 风格良好的代码，应尽量消除魔术字符串，由含义清晰的变量代替
@@ -336,7 +411,7 @@ function makeIterator(arr) {
 }
 ```
 
-## 默认 Iterator 接口
+# 默认 Iterator 接口
 
 - es6 引入 Iterator 接口的目的，就是为所有数据结构提供一种统一的访问机制：`for...of`循环，某数据结构只要部署了 Iterator 接口，就称该数据结构是可遍历的(iterable)
 
@@ -399,7 +474,7 @@ for (let item of range(0, 3)) {
 
 - js 对象 Object 没有原生的的 Iterator 接口，因为对象的哪个属性先遍历哪个属性后遍历是不确定的，
 
-## js 遍历语法
+# js 遍历语法
 
 - for 循环
 - 缺点：不够简洁
@@ -448,7 +523,7 @@ for (let i of arr) {
 }
 ```
 
-## 默认调用
+# 默认调用
 
 - 对 Array 和 Set 的解构赋值，会默认调用 Symbol.iterator
 
@@ -460,7 +535,7 @@ for (let i of arr) {
 
 - yield
 
-## 遍历器对象的其他方法
+# 遍历器对象的其他方法
 
 - return() 方法
 - 调用时机：`for...of`循环提前退出时调用 return()方法
@@ -508,7 +583,7 @@ for (let line of readLinesSync(fileName)) {
 
 - 作用：在目标对象前架设一层拦截外界对该对象的访问，都必须先通过这层拦截，因而提供了一种机制对外界的访问进行过滤盒改写
 
-## Proxy 实例
+# Proxy 实例
 
 - 利用 proxy 构造函数生成 Proxy 实例
 - 语法：`new Proxy(targetObj,handlerObj)`
@@ -518,7 +593,7 @@ for (let line of readLinesSync(fileName)) {
 
 ```
 
-## Proxy 方法
+# Proxy 方法
 
 - get()用于拦截某个属性的读操作，可接受三个参数，依次为
 
@@ -538,9 +613,9 @@ for (let line of readLinesSync(fileName)) {
 - 将某些命令式 Object 操作（如`property in Obj/delete obj[name]`）变为函数行为`(Reflect.has(Obj,name))/Reflect.deleteProperty(Obj, property)`
 - 与 es6 的新增方法等更方便灵活地编程
 
-## 与 Proxy 对象
+# 与 Proxy 对象
 
-## Reflect 对象静态方法
+# Reflect 对象静态方法
 
 - Reflect 对象的方法与 Proxy 对象的方法一一对应，后者的方法都能在前者上找到对应的方法，这就让 Proxy 对选哪个更加方便的调用对应的 Reflect 方法完成默认行为
 
@@ -557,7 +632,7 @@ for (let line of readLinesSync(fileName)) {
 | preventExtensions(targetObj)                    | Object.preventExtensions(targetObj)                             | 将一个对象变为不可扩展 |
 | ownKeys (target)                                | Object.getOwnPropertyNames 与 Object.getOwnPropertySymbols 之和 | 返回对象的所有属性     |
 
-### get()方法
+## get()方法
 
 - 语法：get(target, name, receiver)
 - 作用：查找并返回 target 对象的 name 属性，如果没有就返回 undefined
@@ -575,7 +650,7 @@ Reflect.get(Obj, "age"); //张三
 console.log(Reflect.get(Obj, "say")); //我是张三，今年10岁
 ```
 
-### set()方法
+## set()方法
 
 - 语法：set(target, name, value,receiver)
 - 作用：设置 target 对象的 name 属性值为 value
@@ -593,7 +668,7 @@ Reflect.set(Obj, "age", 20);
 Obj.age; //20
 ```
 
-### has()方法
+## has()方法
 
 - 语法：has(target, name)
 - 作用：相当于`name in obj`中的`in`运算符，判断对象中是否有指定的属性
@@ -607,7 +682,7 @@ let Obj = {
 Reflect.has(Obj, "age"); //true
 ```
 
-### deleteProperty()方法
+## deleteProperty()方法
 
 - 语法：deleteProperty(target, name, receiver)
 - 作用：相当于`delete obj[name]`，用于删除对象的属性
@@ -622,7 +697,7 @@ delete Obj.age;
 Reflect.deleteProperty(Obj, "age");
 ```
 
-## 实例：观察者模式
+# 实例：观察者模式
 
 ```js
 //
@@ -681,7 +756,7 @@ let obj = myGenerator();
 */
 ```
 
-## for...of 循环
+# for...of 循环
 
 - 使用 for...of 循环自动遍历 Generator 函数运行时生成的 Iterator 对象，且此时不再需要调用 next 方法
 
@@ -695,7 +770,7 @@ function* objEntries(obj){
 }
 ```
 
-## 异步
+# 异步
 
 - js 语言的执行环境是单线程的，故异步编程对于 js 语言很重要
   es6 前的异步编程方法
@@ -713,14 +788,14 @@ function* objEntries(obj){
 
 - es6 的
 
-## 严格模式
+# 严格模式
 
 - 变量先声明再使用
 - 函数参数不能有同名属性，负责报错
 - 不能使用 with 语句
 - 不能赋值只读属性
 
-## export 命令
+# export 命令
 
 - es6 模块主要由两个命令构成`export`(灰顶模块的对外接口)和`import`(输入其他模块提供的功能)
 
@@ -795,14 +870,14 @@ if (x === 1) {
 }
 ```
 
-### es6 模块设计初衷
+## es6 模块设计初衷
 
 - 静态化：使编译时就能确定模块的依赖关系以及输入输出的变量
 - 代码组织问题：随着代码量不断增加，将所有代码写进一个文件中会难以组织和维护，将代码从一个大文件拆分为若干个相互依赖的小文件
 - 浏览器和服务器的通用模块解决方案：es6 之前，js 没有官方的模块系统，社区中存在 commonJS 和 AMD 两种模块规范，但两者都有各自的局限，分别是用于浏览器和服务器
 - 简洁性：es6 通过 export 和 import 两个关键字就能完成模块的输入输出操作，使模块的使用非常直观和方便
 
-## import 语句
+# import 语句
 
 - 使用 export 命令定义了模块的对外接口后，其他 js 文件就可以通过 import 命令加载改模块
 
@@ -824,7 +899,7 @@ a = {};
 
 - import 语句具有提升效果
 
-## export default 命令
+# export default 命令
 
 - 指定模块的默认输出
 - 一个模块只能有一个默认输出，因此`export default`命令一个模块中只能使用一次
@@ -858,7 +933,7 @@ export default a;
 export var a=1;
 ```
 
-## 模块整体加载
+# 模块整体加载
 
 - 使用星号（\*）指定一个对象将所有输出值都加载在该对象上
 

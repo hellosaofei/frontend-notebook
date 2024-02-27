@@ -757,7 +757,17 @@ res.json({ name: "张三" });
 res.status(500).json({ error: "message" });
 ```
 
-- 该
+#### res.cookie
+
+- 语法：res.cookie(name, value [, options])
+
+| options 选项 | 描述              |
+| ------------ | ----------------- |
+| maxAge       | cookie 的有效时间 |
+
+#### res.clearCookie
+
+- 语法：res.clearCookie(name [, options])
 
 ## 响应设置
 
@@ -787,4 +797,17 @@ app.get("/response", (req, res) => {
 
 - http 是一种无状态协议，无法区分多次请求是否来自同一个客户端，即无法区分用户
 
-- cookie：http 服务器发送到用户浏览器的
+- 保存在服务器端的一块数据，保存当前访问用户的相关信息
+
+# 会话控制 cookie
+
+- http 服务器发送到用户浏览器并保存在本地浏览器的一小块数据
+- cookie 按照域名进行划分，即每个域名下都有不同的用户 cookie
+- 浏览器向服务器发送请求时，自动将当前域名下可用 cookie 设置在请求头中传递给服务器
+  <img src="../pic/node学习/cookie下发时机.png">
+
+# 会话控制 token
+
+- 服务端生成并返回给 http 客户端的遗传加密字符串，token 中保存着用户信息
+
+- 实现会话控制，可识别用户身份

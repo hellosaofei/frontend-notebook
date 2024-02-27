@@ -77,3 +77,15 @@ $ git branch  # 列出所有分支
 - 使用 branch 创建新分支后，本地的 git 仓库也会分为 master 和若干子分支，使用 checkout 进行分支切换，对应文件夹里的内容也会发生改变
 - 实际开发中经常使用至少三个分支，由于要保证 master 分支始终为稳定的版本，除了 develop 和 master 分支外，其他分支的代码要先合并到 develop 分支中，当 develop 分支中的代码没有问题后再合并到 master
   <img src="../pic/git学习/git版本控制1.png">
+
+# git 日常使用
+
+```bash
+git status
+# 拉取远程仓库内容以进行同步
+git pull origin master
+# 上传文件
+git add .
+git commit -m '本次修改的描述'
+git push origin master
+```

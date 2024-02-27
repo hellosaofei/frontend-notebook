@@ -859,34 +859,6 @@ let newObject = copy(obj);
 </html>
 ```
 
-### 深拷贝
-
-```js
-//深拷贝：基于递归
-const student1 = {
-  name: "小明",
-  age: 10,
-  girlfriend: {
-    name: "小红",
-  },
-};
-function copy(obj) {
-  let newObj = {};
-  for (let i in obj) {
-    if (obj[i] instanceof Object) {
-      newObj[i] = copy(obj[i]);
-    } else {
-      newObj[i] = obj[i];
-    }
-  }
-  return newObj;
-}
-const student2 = copy(student1);
-student2.girlfriend.name = "小花";
-console.log(student1);
-console.log(student2);
-```
-
 ### JSON 对象深拷贝
 
 JSON，全称 JavaScript Object Notation，即 javascript 对象表示法
