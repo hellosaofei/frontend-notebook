@@ -514,24 +514,6 @@ const server = http.createServer((request, response) => {
 
 # express 框架
 
-## 下载使用
-
-```shell
-npm init
-npm i express
-```
-
-```js
-const express = require("express");
-//创建app对象，express()函数是express模块导出的顶层函数
-const app = express();
-
-//监听端口，开启服务
-app.listen(3000, () => {
-  console.log("服务开启，端口监听为3000....");
-});
-```
-
 ## 中间件
 
 - 中间件本质是一个回调函数，可以像路由回调一样访问请求对象（req）和响应对象（res）
@@ -539,14 +521,136 @@ app.listen(3000, () => {
 
 ### 全局中间件
 
+- 每一个请求到达服务端之后都会执行 **全局中间件函数**
+
 - 声明中间件函数
 
 ```js
 let middleWare = function (req, res, next) {
   //实现代码功能
   //....
-  //指向next函数
+  //执行next函数
+  next();
 };
+```
+
+> 上面代码中，如果希望执行中间件函数之后，仍然继续执行路由中的回调函数，必须调用 next
+
+- 应用中间件函数
+
+```js
+app.use(middleWare);
+//或者直接在use()函数内部定义中间件函数
+app.use(function (req, res, next) {
+  //...中间件函数内部逻辑
+});
+```
+
+- 定义多个中间件函数
+
+```js
+app.use(function (req, res, next) {
+  // 第一个中间件
+  next();
+});
+app.use(function (req, res, next) {
+  // 第二个中间件
+  next();
+});
+```
+
+### 路由中间件
+
+- 只对于某些路由进行功能封装
+
+- 使用格式
+
+```js
+app.get("/路径", "中间件函数", (req, res) => {});
+
+// ...使用多个中间件函数
+
+app.get("/路径", "中间件函数1", "中间件函数2", (req, res) => {});
+```
+
+### 静态资源中间件
+
+```
+|- dir
+  |- public
+    |- css
+      |- app.css
+    |- images
+      |- 1.png
+  |- index.js
+```
+
+- 设置静态资源中间件
+
+```js
+// index.js
+
+app.use(express.static(__dirname + "/public"));
+
+app.listen(3000);
+```
+
+> 上面代码中，public 目录下存放静态资源如 css/image/html 等文件
+
+- 访问网址即可得到 public 下的静态文件
+
+```
+http://127.0.0.1:3000/css/app.css
+
+http://127.0.0.1:3000/images/1.png
+```
+
+- index.html 比较特殊，当访问网址http://127.0.0.1:3000/时，会默认加载index.html
+
+```js
+app.get("/index.html", (req, res) => {});
+```
+
+### body-parser 中间件
+
+- 安装 body-parser
+
+```shell
+npm i body-parser
+```
+
+- 导入
+
+```js
+const bodyParser = require("body-parser");
+```
+
+- 获取中间件函数
+
+```js
+let urlParser = bodyParser.urlencoded({ extended: false });
+//处理 JSON 格式的请求体
+let jsonParser = bodyParser.json();
+```
+
+- 设置路由中间件，使用 req.body 后去请求体数据
+
+```js
+app.post("/login", urlParser, (request, response) => {
+  //获取请求体数据
+  //console.log(request.body);
+  //用户名
+  console.log(request.body.username);
+  //密码
+  console.log(request.body.userpass);
+  response.send("获取请求体数据");
+});
+```
+
+-得到的请求体数据为
+
+```
+[Object: null prototype] { username: 'admin', userpass: '123456' }
 ```
 
 ## app 对象
@@ -561,11 +665,9 @@ const express = require("express");
 const app = express();
 ```
 
-### app 对象属性
-
 ### app 对象方法
 
-#### app.all
+#### app.all()
 
 - 语法：app.all(path,callback,callback,....)
 
@@ -592,7 +694,7 @@ app.get("/", (req, res, next) => {
 });
 ```
 
-#### app.listen
+#### app.listen()
 
 - 语法：app.listen(port,host,backlog,callback)
 - port 省略或为 0 时，操作系统将分配一个任意未使用的端口号
@@ -606,7 +708,7 @@ app.listen(3000);
 
 - 返回对象类型：http.Server 对象
 
-#### app.use
+#### app.use()
 
 - 在指定路径上挂载中间件函数 -语法：app.use(path,callback,callback)
 
