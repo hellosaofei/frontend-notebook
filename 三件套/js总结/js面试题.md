@@ -784,3 +784,12 @@ console.log(test);
 ### Array.isArray()
 
 - 只能判断对象是否为数组
+
+# 如何解决跨域
+
+- 跨域：
+
+- 解决方案
+  > CORS，在服务器端设置几个响应头，如 `Access-Control-Allow-Origin: *`
+  > Reverse Proxy，在 nginx/traefik/haproxy 等反向代理服务器中设置为同一域名
+  > JSONP，详解见 JSONP 的原理是什么，如何实现

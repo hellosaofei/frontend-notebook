@@ -258,6 +258,133 @@ h3 {
 <body>
 ```
 
+# 小米商城悬浮导航
+
+## 最终效果
+
+<img src="./pic/效果图/小米商城悬浮导航.png">
+
+## 阿里云矢量图标
+
+- 本案例使用到了阿里云矢量图标 iconfont
+  <img src="./pic/材料/iconfont使用步骤.png">
+
+## 总结
+
+- css 文件
+
+```scss
+/* 默认样式更改 */
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+p {
+  margin: 0;
+}
+a {
+  text-decoration: none;
+  color: #000;
+}
+/* 父容器 */
+body {
+  height: 2000px;
+  background-color: #ddd;
+}
+/* 业务逻辑 */
+.container {
+  width: 85px;
+  height: 500px;
+
+  /* 定位 */
+  position: fixed;
+  right: 20px;
+  bottom: 100px;
+  ul {
+    li {
+      width: 85px;
+      height: 85px;
+      /* border: 1px solid red; */
+      background-color: #fff;
+      span {
+        width: 85px;
+        height: 50px;
+        /* background-color: green; */
+        display: block;
+        font-size: 28px;
+        color: #666;
+        text-align: center;
+        line-height: 50px;
+      }
+      p {
+        font-size: 14px;
+        text-align: center;
+      }
+    }
+    & li:last-child {
+      margin-top: 20px;
+    }
+    & li:hover > * {
+      color: hotpink;
+    }
+    /* 此处.QRCode并非所有li被hover之后都会触发 */
+    & li:hover .QRCode {
+      display: block;
+    }
+    .QRCode {
+      width: 100px;
+      height: 100px;
+      background-color: #fff;
+      position: absolute;
+      top: 0px;
+      left: -150px;
+      padding: 15px;
+      display: none;
+    }
+  }
+}
+```
+
+- html 文件
+
+```html
+<body>
+  <div class="container">
+    <ul>
+      <li>
+        <span class="iconfont icon-shouji"></span>
+        <p>手机APP</p>
+        <div class="QRCode">
+          <img src="./pic/材料/小米商城二维码.png" width="100" alt="" />
+        </div>
+      </li>
+
+      <li>
+        <span class="iconfont icon-wode"></span>
+        <p>个人中心</p>
+      </li>
+      <li>
+        <span class="iconfont icon-shouhou"></span>
+        <p>售后</p>
+      </li>
+      <li>
+        <span class="iconfont icon-kefu"></span>
+        <p>客服</p>
+      </li>
+      <li>
+        <span class="iconfont icon-gouwuchekong"></span>
+        <p>购物车</p>
+      </li>
+      <li>
+        <span class="iconfont icon-dingbu"></span>
+        <p>回顶部</p>
+      </li>
+    </ul>
+  </div>
+</body>
+```
+
 # 小米商城导航栏
 
 ## 最终效果
@@ -332,5 +459,274 @@ a {
     </ul>
   </div>
   <body></body>
+</body>
+```
+
+# 模板
+
+# float 栅格布局
+
+## 效果图
+
+<img src="./pic/效果图/float栅格布局.png">
+
+## 总结
+
+- css 文件
+
+```scss
+
+```
+
+- html 文件
+
+```html
+
+```
+
+# 搜狗
+
+## 效果图
+
+<img src="./pic/效果图/搜狗榜单.png">
+
+## 总结
+
+- css 文件
+
+```scss
+// 清除默认样式
+body,
+h3,
+h4,
+p {
+  margin: 0;
+}
+a {
+  text-decoration: none;
+  color: #000;
+}
+// 业务逻辑
+.container {
+  width: 350px;
+  /* height: 500px; */
+  /* border: 1px solid #9d9a9a; */
+  margin: 50px auto 0;
+  h3 {
+    /* border: 1px solid black; */
+    font-weight: normal;
+    height: 40px;
+    line-height: 40px;
+
+    span {
+      font-size: 0px;
+      & :first-child {
+        color: skyblue;
+        font-style: normal;
+        font-size: 28px;
+      }
+      & :nth-child(2) {
+        /* color: skyblue; */
+        font-style: normal;
+        font-size: 28px;
+      }
+    }
+    a {
+      font-size: 16px;
+      float: right;
+    }
+  }
+  .music-item {
+    height: 98px;
+    background-color: #f6f6f6;
+    margin-top: 20px;
+    .item-img {
+      width: 98px;
+      height: 98px;
+      background-color: purple;
+      float: left;
+    }
+    .item-text {
+      height: 98px;
+      width: 232px;
+      background-color: skyblue;
+      float: right;
+      background: url("./pic/材料/rightRow.png") no-repeat right center;
+      background-size: 20px;
+      h4 {
+        font-size: 14px;
+        padding: 8px 0;
+      }
+      p {
+        font-size: 14px;
+        color: #000;
+        line-height: 25px;
+      }
+    }
+  }
+}
+```
+
+- html 文件
+
+```html
+<body>
+  <div class="container">
+    <h3>
+      <span>
+        <i>搜狗</i>
+        <i>榜单</i>
+      </span>
+      <a href="">更多</a>
+    </h3>
+    <div class="music-item">
+      <div class="item-img">
+        <a href="" alt=""><img src="./pic/材料/3.png" width="98" alt="" /></a>
+      </div>
+      <div class="item-text">
+        <h4>飙升榜</h4>
+        <p>1.后羿(live)-李荣浩</p>
+        <p>2.Lemon-米津玄师</p>
+      </div>
+    </div>
+    <div class="music-item">
+      <div class="item-img">
+        <a href="" alt=""><img src="./pic/材料/2.png" width="98" alt="" /></a>
+      </div>
+      <div class="item-text">
+        <h4>网络流行top50</h4>
+        <p>1.后羿(live)-李荣浩</p>
+        <p>2.Lemon-米津玄师</p>
+      </div>
+    </div>
+    <div class="music-item">
+      <div class="item-img">
+        <a href="" alt=""><img src="./pic/材料/1.png" width="98" alt="" /></a>
+      </div>
+      <div class="item-text">
+        <h4>欧美音乐榜</h4>
+        <p>1.后羿(live)-李荣浩</p>
+        <p>2.Lemon-米津玄师</p>
+      </div>
+    </div>
+  </div>
+</body>
+```
+
+# float 栅格布局
+
+## 效果图
+
+<img src="./pic/效果图/float栅格布局.png">
+
+## 总结
+
+- css 文件
+
+```scss
+/* 改变默认样式 */
+body,
+ul {
+  margin: 0;
+  padding: 0;
+}
+ul {
+  list-style: none;
+}
+/* 清除浮动 */
+.clearfix::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+.container {
+  width: 1000px;
+  height: 1500px;
+  /* border: 1px solid red; */
+  margin: 30px auto 0px;
+  .column2 {
+    /* border: 2px solid black; */
+    .column2-1 {
+      width: 700px;
+      height: 300px;
+      background-color: red;
+      float: left;
+    }
+    .column2-2 {
+      width: 280px;
+      height: 300px;
+      background-color: yellow;
+      float: right;
+    }
+  }
+  .column3 {
+    /* border: 2px solid blue; */
+    margin-top: 20px;
+    & > * {
+      float: left;
+    }
+    .column3-1 {
+      width: 200px;
+      height: 300px;
+      background-color: skyblue;
+    }
+    .column3-2 {
+      width: 400px;
+      height: 300px;
+      background-color: coral;
+      margin: 0px 20px;
+    }
+    .column3-3 {
+      width: 360px;
+      height: 300px;
+      background-color: purple;
+    }
+  }
+  .column-n {
+    /* border: 2px solid red; */
+    margin-top: 20px;
+    ul {
+      /* border: 1px solid red; */
+      li {
+        background-color: rgb(30, 139, 121);
+        width: 190px;
+        height: 200px;
+        float: left;
+        margin: 5px;
+      }
+    }
+  }
+}
+```
+
+- html 文件
+
+```html
+<body>
+  <div class="container">
+    <div class="column2 clearfix">
+      <div class="column2-1"></div>
+      <div class="column2-2"></div>
+    </div>
+    <div class="column3 clearfix">
+      <div class="column3-1"></div>
+      <div class="column3-2"></div>
+      <div class="column3-3"></div>
+    </div>
+    <div class="column-n">
+      <ul class="clearfix">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+      </ul>
+    </div>
+  </div>
 </body>
 ```

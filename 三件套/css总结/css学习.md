@@ -166,9 +166,10 @@ parent > ... {
 </body>
 ```
 
-### 兄弟选择器
+## 兄弟选择器
 
 - 兄弟选择器只会向后找
+- `+` 选择器匹配紧邻的兄弟元素
 
 ```html
 <head>
@@ -184,7 +185,11 @@ parent > ... {
   <h1>李四</h1>
   <p>王五</p>
 </body>
+```
 
+- `~` 选择器匹配随后的所有兄弟元素
+
+```html
 <head>
   <style>
     li ~ li {
@@ -481,7 +486,34 @@ input:focus {
 </body>
 ```
 
-## 选择器优先级
+## 选择器总述
+
+```css
+/* ID选择器 */
+#test {
+}
+/* 类选择器 */
+.parent {
+}
+/* 伪类选择器 */
+/* 动态伪类  a:link{} a:visited{} a:hover{} a:active{} a:focus{} */
+/* 结构伪类  a:first-child{} a:last-child{} a:nth-child{} a:first-of-type{} a:nth-of-type{}*/
+
+/* 否定伪类 a:not(选择器){} */
+/* UI伪类 input:checked{} input:enable{} input:disabled{} */
+/* 目标伪类 input:target{} */
+/* 元素选择器 */
+div {
+}
+
+/*伪元素选择器*/
+/* div::first-letter{} div */
+/* 通配选择器 */
+* {
+}
+```
+
+## 选择器优先级(css 权重)
 
 简单描述：
 
@@ -490,8 +522,8 @@ input:focus {
 
 1. 计算方式：每个选择器，都可计算出一组权重，格式为： (a,b,c)
    a : ID 选择器的个数。
-   b : 类、伪类、属性 选择器的个数。
-   c : 元素、伪元素 选择器的个数。
+   b : 类、伪类、属性选择器的个数。
+   c : 元素、伪元素选择器的个数。
 
 | 选择器                   | 权重    |
 | ------------------------ | ------- |
@@ -508,8 +540,8 @@ input:focus {
 - (1,1,3) > (1,1,2)
 
 3. 特殊规则：
-1. 行内样式权重大于所有选择器。
-1. !important 的权重，大于行内样式，大于所有选择器，权重最高
+   > - 行内样式权重大于所有选择器。
+   > - !important 的权重，大于行内样式，大于所有选择器，权重最高
 
 # css 三大特性
 
@@ -1338,11 +1370,6 @@ input {
 
 ## box-sizing
 
-| 可选值      | 描述                                                                          | 其他 |
-| ----------- | ----------------------------------------------------------------------------- | ---- |
-| content-box | margin 等属性包含在在 width 和 height 里面                                    |
-| border-box  | margin 等属性在 width 和 height 外面 (设置的 width,height 就是元素的最终宽高) |
-
 ## resize
 
 | 可选值     | 描述                            | 其他 |
@@ -1721,6 +1748,48 @@ div {
   margin: auto;
 }
 ```
+
+## flex 伸缩性
+
+### flex-basis 主轴基准长度
+
+- 会使元素的宽度或高度失效
+  > 主轴横向：宽度 width 失效
+  > 主轴纵向：高度 height 失效
+
+```html
+<style>
+  .container {
+    width: 1000px;
+    height: 500px;
+    background-color: #f1f1f1;
+    display: flex;
+  }
+  .item1 {
+    width: 200px;
+    height: 200px;
+  }
+  .item2 {
+    flex-basis: 300px;
+  }
+</style>
+<body>
+  <div class="container">
+    <div class="item1"></div>
+    <div class="item1 item2"></div>
+    <div class="item1"></div>
+  </div>
+</body>
+```
+
+- 效果
+
+<img src="../../pic/css学习/flex-basis效果.png">
+
+### flex-grow 伸缩项目放大比例
+
+- 若所有伸缩项目的 flex-grow 值都为 1，则：它们将等分剩余空间（如果有空间的话）。
+- 若三个伸缩项目的 flex-grow 值分别为：1、2、3，则：分别瓜分到：1/6 、1/2、3/6 的空间。
 
 # 响应式布局
 

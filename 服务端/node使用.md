@@ -653,7 +653,73 @@ app.post("/login", urlParser, (request, response) => {
 [Object: null prototype] { username: 'admin', userpass: '123456' }
 ```
 
-## app 对象
+### 路由拆分
+
+- 目的：对路由进行模块化管理
+
+- 创建独立的 js 文件存储 router
+
+```
+目录结构
+|- Root
+  |- routes
+    |- homeRouter
+    |- adminRouter.js
+  |- index.js
+```
+
+- 前台路由
+
+```js
+// homeRouter.js
+const express = require("express");
+
+const router = express.Router();
+
+router.get("/", (req, res) => {
+  res.send("首页");
+});
+router.get("/cart", (req, res) => {
+  res.send("购物车");
+});
+
+module.exports = router;
+```
+
+- 后台路由
+
+```js
+// adminRouter.js
+const express = require("express");
+
+const router = express.Router();
+
+router.get("/admin", (req, res) => {
+  res.send("后台首页");
+});
+router.get("/setting", (req, res) => {
+  res.send("后台管理");
+});
+
+module.exports = router;
+```
+
+- 主文件
+
+```js
+// index.js
+const express = require("express");
+const app = express();
+//5.引入子路由文件
+const homeRouter = require("./routes/homeRouter");
+const adminRouter = require("./routes/adminRouter");
+//6.设置和使用中间件
+app.use(homeRouter);
+app.use(adminRouter);
+app.listen(3000);
+```
+
+# app 对象
 
 - app 对象表示 express 应用，通过调用 express 模块导出的顶层 express()函数创建
 
@@ -805,6 +871,24 @@ req.acceptsCharsets / req.acceptsEncodings / req.acceptsLanguages：返回指定
 req.get()：获取指定的 HTTP 请求头
 req.is()：判断请求头 Content-Type 的 MIME 类型
 
+#### req.cookies
+
+- 获得请求对象中包含的 cookie，需要使用 cookie-parser 中间件
+
+```js
+// ...
+
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
+
+app.get("/", (req, res) => {
+  console.log(req.cookies);
+  res.send("获得cookie");
+});
+
+//...
+```
+
 ### req 对象方法
 
 #### req.get()
@@ -895,20 +979,54 @@ app.get("/response", (req, res) => {
 });
 ```
 
-# 会话控制 session
+## 会话控制 session
 
 - http 是一种无状态协议，无法区分多次请求是否来自同一个客户端，即无法区分用户
 
 - 保存在服务器端的一块数据，保存当前访问用户的相关信息
 
-# 会话控制 cookie
+## 会话控制 cookie
 
 - http 服务器发送到用户浏览器并保存在本地浏览器的一小块数据
 - cookie 按照域名进行划分，即每个域名下都有不同的用户 cookie
 - 浏览器向服务器发送请求时，自动将当前域名下可用 cookie 设置在请求头中传递给服务器
   <img src="../pic/node学习/cookie下发时机.png">
 
-# 会话控制 token
+- 服务端设置 cookie,指定时间后销毁
+
+```js
+app.get("/home", (req, res) => {
+  // 设置cookie
+  res.cookie("name", "zhangsan", { maxAge: 1000 * 60 });
+  //删除cookie
+  res.clearCookie("name");
+  res.send("home");
+});
+```
+
+- express 框架获取 cookie
+
+```shell
+# 安装中间件
+npm i cookie-parser
+```
+
+- 使用中间件并获取请求对象中的 cookie
+
+```js
+//...
+
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
+
+app.get("/", (req, res) => {
+  console.log(req.cookies);
+  res.send("获得cookie");
+});
+//...
+```
+
+## 会话控制 token
 
 - 服务端生成并返回给 http 客户端的遗传加密字符串，token 中保存着用户信息
 
