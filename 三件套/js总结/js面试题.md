@@ -691,6 +691,93 @@ var slice = Function.prototype.call.bind(Array.prototype.slice);
 slice([1, 2, 3], 0, 1);
 ```
 
+## this 指向问题
+
+- 普通函数中的 this 指向 window
+
+```js
+function test() {
+  this.a = 1;
+  console.log(this);
+}
+test(); //此处相当于window.test(),也就是由window对象进行调用，故该函数中的this指向window
+```
+
+- 普通对象的函数属性中的 this 指向该对象本身
+
+```js
+var obj={
+  a:2;
+  test:function(){
+    console.log(this)
+  }
+}
+obj.test()    //obj
+```
+
+- 构造函数中的 this 指向 new 出来的实例
+
+```js
+function Test(name) {
+  this.name = name;
+}
+var test = new Test("张三");
+console.log(test.name, this); //张三,Test{name:'张三'}
+```
+
+```js
+//下面的构造函数利用Object.definproperty实现了一个自存档对象
+function Archiver() {
+  let temperature = null;
+  const archive = [];
+
+  Object.defineProperty(this, "temperature", {
+    get() {
+      console.log("get!");
+      return temperature;
+    },
+    set(value) {
+      temperature = value;
+      archive.push({ val: temperature });
+    },
+  });
+
+  this.getArchive = () => archive;
+}
+
+const arc = new Archiver();
+arc.temperature; // 'get!'
+arc.temperature = 11;
+arc.temperature = 13;
+arc.getArchive(); // [{ val: 11 }, { val: 13 }]
+```
+
+- 原型上的方法，内部 this 指向仍然是构造函数实例化出来的对象
+
+```js
+Test.prototype.say = function () {
+  console.log(this.name); //张三
+  console.log(this); //Test{name:'张三'}
+};
+```
+
+- DOM 元素上绑定的处理函数，内部的 this 指向为 DOM 元素本身
+
+```js
+//<button id="mybtn">点我</button>
+var Btn = document.getElementById("mybtn");
+Btn.onclick = function () {
+  console.log(this); //<button id="mybtn">点我</button>
+};
+```
+
+```js
+//定时器中的setTimeout中的this指向window
+setTimeout(function () {
+  console.log(this);
+}, 2000); //window{...}
+```
+
 # 性能
 
 ## 数组相关

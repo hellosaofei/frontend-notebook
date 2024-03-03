@@ -322,48 +322,6 @@ function test3(){
 }   //函数声明前面添加运算符，将其转为表达式即刻执行
 ```
 
-## this 指向问题
-
-```js
-//普通函数中的this指向window，
-function test(){
-  this.a=1;
-  console.lg(this)
-}
-test()    //此处相当于window.test(),也就是由window对象进行调用，故该函数中的this指向window
-
-//普通对象的函数属性中的this指向该对象本身，
-var obj={
-  a:2;
-  test:function(){
-    console.log(this)
-  }
-}
-obj.test()    //obj
-
-//构造函数中的this指向new出来的实例
-function Test(name){
-  this.name=name
-}
-var test=new Test('张三')
-console.log(test.name,this)      //张三,Test{name:'张三'}
-
-//原型上的方法，内部this指向仍然是构造函数实例化出来的对象
-Test.prototype.say=function(){
-  console.log(this.name)      //张三
-  console.log(this)       //Test{name:'张三'}
-}
-
-//DOM元素上绑定的处理函数，内部的this指向为DOM元素本身
-//<button id="mybtn">点我</button>
-var Btn=document.getElementById('mybtn')
-Btn.onclick=function(){
-  console.log(this)         //<button id="mybtn">点我</button>
-}
-//定时器中的setTimeout中的this指向window
-setTimeout(function(){console.log(this)},2000)      //window{...}
-```
-
 ## typeof 函数及其再封装
 
 ### typeof 函数存在问题

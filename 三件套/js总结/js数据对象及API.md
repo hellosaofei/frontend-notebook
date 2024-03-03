@@ -576,6 +576,44 @@ var commTools=(function(){
   > obj：要定义属性的对象
   > prop:要定义或修改的属性键
   > descriptor：要定义或更改的属性描述符，每次只能设置一种
+  >
+  > - 属性描述符>数据描述符
+  >   value:属性的值，默认 undefined
+  >   writable:属性的值是否可写，默认 false
+  > - 属性描述符 > 访问器描述符
+  >   get:用作属性的 getter 函数，访问属性时调用该函数
+  >   set:用作属性的 setter 函数，属性被赋值时调用该函数
+- 作用：在一个对象上定义一个新属性或修改其现有属性
+- 返回：被修改后的对象
+
+```js
+const object1 = {};
+
+Object.defineProperty(object1, "property1", {
+  value: 42,
+  writable: false,
+});
+
+object1.property1 = 77;
+// Throws an error in strict mode
+
+console.log(object1.property1); //22
+```
+
+```js
+let bValue = 38;
+Object.defineProperty(o, "b", {
+  get() {
+    return bValue;
+  },
+  set(newValue) {
+    bValue = newValue;
+  },
+  enumerable: true,
+  configurable: true,
+});
+o.b; // 38
+```
 
 #### 属性描述符
 
