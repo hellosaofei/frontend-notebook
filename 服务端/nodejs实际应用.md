@@ -33,4 +33,63 @@ nodemon test.js
 
 - 浏览器访问'http://127.0.0.1:3000/home'
 
-##
+# 连接 mysql 数据库
+
+- server.js
+
+```js
+// express框架
+// cors
+// mysql
+const express = require("express");
+const cors = require("cors");
+const mysql = require("mysql");
+
+const app = express();
+
+app.use(cors());
+
+const db = mysql.createPool({
+  host: "8.142.149.99",
+  port: "3306",
+  user: "root",
+  password: "algdmyys.*?",
+  database: "test",
+});
+app.get("/getReply", (req, res) => {
+  db.query("select * from reply", (err, result) => {
+    if (err) {
+      send_back = {
+        warn: "error",
+        message: "查询reply错误",
+      };
+      res.json(send_back);
+    } else {
+      res.json(result);
+    }
+  });
+});
+app.post("/getUser", (req, res) => {
+  db.query("select * from user", (err, result) => {
+    if (err) {
+      send_back = {
+        warn: "error",
+        message: "查询user错误",
+      };
+      res.json(send_back);
+    } else {
+      res.json(result);
+    }
+  });
+});
+
+app.listen(8888, () => {
+  console.log("服务已经启动");
+});
+```
+
+- client.js
+
+```html
+
+```

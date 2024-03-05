@@ -413,6 +413,23 @@ var commTools=(function(){
     b:b
   }
 })
+```
 
+# js 请求后端数据的若干种方式
 
+## ajax
+
+- 不重新加载页面的情况下与服务器交换数据并更新网页数据
+
+- 创建 XMLHttpRequest 对象
+
+```js
+const xmlhttp = new XMLHttpRequest();
+```
+
+- 向服务器发送请求
+
+```js
+xmlhttp.open("GET", "ajax_info.txt", true);
+xmlhttp.send();
 ```

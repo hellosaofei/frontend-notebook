@@ -581,21 +581,24 @@ for (let line of readLinesSync(fileName)) {
 
 - 用于修改某些操作的默认行为
 
-- proxy对象创建一个对象代理，从而实现基本操作的拦截和自定义（如属性查找、赋值、枚举、函数调用等）
+- proxy 对象创建一个对象代理，从而实现基本操作的拦截和自定义（如属性查找、赋值、枚举、函数调用等）
+
 ```js
 // 语法
-const p = new Proxy(targetObj, handler)
+const p = new Proxy(targetObj, handler);
 ```
+
 > 参数
+>
 > - targetObj:要使用 Proxy 包装的目标对象
 > - handler:函数（通常情况下），定义了在执行各种操作时代理 p 的行为
 
 - 作用：在目标对象前架设一层拦截外界对该对象的访问，都必须先通过这层拦截，因而提供了一种机制对外界的访问进行过滤盒改写
 
-
-## handler函数方法
+## handler 函数方法
 
 ## get
+
 - 作用：拦截对象的读取属性操作
 
 ```js
@@ -603,16 +606,17 @@ var p = new Proxy(
   {},
   {
     get: function (target, prop, receiver) {
-      console.log("called: " + prop);     //读取属性之前，打印待读取的属性名
+      console.log("called: " + prop); //读取属性之前，打印待读取的属性名
       return 10;
     },
-  },
+  }
 );
 
 console.log(p.a); // "called: a"; ouptut 10
 ```
 
 ## set
+
 - 作用：用于拦截设置属性值的操作
 
 ```js
@@ -624,7 +628,7 @@ var p = new Proxy(
       console.log("property set: " + prop + " = " + value);
       return true;
     },
-  },
+  }
 );
 
 console.log("a" in p); // false
@@ -635,13 +639,13 @@ console.log(p.a); // 10
 ```
 
 ## has
+
 - 针对 in 操作符的代理方法
 
 - 可拦截的操作
- > - 属性查询：foo in proxy
- > - 继承属性查询：foo in Object.create(proxy)
- > - with 检查: with(proxy) { (foo); }
-
+  > - 属性查询：foo in proxy
+  > - 继承属性查询：foo in Object.create(proxy)
+  > - with 检查: with(proxy) { (foo); }
 
 ```js
 var p = new Proxy(
@@ -651,12 +655,14 @@ var p = new Proxy(
       console.log("called: " + prop);
       return true;
     },
-  },
+  }
 );
 
 console.log("a" in p); // "called: a"; outputs true
 ```
+
 ## defineProperty
+
 - 作用：拦截对目标对象的 Object.defineProperty() 操作
 
 ```js
@@ -667,7 +673,7 @@ var p = new Proxy(
       console.log("called: " + prop);
       return true;
     },
-  },
+  }
 );
 
 var desc = { configurable: true, enumerable: true, value: 10 };
@@ -675,7 +681,8 @@ Object.defineProperty(p, "a", desc); // "called: a"
 ```
 
 ## deleteProperty
-- 作用：拦截delete操作
+
+- 作用：拦截 delete 操作
 
 ```js
 var p = new Proxy(
@@ -685,138 +692,158 @@ var p = new Proxy(
       console.log("called: " + prop);
       return true;
     },
-  },
+  }
 );
 
 delete p.a; // "called: a"
 ```
-
 
 # Reflect 对象
 
 - 将 Object 对象的一些属于语言内部的方法放在 Reflect 对象上，从 Reflect 对象上拿到语言内部的方法
 - 修改某些 Object 方法的返回结果是变得合理
 - 将某些命令式 Object 操作（如`property in Obj/delete obj[name]`）变为函数行为`(Reflect.has(Obj,name))/Reflect.deleteProperty(Obj, property)`
-> es5写法
-```js
-let obj={
-  'name':'张三',
-  'age':10
-}
-//访问与删除对象元素
-const res="name" in obj
-delete obj.age
-//实例化一个构造函数对象
-function Fn(){}
-const fn=new Fn();
-```
-> es6写法
-```js
-const res=Reflect.has(obj,"name")
-const delete_sign=Reflect.deleteProerty(obj,'age')
+  > es5 写法
 
-const fn2=Reflect.constructr(Fn,[])
+```js
+let obj = {
+  name: "张三",
+  age: 10,
+};
+//访问与删除对象元素
+const res = "name" in obj;
+delete obj.age;
+//实例化一个构造函数对象
+function Fn() {}
+const fn = new Fn();
+```
+
+> es6 写法
+
+```js
+const res = Reflect.has(obj, "name");
+const delete_sign = Reflect.deleteProerty(obj, "age");
+
+const fn2 = Reflect.constructr(Fn, []);
 ```
 
 - 与 es6 的新增方法等更方便灵活地编程
-
 
 ## Reflect 对象静态方法
 
 - Reflect 对象的方法与 Proxy 对象的方法一一对应，后者的方法都能在前者上找到对应的方法，这就让 Proxy 对选哪个更加方便的调用对应的 Reflect 方法完成默认行为
 
-### apply方法
+### apply 方法
+
 - 语法：Reflect.apply(target, thisArg, args)
- >参数
- > - target:目标函数
- > - thisArg:目标函数绑定的this对象
- > - args:target函数调用时传递的参数，类数组对象
 
-- es5写法：先指定方法，再调用apply
+  > 参数
+  >
+  > - target:目标函数
+  > - thisArg:目标函数绑定的 this 对象
+  > - args:target 函数调用时传递的参数，类数组对象
+
+- es5 写法：先指定方法，再调用 apply
+
 ```js
-Math.floor.apply(null,[1.72])
+Math.floor.apply(null, [1.72]);
 ```
 
-- es6写法:先传递apply，再指定方法
+- es6 写法:先传递 apply，再指定方法
+
 ```js
-Reflect.apply(Math.floor,null,[1.72])
+Reflect.apply(Math.floor, null, [1.72]);
 ```
->静态扫描时，Math.floor没有被执行，运行时再动态将Math.floor作为参数传递
+
+> 静态扫描时，Math.floor 没有被执行，运行时再动态将 Math.floor 作为参数传递
 
 - 实际应用
 
 ```js
 //es5写法
-let price=101.5
-if(price>100){price=Math.floor.apply(null,[price])}
-else{price=Math.ceil.apply(null,[price])}
+let price = 101.5;
+if (price > 100) {
+  price = Math.floor.apply(null, [price]);
+} else {
+  price = Math.ceil.apply(null, [price]);
+}
 //es6写法
-Reflect.apply(price>100?Math.floor:Math.ceil,null,[price])
+Reflect.apply(price > 100 ? Math.floor : Math.ceil, null, [price]);
 ```
-## construct方法
+
+### construct 方法
+
 - 创建类实例
 
-- es5写法
+- es5 写法
+
 ```js
-let date=new Date();
+let date = new Date();
 ```
 
-- es6写法
+- es6 写法
+
 ```js
-let date=Reflect.construct(Date,[])
+let date = Reflect.construct(Date, []);
 ```
 
-### defineProperty方法
+### defineProperty 方法
 
-- es5写法
+- es5 写法
+
 ```js
-const student={}
-const res=Object.defineProperty(student,'name',{value:'张三'})
-console.log(res)   //{name:'张三'}
+const student = {};
+const res = Object.defineProperty(student, "name", { value: "张三" });
+console.log(res); //{name:'张三'}
 ```
 
-- es6写法
+- es6 写法
+
 ```js
-const res=Reflect.defineProperty(student,'name',{value:'张三'})
-console.log(res)   //true
+const res = Reflect.defineProperty(student, "name", { value: "张三" });
+console.log(res); //true
 ```
+
 - 两个方法=在效果上一样，但一个返回对象本身，一个返回布尔值
 
 ### deleteProperty()方法
 
 - 语法：deleteProperty(target, name, receiver)
+
   > 作用：相当于`delete obj[name]`，用于删除对象的属性
   > 返回值：Boolean 值。删除成功或被删除的属性不存在则返回 true，删除失败返回 false
 
+- es5 写法
 
-
-- es5写法
 ```js
 let Obj = {
   age: 10,
 };
 delete Obj.age;
 ```
-- es6写法
+
+- es6 写法
 
 ```js
 Reflect.deleteProperty(Obj, "age");
 ```
-### getPrototypeOf方法
+
+### getPrototypeOf 方法
+
 - 返回指定对象的原型
 
+- es5 写法
 
-- es5写法
 ```js
-const date=new Date();
-const res=Object.getPrototypeOf(date)
+const date = new Date();
+const res = Object.getPrototypeOf(date);
 ```
 
-- es6写法
-```js
-const res=Object.getPrototypeOf(date)
-```
+- es6 写法
 
+```js
+const res = Object.getPrototypeOf(date);
+```
 
 ### get()方法
 
@@ -858,86 +885,93 @@ Obj.age; //20
 
 - 语法：has(target, name)
 - 作用：相当于`name in obj`中的`in`运算符，判断对象中是否有指定的属性
-- es5写法
+- es5 写法
+
 ```js
 let Obj = {
   age: 10,
 };
 "age" in Obj; //true
 ```
-- es6写法
+
+- es6 写法
+
 ```js
 Reflect.has(Obj, "age"); //true
 ```
 
 ### ownKeys()方法
+
 - 返回一个由目标对象的属性键组成的数组，
+
 ```js
 var myObject = {
   foo: 1,
   bar: 2,
-  [Symbol.for('baz')]: 3,
-  [Symbol.for('bing')]: 4,
+  [Symbol.for("baz")]: 3,
+  [Symbol.for("bing")]: 4,
 };
 ```
-- es5写法
+
+- es5 写法
+
 ```js
-Object.getOwnPropertyNames(myObject)
+Object.getOwnPropertyNames(myObject);
 // ['foo', 'bar']
 
-Object.getOwnPropertySymbols(myObject)
+Object.getOwnPropertySymbols(myObject);
 //[Symbol(baz), Symbol(bing)]
 ```
-- es6写法
-```js
-Reflect.ownKeys(myObject)
-// ['foo', 'bar', Symbol(baz), Symbol(bing)]
 
+- es6 写法
+
+```js
+Reflect.ownKeys(myObject);
+// ['foo', 'bar', Symbol(baz), Symbol(bing)]
 ```
 
-> 等同于Object.getOwnPropertyNames(obj).concat(Object.getOwnPropertySymbols(obj))
+> 等同于 Object.getOwnPropertyNames(obj).concat(Object.getOwnPropertySymbols(obj))
 
 ## 实例：观察者模式
 
 - 观察者模式：函数自动观察数据对象，一旦对象发生变化，函数自动执行
 
-
 ```js
 //定义一个集合，存储所有观察者函数
-const queueObservers=new Set();
+const queueObservers = new Set();
 //该函数向集合中添加观察者函数
-function observer(Fn){
-  queueObservers.add(Fn)
+function observer(Fn) {
+  queueObservers.add(Fn);
 }
 // 返回一个原始对象的 Proxy 代理，拦截赋值操作，触发充当观察者的各个函数。
-function observable(obj){
-  return new Proxy(obj,{
-    set(target, property, value, receiver){
+function observable(obj) {
+  return new Proxy(obj, {
+    set(target, property, value, receiver) {
       const result = Reflect.set(targetObj, key, value, receiver);
       queuedObservers.forEach((observer) => {
         observers();
       });
       return result;
-    }
-  })
+    },
+  });
 }
 ```
-> 上面proxy代理的内部逻辑是，当对象属性的值被修改时，触发set函数，首先使用Reflect.set()修改该属性的值，然后遍历集合中的每一个观察者函数并执行，，最后返回布尔值代表对象的属性值是否修改成功
+
+> 上面 proxy 代理的内部逻辑是，当对象属性的值被修改时，触发 set 函数，首先使用 Reflect.set()修改该属性的值，然后遍历集合中的每一个观察者函数并执行，，最后返回布尔值代表对象的属性值是否修改成功
 
 ```js
-// 
+//
 const person = observable({
-  name: '张三',
-  age: 20
+  name: "张三",
+  age: 20,
 });
 // 定义一个观察者函数，并加入集合
 function print() {
-  console.log(`${person.name}, ${person.age}`)
+  console.log(`${person.name}, ${person.age}`);
 }
 observe(print);
 //对对象的属性进行赋值操作，触发set函数的执行
-person.name = '李四';
-
+person.name = "李四";
 ```
 
 # Generator 函数
