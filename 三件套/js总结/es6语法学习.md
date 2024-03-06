@@ -75,7 +75,7 @@ console.log(obj); //{str:'hello world'}
 
 - 有了 Promise 对象，异步操作就可以以同步操作的流程表达出来，避免了嵌套的回调函数
 
-# 基本用法
+## 基本用法
 
 - Promise 构造函数接受一个函数作为参数，该函数的两个参数分别为 resolve 和 reject,两者也是函数
 
@@ -149,7 +149,7 @@ p2.then((result) => console.log("执行了then", result)).catch((error) =>
 > 从头分析，1s 之后，由于调用 resolve 函数，p2 的状态变为 resolved,但是由于 p2 返回的是另一个 Promise，导致 p2 自己的状态无效了，p1 的状态决定 p2 的状态，p1 此时状态为 pending，p2 的回调函数就会等待 p1 的状态改变。
 > 3s 时，p1 变为 rejected，导致触发 catch 方法指定的回调函数
 
-# then 函数
+### then 函数
 
 实例化过的 promise 对象可调用 then 方法，为 Promise 实例添加状态改变时的回调函数
 
@@ -225,7 +225,7 @@ getJSON("./post/1.json")
 
 then 方法用于处理 Promise 成功状态回调函数，使用 catch 方法处理 Prmoise 失败状态的回调函数
 
-# catch 方法
+## catch 方法
 
 - 指定发生错误时(包括 Promise 对象的异步操作中的错误，then 回调方法中的错误)的回调
 
@@ -257,6 +257,35 @@ Promise().catch((error)=>console.log('rejected'，error))
 //等价于
 //一般不要在then方法中定义rejected状态的回调函数，即不要在then方法中定义第二个参数用于错误处理，而是将其放在catch方法中
 Promise().then(null,(error)=>console.log('rejected',error))
+```
+
+## Promise.all
+
+- 将多个 Promise 实例包装成一个新的 Promise 实例
+
+```js
+const p = Promise.all([p1, p2, p3]);
+```
+
+p 的状态变化：
+（1）只有 p1、p2、p3 的状态都变成 fulfilled，p 的状态才会变成 fulfilled，此时 p1、p2、p3 的返回值组成一个数组，传递给 p 的回调函数。
+（2）只要 p1、p2、p3 之中有一个被 rejected，p 的状态就变成 rejected，此时第一个被 reject 的实例的返回值，会传递给 p 的回调函数
+
+- 语法：const p = Promise.all([p1, p2, p3]);
+  > - 参数：
+  > - all()方法接受一个类数组（具有 Iterator 接口）作为参数，类数组中的每个元素都是 Promise 实例
+
+```js
+const promises = [1, 2, 3, 4].map((index) => {
+  getJSON("/post" + index + ".json");
+});
+Promise.all(promises)
+  .then((posts) => {
+    //...
+  })
+  .catch((reason) => {
+    //...
+  });
 ```
 
 # class 类

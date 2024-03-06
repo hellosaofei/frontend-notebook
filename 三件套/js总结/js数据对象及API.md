@@ -694,44 +694,300 @@ let name = params.get("name"); // "Smith".
 let age = parseInt(params.get("age")); // 18
 ```
 
-# FormData 构造函数
+# Blob/File/ArrayBuffer 等对象
 
-> 参考文献：[mdn FormData 文档](https://developer.mozilla.org/zh-CN/docs/Web/API/FormData#%E6%96%B9%E6%B3%95)
+- 一个不可变的、原始数据的类文件对象，
+  <img src="../../pic/js学习/Blob等对象的关系.png">
+
+- Blob(binary large object，二进制大对象)，可以存储大量二进制编码格式的数据，Blob 对象不可修改，只能呢个通关过 FileReader 读取内容
+- 语法：new Blob(array,options)
+  > 参数：
+  >
+  > - array:一个可迭代对象，比如 Array，包含 ArrayBuffer、TypedArray、DataView、Blob、字符串或者任意这些元素的混合
+  > - options:如下表
+
+| MIME 类型        | 描述       |
+| ---------------- | ---------- |
+| text/plain       | 纯文本文档 |
+| text/html        | html 文档  |
+| text/javascript  | js 文档    |
+| text/css         | css 文档   |
+| application/json | json 文件  |
+| application/pdf  | pdf 文件   |
+| application/xml  | ...        |
+| image/jpeg       | ...        |
+| image/png        | ...        |
+| image/gif        | ...        |
+| image/svg+xml    | svg 图像   |
+| audio/mpeg       | mp3 文件   |
+| vdeo/mpeg        | mp4 文件   |
+
+```js
+let blob = new Blob(["helloWorld"], { type: "text/plain" });
+```
+
+<img src="../../pic/js学习/新建blob对象.png">
+
+## Blob.slice()方法
+
+- 语法：slice(start, end, contentType)
+- 作用：对 Blob 对象进行切片并返回一个新的 Blob 对象
+  > 参数：
+  >
+  > - start：切片的起始位置，默认 0，即从第一个字节开始
+  > - end：切片的结束位置：默认 blob.size，即最后一个字节
+  > - contentType:用于设置新生成的 Blob 对象的 MIME 类型，默认继承原 Blob 对象
+
+```js
+let blob = new Blob(["helloWorld"], { type: "text/plain" });
+let new_blob = blob.slice(0, 2);
+let reader = new FileReader();
+reader.readAsText(new_blob);
+reader.result;
+
+// 输出结果
+// he
+```
+
+<img src="../../pic/js学习/blob对象切片与读取.png">
+
+# File 对象
+
+- 实质上是一个特殊的 Blob 对象
+
+**js 中获取 File 对象的方法**
+
+- 通过 input 标签选择文件得到 FileList 对象
+
+```html
+<body>
+  <input type="file" />
+  <script>
+    let fileInput = document.querySelector("input");
+    fileInput.onchange = (event) => {
+      console.log(event.target.files);
+    };
+  </script>
+</body>
+```
+
+<img src="../../pic/js学习/通过input标签获取File对象.png">
+
+- 文件拖放生成 DataTransfer 对象
+
+```html
+<style>
+  div {
+    width: 300px;
+    height: 300px;
+    border: 1px solid red;
+  }
+</style>
+<body>
+  <div></div>
+  <script>
+    let dropArea = document.querySelector("div");
+    dropArea.ondragover = (event) => {
+      event.preventDefault();
+    };
+    dropArea.ondrop = (event) => {
+      event.preventDefault();
+      let files = event.dataTransfer.files;
+      console.log(files);
+    };
+  </script>
+</body>
+```
+
+# FileReader
+
+- web 应用程序异步读取文件内容，通常是 File 对象或 Blob 对象
+
+```js
+let blob = new Blob(["helloWorld"], { type: "text/plain" });
+let new_blob = blob.slice(0, 5);
+let reader = new FileReader();
+reader.readAsText(new_blob);
+reader.result;
+
+// 输出结果
+// hello
+```
+
+## 实例方法
+
+- readAsArrayBuffer():读取指定 Blob 中的内容,完成之后,result 属性中保存的将是被读取文件的 ArrayBuffer 数据对象;
+
+- readAsDataURL():读取指定 Blob 中的内容,完成之后,result 属性中将包含一个 data: URL 格式的 Base64 字符串以表示所读取文件的内容。
+
+- readAsText():读取指定 Blob 中的内容,完成之后,result 属性中将包含一个字符串以表示所读取的文件内容。
+
+- 使用步骤
+  > 实例化 FileReader 对象
+  > 调用实例方法处理 File 对象或 Blob 对象
+  > 在实例对象的 result 查看读取结果
+
+```html
+<body>
+  <input type="file" />
+  <script>
+    let fileInput = document.querySelector("input");
+    fileInput.onchange = (event) => {
+      console.log(event.target.files);
+      let reader = new FileReader();
+      reader.readAsText(event.target.files[0]);
+      console.log(reader.result);
+    };
+  </script>
+</body>
+```
+
+- blob+fileReader 实现图片预览功能
+
+当需要在前端预览用户上传的图片时，可以将图片文件转换为 Blob 对象，并通过 FileReader 对象读取图片数据，然后显示在页面上
+
+```html
+<body>
+  <input type="file" />
+  <script>
+    const fileInput = document.querySelector("input");
+    fileInput.addEventListener("change", (e) => {
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+      console.log(e);
+      reader.onload = (event) => {
+        const image = document.createElement("img");
+        image.src = event.target.result;
+        document.body.appendChild(image);
+        console.log(event);
+      };
+      //虽然读取结果存在fileReader实例对象的result属性中，但是该操作是异步的，故需要使用回调函数
+      reader.readAsDataURL(file);
+    });
+  </script>
+</body>
+```
+
+# Object URl
+
+- 用来表示 FileObject 或 Blob Object 的 Url
+
+```html
+<body>
+  <input type="file" />
+  <script>
+    const fileInput = document.querySelector("input");
+    fileInput.onchange = (event) => {
+      let file = event.target.files[0];
+      console.log(URL.createObjectURL(file));
+    };
+  </script>
+</body>
+```
+
+# base64
+
+- js 中编码和解码 base64 字符串
+- atob():解码一个 base64 字符串
+- btoa():编码，将一个字符串或二进制数据编码为一个 base64 字符串
+
+<img src="../../pic/js学习/base64与字符串互转.png">
+
+# FormData 构造函数
 
 - 用于创建一个新的 FormData 对象
 
-## FormData.append()
+- FormData.append()
 
 - 语法：formData.append(name,value,filename)
-- 向 FormData 中添加新的属性值
-
-| 参数          | 描述                                  |
-| ------------- | ------------------------------------- |
-| name          | 表单的名称                            |
-| value         | 表单的值                              |
-| filename 可选 | 传给服务器的文件名称 (一个 USVString) |
+- 作用：向 FormData 对象的一个已经存在的键中添加一个新值，如果键不存在则添加该键
+  > 参数
+  > name:键名(表单名)
+  > value:值（表单值，）
 
 ```js
+var formData = new FormData();
 formData.append("username", "Chris");
 formData.append("userpic", myFileInput.files[0], "chris.jpg");
 ```
 
-## FormData.delete()
+- FormData.delete()
 
 从 FormData 对象里面删除一个键值对
 
-## FormData.has()
+- FormData.has()
 
 判断 FormData 对象中是否包含某些键
 
-## FormData.entries()
+- FormData.entries()
 
 返回一个包含所有键值对的 iterator 对象
 
-## FormData.keys()
+```js
+var formData = new FormData();
+formData.append("key1", "value1");
+formData.append("key2", "value2");
+for (let pair of formData.entries()) {
+  console.log(pair);
+}
+// 执行结果
+// Array [ "key1", "value1" ]
+// Array [ "key2", "value2" ]
+```
+
+- FormData.keys()
 
 返回一个包含所有键的 iterator 对象
 
-## FormData.values()
+```js
+var formData = new FormData();
+formData.append("key1", "value1");
+formData.append("key2", "value2");
+for (let key of formData.keys()) {
+  console.log(key);
+}
+// 执行结果
+// key1
+// key2
+```
+
+- FormData.values()
 
 返回一个包含所有值的 iterator 对象
+
+```js
+var formData = new FormData();
+formData.append("key1", "value1");
+formData.append("key2", "value2");
+for (let value of formData.values()) {
+  console.log(value);
+}
+// 执行结果
+// value2
+// value1
+```
+
+## FormData 对象使用
+
+- 浏览器中
+
+```js
+const form = new FormData();
+form.append("my_field", "my value");
+form.append("my_buffer", new Blob([1, 2, 3]));
+form.append("my_file", fileInput.files[0]);
+
+axios.post("https://example.com", form);
+```
+
+- nodejs 中
+
+```js
+import axios from "axios";
+
+const form = new FormData();
+form.append("my_field", "my value");
+form.append("my_buffer", new Blob(["some content"]));
+
+axios.post("https://example.com", form);
+```

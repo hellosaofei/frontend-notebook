@@ -433,3 +433,122 @@ const xmlhttp = new XMLHttpRequest();
 xmlhttp.open("GET", "ajax_info.txt", true);
 xmlhttp.send();
 ```
+
+## axios 的使用
+
+## 封装 get 请求方法
+
+```js
+export function httpGet({ url, params = {} }) {
+  return new Promise((resolve, reject) => {
+    axios
+      .get(url, {
+        params,
+      })
+      .then((res) => {
+        resolve(res.data);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}
+```
+
+##
+
+```js
+export function httpPost({ url, data = {}, params = {} }) {
+  return new Promise((resolve, reject) => {
+    axios({
+      url,
+      method: "post",
+      data,
+      params,
+    }).then((res) => {
+      resolve(res.data);
+    });
+  });
+}
+```
+
+### 目录结构
+
+```
+|- http.js
+|- api.js
+|- app.vue
+```
+
+```js
+/*http.js*/
+export function httpGet({
+  //...
+})
+export function httpPost({
+  //...
+})
+```
+
+```js
+// api.js
+import { httpGet, httpPost } from "./http";
+export const getList = (params = {}) => {
+  httpGet({
+    url: "/apps/api/list",
+    params,
+  });
+};
+```
+
+```js
+// app.vue
+import { getList } from "./api.js";
+getList({ id: 200 }).then((res) => {
+  console.log(res);
+});
+```
+
+- 请求拦截器
+
+```js
+axios.interceptors.request.use(
+  (config) => {
+    token && (config.headers.Authorization = token);
+    return config;
+  },
+  (error) => {
+    return Promise.error(error);
+  }
+);
+```
+
+> 每次发送请求之前判断是否存在 token
+> 如果存在，则统一在 http 请求的 header 都加上 token，这样后台根据 token 判断你的登录情况，此处 token 一般是用户完成登录后储存到 localstorage 里
+
+- 响应拦截器
+
+```js
+axios.interceptors.response.use(
+  (response) => {
+    if (response.status === 200) {
+      if (response.data.code === 511) {
+        // 未授权调取授权接口
+      } else if (response.data.code === 510) {
+        // 未登录跳转登录页
+      } else {
+        return Promise.resolve(response);
+      }
+    } else {
+      return Promise.reject(response);
+    }
+  },
+  (error) => {
+    if (error.response.status) {
+      // 处理请求失败的情况
+      // 对不同返回码对相应处理
+      return Promise.reject(error.response);
+    }
+  }
+);
+```
