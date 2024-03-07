@@ -65,8 +65,6 @@ const obj = { str };
 console.log(obj); //{str:'hello world'}
 ```
 
-# Generator
-
 # Promise 对象
 
 - promise 对象实质上是一个容器，代表一个异步操作，其具有三种状态：pending（进行中）、fulfilled（已成功）、rejected（已失败），异步操作的结果，决定当前状态，其他任何操作都不能改变该状态
@@ -1005,30 +1003,136 @@ person.name = "李四";
 
 # Generator 函数
 
-- Generator 函数返回一个遍历器对象，也就是
-
-Generator 函数
-
-1. 是一个普通函数
-2. function 关键字与函数名之间有一个星号
-3. 函数体内部使用 yield 表达式以定义不同的内部状态
-4. 调用与普通函数的写法一样，在函数名后面加一对圆括号，但必须调用遍历器对象的 next 方法使指针移向下一个状态
+- 一种异步编程解决方案，形式上 Generator 函数是一个普通函数，但具有两个特征
+  > - function 关键字与函数名之间有一个星号
+  > - 函数体内部使用 yield 表达式，用于定义不同的内部状态
 
 ```js
-/*下面定义一个Generator函数，其内部有两个yield表达式，带上return语句，该函数有三个状态：NO1/NO2/ending*/
+const foo = function* () {
+  yield "a";
+  yield "b";
+  yield "c";
+};
+
+let arr = [];
+for (const val of foo()) {
+  arr.push(val);
+}
+console.log(arr); // ['a','b','c']
+```
+
+- Generator 函数的调用与普通函数的写法一样，在函数名后面加一对圆括号
+- Generator 函数调用之后，该函数并不执行，返回的不是函数运行的结果，而是一个指向内部状态的指针对象（遍历器对象 Iterator Object）
+
+```js
 function* myGenerator() {
   yield "NO1";
   yield "NO2";
   return "ending";
 }
-//实例化一个遍历器对象
+
 let obj = myGenerator();
-
-/*
-每次调用next()方法，内部指针就从函数头部或上一次停下来的地方开始执行，直到遇到下一个yield表达式；也就是说，Generator函数是分段执行的，yield表达式是暂停执行的标志
-
-*/
 ```
+
+> 上面代码中，定义一个 Generator 函数，其内部有两个 yield 表达式和 return 语句，该函数有三个状态：NO1/NO2/ending
+
+- Generator 函数调用之后，需要调用其 next()方法使指针移向下一个状态，直到遇到 yield 或 return 语句（也就是说 Generator 函数是分段执行的，yield 表达式是暂停执行的标记，而 next 方法可以恢复执行）
+
+```js
+obj.next();
+// { value: 'NO1', done: false }
+
+obj.next();
+// { value: 'NO2', done: false }
+
+obj.next();
+// { value: 'ending', done: true }
+
+obj.next();
+// { value: undefined, done: true }
+```
+
+- 注意：ES6 没有规定，function 关键字与函数名之间的星号，写在哪个位置。这导致下面的写法都能通过
+
+```js
+function * foo(x, y) { ··· }
+function *foo(x, y) { ··· }
+function* foo(x, y) { ··· }
+function*foo(x, y) { ··· }
+```
+
+## yield 表达式
+
+- next 方法执行逻辑
+
+- yield 表达式只能用在 Generator 函数里面，用在其他地方都会报错
+
+```js
+(function (){
+  yield 1;
+})()
+// SyntaxError: Unexpected number
+```
+
+- yield 表达式如果用在另一个表达式之中，必须放在圆括号里面
+
+```js
+function* demo() {
+  console.log('Hello' + yield); // SyntaxError
+  console.log('Hello' + yield 123); // SyntaxError
+
+  console.log('Hello' + (yield)); // OK
+  console.log('Hello' + (yield 123)); // OK
+}
+```
+
+- yield 表达式用作函数参数或放在赋值表达式的右边，可以不加括号
+
+```js
+function* demo() {
+  foo(yield "a", yield "b"); // OK
+  let input = yield; // OK
+}
+```
+
+- 把 Generator 赋值给对象的 Symbol.iterator 属性，从而使得该对象具有 Iterator 接口
+
+```js
+var myIterable = {};
+myIterable[Symbol.iterator] = function* () {
+  yield 1;
+  yield 2;
+  yield 3;
+};
+
+[...myIterable]; // [1, 2, 3]
+```
+
+## next()方法
+
+- next 方法可以携带一个参数作为上一个 yield 表达式的返回值
+- next 携带的参数可用于在 Generator 函数开始运行之后，向函数体内部注入值，从而在 Generator 函数的不同运行阶段调整函数行为
+
+```js
+// 定义一个可以无限运行的Generator函数
+function* f() {
+  for (var i = 0; true; i++) {
+    var reset = yield i;
+    if (reset) {
+      i = -1;
+    }
+  }
+}
+
+var g = f();
+
+g.next(); // { value: 0, done: false }
+g.next(); // { value: 1, done: false }
+g.next(true); // { value: 0, done: false }
+```
+
+> 上面代码中，如果 next 方法没有参数，每次运行到 yield 表达式，变量 reset 的值总是 undefined。
+> 当 next 方法带一个参数 true 时，变量 reset 就被重置为这个参数（即 true）执行 i=-1，下一轮循环就会从-1 开始递增。
 
 # for...of 循环
 
