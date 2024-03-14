@@ -216,7 +216,67 @@ page {
 
 ## 组件属性 properties
 
+```
+|- 根目录
+  |- components
+    |- custom-checkbox      自定义全局组件
+      |- custom-checkbox.wxml       (定义组件内容)
+      |- custom-checkbox.js
+      |- custom-checkbox.wxss
+      |- custom-checkbox.json
+  |- pages
+    |- index
+      |- index.wxml   （使用全局组件）
+      |- index.wxss
+      |- index.js
+      |- index.json
+  |- app.json       （注册全局组件）
+```
+
 - 用于接受组件使用者传递给组件内部的数据
+- custom-checkbox.js
+
+```js
+Component({
+  properties:{
+    //简写
+    label:String
+    //全写
+    label:{
+      //js基本数据类型
+      type:String，
+      value:'',
+    },
+    position:{
+      type:String,
+      value:"right"
+    }
+  }
+})
+```
+
+- custom-checkbox.wxml 定义组件内容，并使用插件语法使用 index.html 传递过来的数据
+
+```xml
+<view class="container">
+  <view>
+    <!-- 其他内容... -->
+    <view class="{{position==='right' ? 'right' : 'left'}}">
+      <text>{{label}}</text>
+    </view>
+  </view>
+
+</view>
+```
+
+- index.html 使用组件并向组件传递数据
+
+```xml
+<custom-checkbox label="我已阅读用户协议" position="right">
+<custom-checkbox label="匿名提交" position="left">
+```
+
+## wxml 的插槽
 
 # 事件处理系统
 
@@ -281,7 +341,7 @@ Page({
 - 数据声明好后，在 WXML 文件中使用插值语法`{{}}`将变量包裹起来，从而实现数据绑定
 - 在`{{}}`内部只能写表达式不能写语句，也不能调用 js 方法
 
-```html
+```xml
 <!--要展示的数据在wxml中使用双大括号将变量进行包裹-->
 <view>{{name}}</view>
 <view>{{obj.age}}</view>
@@ -461,7 +521,7 @@ Page({
 });
 ```
 
-```html
+```xml
 <!-- 单向绑定：数据能够影响页面 -->
 <input value="{{value}}" />
 <!-- 双向绑定：数据能影响页面，页面也能影响数据 -->
@@ -490,7 +550,7 @@ Page({
 });
 ```
 
-```html
+```xml
 <!-- 通过wx:if判断 -->
 <view wx:if="{{num===1}}">num 等于{{num}}</view>
 <view wx:elif="{{num===2}}">num 等于{{num}}</view>
