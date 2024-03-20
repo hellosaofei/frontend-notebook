@@ -228,3 +228,34 @@ el.style.top = offTop + "px";
   background-color: red;
 }
 ```
+
+## h3c3 有哪些新特性
+
+- h5 新特性
+  > - 语义化标签
+  > - 新增音频视频
+  > - 画布 canvas
+  > - 数据存储 localStoage\sessionStorage
+  > - 表单控件 email url search...
+  > - 拖拽释放 API
+- c3
+  > - 选择器：属性、伪类、伪元素
+  > - 媒体查询
+  > - 文字阴影
+  > - 边框
+  > - 盒子模型 box-sizing
+  > - 渐变
+  > - 过渡 transform
+  > - 自定义动画 keyframe
+  > - 背景属性
+  > - 2D、3D
+
+# rem 如何做适配
+
+rem 相对于根元素 html 的 font-size 计算大小通常用于做移动端适配
+
+```
+html{font-size:10px;}div{width:1.2rem(实际宽度1.2x10=12px)}
+```
+
+# 移动端兼容性问题
