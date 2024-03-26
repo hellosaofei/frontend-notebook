@@ -276,7 +276,130 @@ Component({
 <custom-checkbox label="匿名提交" position="left">
 ```
 
-## wxml 的插槽
+## wxml 的 slot-插槽
+
+> 插槽解决了什么问题？
+> 你定义了一个组件并在 index.wxml 页面使用了它，代码如下
+
+```xml
+<custom01></custom01>
+```
+
+> 这时你想要在这个组件标签中间插入一段文本，直接插入你会发现这段文本不会显示
+
+```xml
+<custom01>这是插入的文件</custom01>
+```
+
+> 于是你需要先在 custom01 组件的 wxml 文件中使用`<slot/>`标签来作为占位符，为这段文本占位
+
+```xml
+<view>
+  <slot />
+</view>
+```
+
+> 重新编译发现文本得以显示
+
+- 项目目录结构
+
+```
+|- 根目录
+  |- components
+    |- custom01      自定义全局组件
+      |- custom01.wxml       (定义组件内容)
+      |- custom01.js
+      |- custom01.wxss
+      |- custom01.json
+  |- pages
+    |- index
+      |- index.wxml   （使用全局组件）
+      |- index.wxss
+      |- index.js
+      |- index.json
+  |- app.json       （注册全局组件）
+```
+
+### 默认插槽的使用
+
+- 默认情况下，自定义组件的子节点内容不会进行展示
+- index.wxml
+
+```xml
+<custom01>
+  在index.wxml页面使用全局组件custom01，这段文本就是该组件的子节点
+</custom01>
+```
+
+- 要想展示，需要在**组件的 wxml 文件**中配置`<slot />`标签
+- custom01.wxml
+
+```xml
+<view>
+  <slot />
+</view>
+```
+
+> `<slot />`标签用于接受承载子节点内容，实质上是一个占位符，子节点内容会将 slot 进行替换
+
+### 具名插槽的使用
+
+- 一个组件的 wxml 只能有一个默认插槽 slot，使用多个 slot 需要在**组件的 js 文件**中进行声明
+- custom01.js
+
+```js
+Component({
+  options:{
+    //启用多个slot
+    multipleSlots:true;
+  }
+})
+```
+
+- 书写`<slot name="">`标签时携带 name 配置项可以为插槽命名
+- custom01.wxml
+
+```xml
+<view>
+  <slot name="slot-top">
+  <view><slot/></view>
+  <slot name="slot-bottom">
+</view>
+```
+
+- index.wxml 使用全局组件
+
+```xml
+<custom01>
+  <text slot="slot-top">显示在顶部的文本<text>
+  其余文本
+  <text slot="slot-bottom">显示在底部的文本<text>
+</custom01>
+```
+
+## 组件样式
+
+- 组件的 wxss 样式默认只对当前组件生效
+
+- 自定义**组件的 wxss 文件**不能使用 ID、属性、标签名选择器
+- custom01.wxss
+
+```css
+/*下面的选择器不被允许*/
+text: {
+  color: red;
+}
+#content {
+  color: red;
+}
+[id="content"] {
+  color: red;
+}
+/*推荐的选择器：类选择器*/
+.content {
+  color: green;
+}
+```
 
 # 事件处理系统
 
@@ -763,6 +886,101 @@ async setData(){
   })
 }
 ```
+
+# npm 包的使用
+
+打开终端》》npm init -y 初始化 package.json 文件》》npm i @vant/weapp 下载包》》点击【工具>构建 npm】生成 miniprogram_npm 文件存放构建后的 npm 包
+
+> 使用 npm 包之前应确定该 npm 包是否支持微信小程序
+
+## 自定义构建 npm
+
+实际开发中项目功能越来越多，文件目录越来越复杂，对项目目录结构进行优化，如将源码放在 miniprogram 目录下
+
+```
+|- 根目录
+  |- miniprogram
+    |- miniprogram_npm
+      |- @vant
+        |- weapp
+    |- assets
+      |- images
+    |- pages
+      |- index
+      |- cate
+    |- app.js
+    |- app.json
+    |- app.wxss
+  |- .eslintrc.js
+  |- project.config.json
+  |- project.private.config.json
+```
+
+- 在 project.config.json 中指定 node_modules 的位置
+
+```json
+{
+  //指定小程序源码目录
+  "miniprogramRoot": "./miniprogram/",
+  "setting": {
+    //开启自定义npm构建方式
+    "packNpmManually": true,
+    //指定构建前后的npm包位置
+    "packNpmRelationList": [
+      {
+        "packageJsonPath": "./package.json",
+        "miniprogramNpmDistDir": "./miniprogram"
+      }
+    ]
+    //...
+  }
+  //...
+}
+```
+
+## vant Weapp 组件库使用
+
+- 一个前端小组件库
+
+> 删除 app.json 文件中的配置项`style:v2`，微信客户端 7.0 开始 ui 界面改版，该配置项的意思是使用最新版的小程序 ui 样式，而其强加了很多样式且这些样式难以覆盖，若想用 vant-weapp 覆盖小程序组件，就必须去除该配置项以避免出现样式混杂的问题
+
+```json
+//app.json
+{
+  "style": "v2"
+}
+```
+
+- 使用步骤
+  - 在**组件的 json 文件**或 app.json 中进行注册
+  - 在**组件的 wxml 文件**直接使用
+
+在 vant-image 组件中使用插槽
+
+- app.json 注册组件
+
+```json
+{
+  "usingComponents": {
+    "vant-image": "@vant/weapp/image/index",
+    "vant-loading": "@vant/weapp/loading/index"
+  }
+}
+```
+
+- index.wxml 使用组件
+
+```xml
+<vant-image
+  use-loading-slot
+  use-error-slot
+  >
+  <van-loading slot="loading" type="spinner" size="20" vertical>
+  <text slot="error">加载失败</text>
+</vant-image>
+```
+
+### vant-weapp 样式的修改
 
 # 小程序分包
 

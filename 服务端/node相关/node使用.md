@@ -660,10 +660,43 @@ app.post("/login", urlParser, (request, response) => {
 });
 ```
 
--得到的请求体数据为
+- 得到的请求体数据为
 
 ```
 [Object: null prototype] { username: 'admin', userpass: '123456' }
+```
+
+### cookie-parser 中间件
+
+- 安装
+
+```shell
+npm i cookie-parser
+```
+
+- 导入
+
+```js
+var cookieParser = require("cookie-parser");
+```
+
+- 设置为全局中间件
+
+```js
+app.use(cookieParser);
+```
+
+- 在具体的路由中使用
+
+```js
+app.get("/", function (req, res) {
+  // 已签名的路由
+  console.log(req.cookies);
+  // 未签名的路由
+  console.log(req.signedCookies);
+});
+
+app.listen(8080);
 ```
 
 ### 路由拆分
@@ -676,7 +709,7 @@ app.post("/login", urlParser, (request, response) => {
 目录结构
 |- Root
   |- routes
-    |- homeRouter
+    |- homeRouter.js
     |- adminRouter.js
   |- index.js
 ```
@@ -723,10 +756,10 @@ module.exports = router;
 // index.js
 const express = require("express");
 const app = express();
-//5.引入子路由文件
+//引入子路由文件
 const homeRouter = require("./routes/homeRouter");
 const adminRouter = require("./routes/adminRouter");
-//6.设置和使用中间件
+//设置和使用中间件
 app.use(homeRouter);
 app.use(adminRouter);
 app.listen(3000);
