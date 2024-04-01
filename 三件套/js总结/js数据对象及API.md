@@ -991,3 +991,37 @@ form.append("my_buffer", new Blob(["some content"]));
 
 axios.post("https://example.com", form);
 ```
+
+# 拖拽相关
+
+## 事件
+
+- dragstart：用户开始拖动**元素或被选择的文本**时
+
+```js
+addEventListener("dragstart", (event) => {});
+
+ondragstart = (event) => {};
+```
+
+- dragend：拖放操作结束时触发，通常指释放鼠标按钮
+
+- dragover:在**元素或者被选择的文本**被拖进一个有效的放置目标时触发,通常指在放置目标上
+
+```js
+addEventListener("dragover", (event) => {});
+
+ondragover = (event) => {};
+```
+
+- dragenter :**元素或者被选择的文本**进入一个有效的放置目标时触发
+
+```js
+addEventListener("dragleave", (event) => {});
+
+ondragleave = (event) => {};
+```
+
+# 生成二维码 QRcode 库
+
+- 好的博客：https://juejin.cn/post/6844903719255932936
