@@ -303,6 +303,8 @@ module.exports = {
 
 # vuex 基本使用
 
+<img src="../pic/vue学习/vuex工作流程图.png">
+
 创建》》》引入》》》使用
 
 - 步骤 1：创建`store/index.js`文件
@@ -465,5 +467,829 @@ computed:{
   ...mapGetters({bigSum:'bigSum'})
   //数组写法
   ...mapGetters(['bigSum'])
+}
+```
+
+## mapAction 与 mapMutation 的使用
+
+- store/index.js
+
+```js
+// ... store/index.js的其它代码
+const actions={
+  jia(context,value){
+    context.commit('JIA',value)
+  },
+  jian(context,value){
+    context.commit("JIAN",value)
+  },
+  jiaOdd(context,value){
+    if(context.state.sum%2){
+      context.commit("JIA",value)
+    }
+  },
+  jiaWait(context,value){
+    setTimeout(()=>{
+      context.commit("JIA",value)
+    },1000)
+  },
+}
+const mutation={
+  JIA(state,value){
+    state.sum+=value;
+  }
+  JIAN(state,value){
+    state.sum-=value
+  }
+}
+const state={
+  sum:9,
+}
+```
+
+- 组件中使用`count.vue`(不使用 mapMutation 与 mapAction)
+
+```vue
+<template>
+  <div>
+    <h1>总和：{{ sum }}</h1>
+    <button @click="increment">+</button>
+    <button @click="decrement">-</button>
+    <button @click="incrementOdd">为奇数就加</button>
+    <button @click="incrementWait">等1秒再加</button>
+  </div>
+</template>
+<script>
+export default {
+  name: "Count",
+  data() {
+    return {
+      n: 1,
+    };
+  },
+  methods: {
+    increment() {
+      this.$store.commit("JIA", this.n);
+    },
+    increment() {
+      this.$store.commit("JIAN", this.n);
+    },
+    incrementOdd() {
+      this.$store.dispatch("jiaOdd", this.n);
+    },
+    incrementWait() {
+      this.$store.dispatch("jiaWait", this.n);
+    },
+  },
+};
+</script>
+```
+
+- 组件中使用`count.vue`(不使用 mapMutation 与 mapAction)
+
+```vue
+<template>
+  <div>
+    <h1>总和：{{ sum }}</h1>
+    <!-- mapMutation与mapActions的对象写法：可以重命名方法 -->
+    <button @click="increment(n)">+</button>
+    <button @click="decrement(n)">-</button>
+    <button @click="incrementOdd(n)">为奇数就加</button>
+    <button @click="incrementWait(n)">等1秒再加</button>
+
+    <!-- mapMutation与mapActions的数组写法：只能使用state中定义的方法名 -->
+    <!-- <button @click="JIA(n)">+</button> -->
+    <!-- <button @click="JIAN(n)">-</button>
+    <button @click="jiaOdd(n)">为奇数就加</button>
+    <button @click="jiaWait(n)">等1秒再加</button> -->
+  </div>
+</template>
+<script>
+export default {
+  name: "Count",
+  data() {
+    return {
+      n: 1,
+    };
+  },
+  methods:{
+    //对象写法
+    ...mapMutation({increment:"JIA",decrement:"JIAN"}),
+    //数组写法
+    ...mapMutation(['JIA','JIAN'])
+
+    //对象写法
+    ...mapActions({incrementOdd:"jiaOdd",incrementWait:"jiaWait"}),
+    //数组写法
+    ...mapActions(['jiaOdd','jiaWait'])
+  }
+};
+</script>
+```
+
+> 注意： 使用函数时该带参数需要带参数
+
+## vuex 模块化
+
+- 引入背景:当多个组件需要共享 vuex 存储的数据时，如果都写在 store/index.js 文件中，会使得文件十分臃肿，`actions/mutations/state`等配置项中存放着多个组件的逻辑和数据，很混乱且维护麻烦
+
+**单文件使用 map...**
+
+```js
+//... store/index.js其他代码
+const personOptions = {
+  namespaced: true,
+  actions: {},
+  mutations: {},
+  state: {
+    name: "张三",
+    age: 10,
+  },
+  getters: {
+    sayName(state) {
+      return `我的名字是${state.name}`;
+    },
+  },
+};
+const countOptions = {
+  namespaced: true,
+  //dispatch
+  actions: {
+    jia(context, value) {
+      context.commit("JIA", value);
+    },
+  },
+  //commit
+  mutations: {
+    JIA(state, value) {
+      state.sum += value;
+    },
+  },
+  state: {
+    sum: 0,
+  },
+  getters: {},
+};
+export default new Vuex.Store({
+  modules: {
+    countAbout: countOptions,
+    personAbout: personOptions,
+  },
+});
+```
+
+- Person.vue
+
+```js
+<template>
+  <h1>{{xingming}}</h1>
+  <h1>{{sayName}}</h1>
+</template>
+<script>
+  export default{
+    name:"Count",
+    data(){
+      return{
+      }
+    },
+    computed:{
+      ..mapState('personAbout',{xingming:'name',nianling:'age'}),
+      ...mapGetters('personAbout',['sayName'])
+    }
+  }
+</script>
+```
+
+- Count.vue
+
+```js
+<template>
+  <h1>总和：{{sum}}</h1>
+  <button @click="jia(n)">+</button>
+</template>
+<script>
+  export default{
+    name:"Count",
+    data(){
+      return{
+        n:1
+      }
+    },
+    computed:{
+      ...mapState('countAbout',['sum'])
+    },
+    methods:{
+      ...mapMutation('countAbout',['jia'])
+    }
+  }
+</script>
+```
+
+**单文件：不使用 map...**
+
+- count.vue
+
+```vue
+<template>
+  <h1>{{ xingming }}</h1>
+  <h1>{{ sayName }}</h1>
+  <h1>{{ sum }}</h1>
+  <button @click="add(n)">+</button>
+</template>
+<script>
+export default {
+  name: "Count",
+  data() {
+    return {
+      n: 1,
+    };
+  },
+  computed: {
+    sum() {
+      return this.$store.countAbout.sum;
+    },
+    xingming() {
+      return this.$store.personAbout.name;
+    },
+    sayName() {
+      return this.$store.getters["perconAbout/sayName"];
+    },
+  },
+  methods: {
+    add() {
+      this.$store.commit("countAbout/JIA", this.n);
+    },
+  },
+};
+</script>
+```
+
+**拆分为多个文件**
+
+```
+|- store
+  |- index.js
+  |- count.js
+  |- person.js
+```
+
+- index.js
+
+```js
+import Vue from "vue";
+import Vuex from "vuex";
+import countOptions from "./count";
+import personOptions from "./person";
+
+Vue.use(vuex);
+
+export default new Vuex.Store({
+  modules: {
+    countAbout: countOptions,
+    personAbout: personOptions,
+  },
+});
+```
+
+- person.js
+
+```js
+export default {
+  namespaced: true,
+  actions: {},
+  mutations: {},
+  state: {
+    name: "张三",
+    age: 10,
+  },
+  getters: {
+    sayName(state) {
+      return `我的名字是${state.name}`;
+    },
+  },
+};
+```
+
+- count.js
+
+```js
+export default {
+  namespaced: true,
+  actions: {
+    jia(context, value) {
+      context.commit("JIA", value);
+    },
+  },
+  mutations: {
+    JIA(state, value) {
+      state.sum += value;
+    },
+  },
+  state: {
+    sum: 0,
+  },
+  getters: {},
+};
+```
+
+# 路由 vueRouter
+
+<img src="../pic/vue学习/$route对象内容.png">
+
+- 步骤 1：安装，只有 vue-router3 才能在 vue2 中使用
+
+```shell
+npm i vue-router@3
+```
+
+- 步骤 2：建立文件 router/index.js
+
+```js
+import VueRouter from 'vue-router'
+import About from './components/About'
+import Home from './components/Home'
+export default new VueRouter({
+  routes:[
+    {
+      path:'/about',
+      component：About
+    },
+    {
+      path:'/home',
+      component:Home
+    }
+  ]
+})
+```
+
+- 步骤 3：在 main.js 中引入
+
+```js
+import VueRouter from "vue-router";
+import router from "./router/index";
+
+Vue.use(VueRouter);
+
+new Vue({
+  el: "#app",
+  render: (h) => h(App),
+  router,
+});
+```
+
+- 步骤 4：在组件中使用
+
+```html
+<div class="sidebar">
+  <router-link to="/home">Home</router-link>
+  <router-link to="/about">About</router-link>
+</div>
+<div class="content">
+  <router-view></router-view>
+</div>
+```
+
+**嵌套（多级）路由**
+
+- 路由规则的配置
+
+```js
+routes:[
+  {
+    path:'/about',
+    component：About
+  },
+  {
+    path:'/home',
+    component:Home,
+    children:[
+      {
+        path:'news',
+        components:Message
+      }
+    ]
+  }
+]
+```
+
+> children 配置项中的 path 不同写'/'
+
+- 跳转（要写完整路径）
+
+```html
+<router-link to="/home/news">News</router-link>
+```
+
+**query 参数**
+
+- 传递参数
+
+```js
+//写法一：to的字符串写法
+<router-link :to="`/home/message/detail?id=${666}&title=${msg}`"></router-link>
+//写法二：to的对象写法
+<router-link
+  :to="{
+    path:'/home/message/detail',
+    query:{
+      id:666,
+      title:'你好'
+    }
+  }"
+>点击跳转
+</router-link>
+```
+
+- 接收参数
+
+```js
+$route.query.id;
+$route.query.title;
+```
+
+**命名路由**
+作用：多级路由的 path 配置项往往很长，使用 name 配置项简化路由跳转
+
+- 步骤 1：给路由配置 name
+
+```js
+routes: [
+  {
+    path: "/home",
+    component: Home,
+    children: [
+      {
+        name: "xinwen",
+        path: "news",
+        components: Message,
+      },
+    ],
+  },
+];
+```
+
+- 步骤 2：使用 name 配置项简化路由跳转
+
+```js
+// 写法一：完成的路径
+<router-link to="/home/news"></router-link>
+// 写法二：name配置项
+<router-link :to="{name:"xinwen"}"></router-link>
+// 写法二：name配置项+query传递参数
+<router-link
+  :to="{
+    name:"xinwen",
+    query:{
+      id:666,
+      title:'你好'
+    }
+  }"
+>点击跳转
+</router-link>
+```
+
+**params 参数**
+
+```
+|- components
+  |- Home.vue
+  |- Message.vue
+  |- Detail.vue
+|- router
+  |- index.js
+```
+
+- 配置路由，声明接受 params 参数
+
+```js
+routes: [
+  {
+    path: "/home",
+    component: Home,
+    children: [
+      {
+        path: "message",
+        components: Message,
+        children: [
+          {
+            name: "xiangqing",
+            path: "detail/:id/:title",
+            component: Detail,
+          },
+        ],
+      },
+    ],
+  },
+];
+```
+
+- 传递参数`Message.vue`
+
+```js
+// 写法一：to的字符串写法
+<router-link :to="`/home/message/detail/666/你好`"></router-link>
+// 写法二：name配置项+query传递参数
+<router-link
+  :to="{
+    name:"xiangqing",// 此处不能使用path配置项
+    params:{
+      id:666,
+      title:'你好'
+    }
+  }"
+>点击跳转
+</router-link>
+```
+
+> 注意：to 的对象写法中，路由携带 params 参数时，若使用 to 的对象写法，则不能使用`path:''`配置项来指明要跳转的位置，必须使用 name 配置
+
+- 接受参数`Detail.vue`
+
+```js
+computed:{
+  id(){
+    return this.$route.params.id
+  }
+}
+```
+
+**props 配置项**
+
+- 目的：让组件在接受路由参数时，更加轻便不必要写一些重复性的东西
+  写法一：props 的值为对象，该对象中的所有 key-value 都会一 props 的形式传递给 Detail 组件
+
+- 传递 props`router/index.js`
+
+```js
+{
+  name: "xiangqing",
+  path: "detail/:id/:title",
+  component: Detail,
+  props:{a:1,b:'hello'}
+}
+```
+
+- 接受 props`Detail.vue`
+
+```vue
+<template>a:{{ a }},b:{{ b }}</template>
+<script>
+export default {
+  name: "Detail",
+  props: ["a", "b"],
+};
+</script>
+```
+
+写法二：props 值为布尔值，若为 true，就会将该路由组件收到的所有 params 参数以 props 的形式传递给 Detail 组件
+
+> 存在问题：不能处理 query 参数
+
+- 传递 params 参数`Component.vue`
+
+```js
+<router-link
+  :to="{
+    name:"xiangqing",// 此处不能使用path配置项
+    params:{
+      id:666,
+      title:'你好'
+    }
+  }"
+>点击跳转
+</router-link>
+```
+
+- 传递 props`router/index.js`
+
+```js
+{
+  name: "xiangqing",
+  path: "detail/:id/:title",
+  component: Detail,
+  props:true
+}
+```
+
+- 接受 props`Detail.vue`
+
+```vue
+<template>id:{{ id }},title:{{ title }}</template>
+<script>
+export default {
+  name: "Detail",
+  props: ["id", "title"],
+  // 改进了下面的写法
+  // computed:{
+  //   id(){
+  //     return this.$route.params.id
+  //   },
+  //    title(){
+  //     return this.$route.params.tile
+  //   },
+  // }
+};
+</script>
+```
+
+写法三：props 的函数写法
+
+- 传递 props`router/index.js`
+
+```js
+{
+  name: "xiangqing",
+  path: "detail/:id/:title",
+  component: Detail,
+  props($route){
+    return {
+      id:$route.query.id,
+      title:$route.query.title
+    }
+  }
+}
+```
+
+- 接受 props`Detail.vue`
+
+```vue
+<template>id:{{ id }},title:{{ title }}</template>
+<script>
+export default {
+  name: "Detail",
+  props: ["id", "title"],
+  // 改进了下面的写法
+  // computed:{
+  //   id(){
+  //     return this.$route.params.id
+  //   },
+  //    title(){
+  //     return this.$route.params.tile
+  //   },
+  // }
+};
+</script>
+```
+
+### router-link 的 replace 属性
+
+作用：用于控制条住哪时操作浏览器历史记录的模式
+
+浏览器的历史记录有两种写入方式：分别是 push（默认，追加记录）和 replace（替换当前记录）
+
+- 开启 replace 模式
+
+```html
+<router-link replace to=""></router-link>
+```
+
+### 编程式路由导航
+
+作用：不借助 router-link 实现路由跳转
+
+```js
+this.$route.push({
+  name: "xiangqing",
+  params: {
+    id: xxx,
+    title: xxx,
+  },
+});
+this.$route.replace({
+  name: "xiangqing",
+  params: {
+    id: xxx,
+    title: xxx,
+  },
+});
+```
+
+### 缓存路由组件
+
+作用：让不展示的路由组件保持挂载不被销毁
+
+```js
+//下面的News是组件名
+<keep-alive include="News">
+  <router-view></router-view>
+</keep-alive>
+```
+
+### 路由守卫
+
+作用：对路由进行鉴权
+
+**全局前置守卫**
+
+```js
+const route={
+  {
+    path: "/home",
+    component: Home,
+    children: [
+      {
+        path: "News",
+        components: News
+      },
+      {
+        path: "message",
+        components: Message,
+        children: [
+          {
+            name: "xiangqing",
+            path: "detail/:id/:title",
+            component: Detail,
+          },
+        ],
+      },
+    ],
+  }
+ }
+router.beforeEach((to,from,next)=>{
+  if(to.path==='/home/news'||to.path==='/home/message'){
+    if('判断条件'){
+      next();
+    }else{
+      conosle.log('没有去啊你先拿执行条跳转')
+    }
+  }else{
+    next()
+  }
+})
+export default router;
+```
+
+> beforeEach()函数的三个参数中 to 和 from 均为完整的$route 对象，next 作为一个函数，决定是否继续完成路由跳转
+> 存在问题：`to.path==='/home/news'`这种方式判断路由的路径太过繁琐
+> 改进：配置路由的`meta`配置项（路由元信息）
+
+```js
+{
+  path: "News",
+  components: News,
+  meta:{isAuth:true;}
+}
+router.beforeEach((to,from,next)=>{
+  if(to.isAuth){
+    if('判断条件'){
+      next();
+    }else{
+      conosle.log('没有权限执行跳转')
+    }
+  }else{
+    next()
+  }
+})
+```
+
+**后置路由守卫**
+
+```js
+const route={
+  {
+    path: "/home",
+    component: Home,
+    meta:{title:'首页'},
+    children: [
+      {
+        path: "News",
+        components: News,
+        meta:{title:'新闻'}
+      },
+      {
+        path: "message",
+        components: Message,
+        meta:{title:'消息'}
+        children: [
+          {
+            name: "xiangqing",
+            path: "detail/:id/:title",
+            component: Detail,
+            meta:{title:'新闻'}
+          },
+        ],
+      },
+    ],
+  }
+ }
+// 完成跳转后执行
+router.afterEach((to,from)=>{
+  document.title=to.meta.title;
+})
+```
+
+### 独享守卫
+
+- 独享守卫仅仅针对某一个路由生效
+- 独享守卫仅有前置守卫
+
+```js
+{
+  path: "News",
+  components: News,
+  meta:{title:'新闻'},
+  beforeEnter(to,from,next){
+    //....
+  }
 }
 ```
