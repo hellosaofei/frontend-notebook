@@ -10,6 +10,97 @@ export default {
 
 # 配置项
 
+## watch 配置项
+
+用于监听变量名
+
+```js
+export default {
+  name: "App",
+  data() {
+    return {
+      isHot: true,
+    };
+  },
+  watch: {
+    isHot: {
+      immediate: true,
+      handler(newValue, oldValue) {
+        console.log(`新的值：${newValue}，旧的值：${oldValue}`);
+      },
+    },
+  },
+};
+```
+
+**深度监听**
+
+```js
+<script>
+export default{
+  name:"App",
+  data(){return {
+    isHot:true,
+    numbers:{
+      a:1,
+      b:2
+    }
+  }},
+  watch:{
+    isHot:{
+      numbers:{
+        deep:true,
+        handler(oldVal,newVal){
+          console.log(oldVal,newVal)
+        }
+      }
+    }
+  }
+}
+```
+
+**简写形式**
+
+```js
+export default {
+  name: "App",
+  data() {
+    return {};
+  },
+  watch: {
+    isHot: (newValue, oldValue) => {
+      console.log(`新的值：${newValue}，旧的值：${oldValue}`);
+    },
+  },
+};
+```
+
+## ref 配置项
+
+```vue
+<h1 id="myId_1"></h1>
+<h1 ref="myId_2"></h1>
+<School ref="mySchool" />
+<script>
+export default {
+  methods: {
+    getEle_1() {
+      //使用原生API获取DOM元素
+      console.log(document.getElementById("myId_1"));
+    },
+    getEle_2() {
+      //使用原生API获取DOM元素
+      console.log(this.$refs.myId_2);
+    },
+    //获取组件实例对象
+    getCom() {
+      return this.$refs.mySchool;
+    },
+  },
+};
+</script>
+```
+
 ## props
 
 - 用与父组件向子组件传递数据
