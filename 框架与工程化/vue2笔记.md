@@ -396,7 +396,13 @@ module.exports = {
 
 <img src="../pic/vue学习/vuex工作流程图.png">
 
-创建》》》引入》》》使用
+## 安装
+
+```shell
+npm i vuex@3 --save
+```
+
+## 使用步骤
 
 - 步骤 1：创建`store/index.js`文件
 
@@ -500,6 +506,8 @@ export default new Vuex.Store({
 });
 ```
 
+- App.vue
+
 ```html
 <template>
   <div>
@@ -530,7 +538,7 @@ export default new Vuex.Store({
       // 方式二：mapState对象写法，相当于重命名了state中的变量
       // ...mapState({sum:'sum',nianling:'age',xingming:'name'})
 
-      //方式三：mapState数组写法
+      //方式三：mapState数组写法:在组件中进行使用时，变量名需要和vuex中定义的相同
       ...mapState(["sum", "age", "name"]),
     },
   };
@@ -562,6 +570,10 @@ computed:{
 ```
 
 ## mapAction 与 mapMutation 的使用
+
+<img src="../pic/vue学习/vuex工作流程图.png">
+
+根据 vuex 工作流程图，==要改变 store 中存储的数据==，其他组件需要在 methods 中`dispatch`将控制权交给 store 中的**actions**中定义的方法，后者再`commit`将控制权交给**mutation**中定义的方法，后者最终操作**state**中定义的数据
 
 - store/index.js
 
@@ -636,7 +648,7 @@ export default {
 </script>
 ```
 
-- 组件中使用`count.vue`(不使用 mapMutation 与 mapAction)
+- 组件中使用`count.vue`(使用 mapMutation 与 mapAction)
 
 ```vue
 <template>
@@ -666,12 +678,12 @@ export default {
   methods:{
     //对象写法
     ...mapMutation({increment:"JIA",decrement:"JIAN"}),
-    //数组写法
+    //数组写法：函数名需要和store/index.js中定义的相同
     ...mapMutation(['JIA','JIAN'])
 
     //对象写法
     ...mapActions({incrementOdd:"jiaOdd",incrementWait:"jiaWait"}),
-    //数组写法
+    //数组写法:函数名需要和store/index.js中定义的相同
     ...mapActions(['jiaOdd','jiaWait'])
   }
 };
@@ -887,6 +899,14 @@ export default {
 
 <img src="../pic/vue学习/$route对象内容.png">
 
+## 安装
+
+```shell
+npm i vue-router@3
+```
+
+## 使用步骤
+
 - 步骤 1：安装，只有 vue-router3 才能在 vue2 中使用
 
 ```shell
@@ -940,7 +960,7 @@ new Vue({
 </div>
 ```
 
-**嵌套（多级）路由**
+## 嵌套（多级）路由
 
 - 路由规则的配置
 
@@ -963,7 +983,7 @@ routes:[
 ]
 ```
 
-> children 配置项中的 path 不同写'/'
+> 注意：children 配置项中的 path 不用写'/'
 
 - 跳转（要写完整路径）
 
@@ -971,7 +991,7 @@ routes:[
 <router-link to="/home/news">News</router-link>
 ```
 
-**query 参数**
+## query 参数
 
 - 传递参数
 
@@ -998,7 +1018,8 @@ $route.query.id;
 $route.query.title;
 ```
 
-**命名路由**
+## 路由命名
+
 作用：多级路由的 path 配置项往往很长，使用 name 配置项简化路由跳转
 
 - 步骤 1：给路由配置 name
@@ -1039,7 +1060,7 @@ routes: [
 </router-link>
 ```
 
-**params 参数**
+## params 参数
 
 ```
 |- components
@@ -1104,10 +1125,11 @@ computed:{
 }
 ```
 
-**props 配置项**
+## props 配置项
 
 - 目的：让组件在接受路由参数时，更加轻便不必要写一些重复性的东西
-  写法一：props 的值为对象，该对象中的所有 key-value 都会一 props 的形式传递给 Detail 组件
+
+==写法一：props 的值为对象，该对象中的所有 key-value 都会一 props 的形式传递给 Detail 组件==
 
 - 传递 props`router/index.js`
 
@@ -1132,7 +1154,7 @@ export default {
 </script>
 ```
 
-写法二：props 值为布尔值，若为 true，就会将该路由组件收到的所有 params 参数以 props 的形式传递给 Detail 组件
+==写法二：props 值为布尔值，若为 true，就会将该路由组件收到的所有 params 参数以 props 的形式传递给 Detail 组件==
 
 > 存在问题：不能处理 query 参数
 
@@ -1222,7 +1244,7 @@ export default {
 </script>
 ```
 
-### router-link 的 replace 属性
+## router-link 的 replace 属性
 
 作用：用于控制条住哪时操作浏览器历史记录的模式
 
@@ -1234,7 +1256,7 @@ export default {
 <router-link replace to=""></router-link>
 ```
 
-### 编程式路由导航
+## 编程式路由导航
 
 作用：不借助 router-link 实现路由跳转
 
@@ -1255,7 +1277,7 @@ this.$route.replace({
 });
 ```
 
-### 缓存路由组件
+## 缓存路由组件
 
 作用：让不展示的路由组件保持挂载不被销毁
 
@@ -1266,11 +1288,11 @@ this.$route.replace({
 </keep-alive>
 ```
 
-### 路由守卫
+## 路由守卫
 
 作用：对路由进行鉴权
 
-**全局前置守卫**
+### 全局前置守卫
 
 ```js
 const route={
@@ -1333,7 +1355,7 @@ router.beforeEach((to,from,next)=>{
 })
 ```
 
-**后置路由守卫**
+### 后置路由守卫
 
 ```js
 const route={
