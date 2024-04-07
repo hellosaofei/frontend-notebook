@@ -3,24 +3,57 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.bootcdn.net/ajax/libs/Mock.js/1.0.0/mock-min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.4.0/vue.min.js"></script>
     <title>vue2</title>
+    <style>
+      .basic {
+        height: 200px;
+        width: 300px;
+        background-color: antiquewhite;
+      }
+      .happy {
+        background-color: orange;
+      }
+      .gloom {
+        background-color: skyblue;
+      }
+      .sad {
+        background-color: lightseagreen;
+      }
+
+      .style1 {
+        border-radius: 10px;
+      }
+      .style2 {
+        font-size: 25px;
+      }
+      .style3 {
+        color: #000;
+      }
+    </style>
   </head>
   <body>
+    <div id="root">
+      <div class="basic" :class="{style1:true,style2:true}">{{name}}</div>
+      <!-- <div class="basic" :class="mood" @click="changeMood">{{name}}</div> -->
+    </div>
     <script>
-      var id = Mock.mock("@id"); //得到随机的id,字符串
-      console.log(id, typeof id);
-
-      var obj = Mock.mock({
-        id: "@id()", //得到随机的id,对象
-        username: "@cname()", //随机生成中文名字
-        date: "@date()", //随机生成日期
-        avatar: "@image('200x200','red','#fff','avatar')", //生成图片,参数:size, background, foreground, text
-        description: "@paragraph()", //描述
-        ip: "@ip()", //IP地址
-        email: "@email()", //email
+      const vm = new Vue({
+        el: "#root",
+        data: {
+          name: "张三",
+          mood: "gloom",
+          classObj: {
+            style1: true,
+            style2: true,
+          },
+        },
+        methods: {
+          changeMood() {
+            this.mood = "happy";
+          },
+        },
       });
-      console.log(obj);
     </script>
   </body>
 </html>

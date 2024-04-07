@@ -10,6 +10,265 @@ export default {
 
 # 配置项
 
+## 绑定 class 样式
+
+```css
+.basic {
+  height: 200px;
+  width: 300px;
+  background-color: antiquewhite;
+}
+.happy {
+  background-color: orange;
+}
+.gloom {
+  background-color: skyblue;
+}
+.sad {
+  background-color: lightseagreen;
+}
+
+.style1 {
+  border-radius: 10px;
+}
+.style2 {
+  font-size: 25px;
+}
+.style3 {
+  color: #000;
+}
+```
+
+- 场景：鼠标点击后更换样式
+- 写法一：字符串写法，要绑定的类名不确定，需要动态指定
+
+```html
+<div id="root">
+  <div class="basic" :class="mood" @click="changeMood">{{name}}</div>
+</div>
+<script>
+  const vm = new Vue({
+    el: "#root",
+    data: {
+      name: "张三",
+      mood: "gloom",
+    },
+    methods: {
+      changeMood() {
+        // this.mood="happy"
+        const arr = ["style1", "style2", "style3"];
+        const index = Math.floor(Math.random() * 3);
+        this.mood = arr[index];
+      },
+    },
+  });
+</script>
+```
+
+- 场景：在所有样式中，可能全都用，也可能只用一部分
+- 写法二：数组写法，适用于：要绑定的类名个数和名字都不确定
+- 优点：可以通过操作数组`classArr`的方式(`shift,push等增删方式`)动态控制容器绑定的 class 样式
+
+```html
+<div id="root">
+  <div class="basic" :class="classArr">{{name}}</div>
+</div>
+<script>
+  const vm = new Vue({
+    el: "#root",
+    data: {
+      name: "张三",
+      classArr: ["style1", "style2", "style3"],
+    },
+  });
+</script>
+```
+
+- 场景：在已知的两种样式中，使用的时候样式可能共存、可能互斥
+- 写法三：对象写法，适用于：要绑定的类名个数和名字都确定
+
+```html
+<div id="root">
+  <!-- 写法一： -->
+  <div class="basic" :class="classObj">{{name}}</div>
+  <!-- 写法二： -->
+  <!-- <div class="basic" :class="{style1:false,style2:false}">{{name}}</div> -->
+</div>
+<script>
+  const vm = new Vue({
+    el: "#root",
+    data: {
+      name: "张三",
+      classObj: {
+        style1: true,
+        style2: false,
+      },
+    },
+  });
+</script>
+```
+
+## 自定义事件
+
+- 目录结构
+
+```
+|- 根目录
+  |- components
+    |- School.vue
+    |- Student.vue
+  |- App.vue
+```
+
+**场景：子组件给父组件传递数据**
+
+- 写法一：父组件给子组件传递函数类型 props 实现
+- 步骤：
+  1. 父组件定义方法，并传递给子组件
+  2. 子组件通过 props 配置项接收
+  3. 子组件内调用父组件的方法
+
+> App.vue
+
+- 思路梳理：父组件中定义一个函数并且直接交给了子组件
+
+```html
+<!-- 此处v-on后面的变量名可以随便写，但是写什么，子组件School使用props接收的就是什么 -->
+<School v-on:getSchoolName="getSchoolName" />
+
+<script>
+  export default {
+    methods: {
+      getSchoolName(name) {
+        console.log(name);
+      },
+    },
+  };
+</script>
+```
+
+> School.vue
+
+- 思路梳理：点击按钮后，执行`sendSchoolName`方法，该方法又会调用父组件传递过来的`getSchoolName`方法，最终完成业务场景
+
+```html
+<button @click="sendSchoolName">点击发送</button>
+
+<script>
+  export default {
+    //...
+    props: ["getSchoolName"],
+    data() {
+      return {
+        name: "第一高中",
+      };
+    },
+    methods: {
+      sendSchoolName() {
+        this.getSchoolName(this.name);
+      },
+    },
+  };
+</script>
+```
+
+- 写法二：父组件给子组件绑定自定义事件（使用`v-on`实现）
+- 步骤：
+  1. 父组件给组件绑定自定义事件，该事件触发后，执行父组件内的响应函数
+  2. 子组件通过`this.$emit`触发该自定义事件同时向父组件传递数据
+
+> App.vue
+
+- 思路梳理：`toggleName`相当于是在 Student 的实例 vc 上绑定了一个事件，当该事件触发时，执行父组件的`demo`函数
+
+```html
+<Student @toggleName="demo" />
+<!-- 仅触发一次 -->
+<!-- <Student @toggleName.once="demo" /> -->
+<script>
+  export default {
+    methods: {
+      demo(name) {
+        console.log(name);
+      },
+    },
+  };
+</script>
+```
+
+> Student.vue
+
+- 思路梳理：`this.$emit`相当于触发 Student 的实例 vc 上绑定的`toggleName`事件
+- 存在问题：如果有下面的业务需求：等待若干秒后再绑定事件，该种写法就不能实现
+
+```html
+<button @click="sendStudentName">点击发送</button>
+
+<script>
+  export default {
+    //...
+    data() {
+      return {
+        name: "张三",
+      };
+    },
+    methods: {
+      sendStudentName() {
+        this.$emit("toggleName", this.name);
+      },
+    },
+  };
+</script>
+```
+
+- 写法三：父组件给子组件绑定一个自定义事件实现（使用 ref）
+
+> App.vue
+
+```html
+<School ref="school" />
+
+<script>
+  export default {
+    methods: {
+      getSchoolName(name) {
+        console.log(name);
+      },
+      //解构：接受多个参数
+      // getSchoolName(name,...params) {
+      //   console.log(name,params);
+      // },
+    },
+    mounted() {
+      //触发多次
+      this.$refs.school.$on("toggleName", this.getSchoolName);
+      //仅触发一次
+      // this.$refs.school.$once("toggleName", this.getSchoolName);
+    },
+  };
+</script>
+```
+
+> School.vue
+
+```html
+<button @click="sendSchoolName">点击发送</button>
+
+<script>
+  export default {
+    //...
+    data() {
+      return {
+        name: "第一高中",
+      };
+    },
+    sendSchoolName() {
+      this.$emit("toggleName", this.name, 1, 2, 3, 4);
+    },
+  };
+</script>
+```
+
 ## watch 配置项
 
 用于监听变量名
