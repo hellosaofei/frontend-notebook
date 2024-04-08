@@ -1158,14 +1158,6 @@ function* objEntries(obj){
 3. 发布/订阅
 4. Promise 对象
 
-# 模块语法
-
-- es6 以前，js 已知没有模块体系，无法将一个大工程拆分为互相依赖的小文件在用简单的方法拼接起来，但其他语言都有这项功能（如 python 的 import、Ruby 的 require），这对开发大型复杂的项目形成了巨大的障碍
-
-- es6 前社区制定了一些模块加载方案主要是 commonJS（用于服务器）和 AMD（用于浏览器），es6 实现了模块功能并可以完全替代上面两种规范，成为浏览器和服务器通用的模块解决方案
-
-- es6 的
-
 # 严格模式
 
 - 变量先声明再使用
@@ -1173,9 +1165,24 @@ function* objEntries(obj){
 - 不能使用 with 语句
 - 不能赋值只读属性
 
-# export 命令
+# 模块语法
 
-- es6 模块主要由两个命令构成`export`(灰顶模块的对外接口)和`import`(输入其他模块提供的功能)
+- es6 以前，js 已知没有模块体系，无法将一个大工程拆分为互相依赖的小文件在用简单的方法拼接起来，但其他语言都有这项功能（如 python 的 import、Ruby 的 require），这对开发大型复杂的项目形成了巨大的障碍
+
+- es6 前社区制定了一些模块加载方案主要是 commonJS（用于服务器）和 AMD（用于浏览器），es6 实现了模块功能并可以完全替代上面两种规范，成为浏览器和服务器通用的模块解决方案
+
+- es6 模块的设计思想是尽量静态化，使编译时就能确定模块之间的依赖关系以及输入和输出的关系。CommonJs 和 AMD 都只能在运行时才能确定模块间的依赖关系
+
+## es6 模块设计初衷
+
+- 静态化：使编译时就能确定模块的依赖关系以及输入输出的变量
+- 代码组织问题：随着代码量不断增加，将所有代码写进一个文件中会难以组织和维护，将代码从一个大文件拆分为若干个相互依赖的小文件
+- 浏览器和服务器的通用模块解决方案：es6 之前，js 没有官方的模块系统，社区中存在 commonJS 和 AMD 两种模块规范，但两者都有各自的局限，分别是用于浏览器和服务器
+- 简洁性：es6 通过 export 和 import 两个关键字就能完成模块的输入输出操作，使模块的使用非常直观和方便
+
+## export 命令
+
+- es6 模块主要由两个命令构成`export`(规定模块的对外接口)和`import`(输入其他模块提供的功能)
 
 - 一个模块就是一个独立文件，该文件内部所有变量没有经过 export 暴露，外界就无法获取
 
@@ -1202,7 +1209,7 @@ export { name, age, year };
 ```js
 //报错
 export 1;
-//报错
+//报错:直接向外暴露数字1（此处相当于直接使用了变量m），没有一一对应关系
 var m=1;
 export m;
 
@@ -1211,14 +1218,38 @@ export var m=1;
 //正确写法二：
 var m=1;
 export {m}
-
 //正确性写法三：
 var n=1;
 export {n as m}
+```
 
+```js
+// 报错
+function f() {}
+export f;
+
+// 正确
+export function f() {};
+
+// 正确
+function f() {}
+export {f};
 ```
 
 - 使用 as 关键字重命名
+
+```js
+function v1() { ... }
+function v2() { ... }
+
+export {
+  v1 as streamV1,
+  v2 as streamV2,
+  v2 as streamLatestVersion
+};
+```
+
+> 上面代码中**函数 v2**使用不同的名字输出了两次
 
 - export 命令能够向外暴露三种接口：函数 Function、类 Class、变量 variable
 
@@ -1233,7 +1264,7 @@ export class Person(){
 }
 ```
 
-- export 命令可出现在模块的任何位置，但如果位于块级作用域内就会报错。因为处于条件代码块中就没法做静态优化，违背了 es6 模块的设计初衷
+- export 命令可出现在模块的任何位置，但如果**位于块级作用域内**就会报错。因为处于**条件代码块中**就没法做静态优化，违背了 es6 模块的设计初衷
 
 ```js
 //export语句放在了块级作用域之中，将会报语法错误
@@ -1248,24 +1279,93 @@ if (x === 1) {
 }
 ```
 
-## es6 模块设计初衷
+## import 语句
 
-- 静态化：使编译时就能确定模块的依赖关系以及输入输出的变量
-- 代码组织问题：随着代码量不断增加，将所有代码写进一个文件中会难以组织和维护，将代码从一个大文件拆分为若干个相互依赖的小文件
-- 浏览器和服务器的通用模块解决方案：es6 之前，js 没有官方的模块系统，社区中存在 commonJS 和 AMD 两种模块规范，但两者都有各自的局限，分别是用于浏览器和服务器
-- 简洁性：es6 通过 export 和 import 两个关键字就能完成模块的输入输出操作，使模块的使用非常直观和方便
-
-# import 语句
-
+- import 语句具有提升效果，会提升到整个模块头部首先执行
 - 使用 export 命令定义了模块的对外接口后，其他 js 文件就可以通过 import 命令加载改模块
 
 ```js
-//大括号中的变量名必须与被导入模块对外接口的名称相同
-//这就需要使用该模块的开发者事先知道这些接口名称，可使用export default命令解除该限制
+//可使用export default命令解除该限制
 import { name, age } from "./test.js";
 //为输入的变量重命名
 import { name as myName } from "./test.js";
 ```
+
+### 注意：关于 export 和 import 方法名一致的问题
+
+目录结构
+
+```
+|- data.js    向外export
+|- index.js   从外面import
+```
+
+**第一种：export 分别暴露，import 分别导入**
+
+- data.js
+
+```js
+var name = "张三";
+var age = 12;
+
+//此处相当于向外面暴露了一个对象，该对象有属性name和age
+export { name, age };
+```
+
+> 能不能将 export 命令理解为就是向外暴露了一个对象，不管是不是 default 暴露，其他模块引入时都是将该对象进行了引入
+
+- index.js
+
+> 分别导入时，大括号中的变量名必须与被导入模块对外接口的名称相同，这就需要使用该模块的开发者事先知道这些接口名称
+> 通俗的来说，就是 data.js 向外暴露了 name 和 age 两个变量，index.js 要分别导入，就只能使用 name 和 age 两个变量
+
+```js
+import { name, age } from "data.js";
+// 或使用as关键字重命名
+import { name as myName, age as myAge } from "data.js";
+```
+
+**第二种：export 默认暴露，import 默认导入**
+
+- data.js
+
+```js
+var name = "张三";
+
+export default name;
+```
+
+- index.js
+
+> 由于 data.js 向外默认暴露了一个变量，index.js 导入时可随便进行重命名
+
+```js
+import myName from "./data.js";
+```
+
+**第三种：export 默认暴露和分别暴露，import 同时导入默认接口和其他接口**
+
+- data.js
+
+```js
+export default function (obj) {
+  // ···
+}
+
+export function each(obj, iterator, context) {
+  // ···
+}
+
+export { each as forEach };
+```
+
+- index.js
+
+```js
+import _, { each, forEach } from "lodash";
+```
+
+### 其他注意事项
 
 - 使用 import 命令导入的变量（只读）不允许被修改
 
@@ -1275,14 +1375,78 @@ import { a } from "./test.js";
 a = {};
 ```
 
-- import 语句具有提升效果
+- import 语句会执行所加载的模块,下面一行代码只会执行`mock/index.js`文件但不会导入任何变量
 
-# export default 命令
+```js
+import "./mock/index.js";
+```
 
-- 指定模块的默认输出
+- 多次加载同一句 import 语句只会执行一次，下面代码加载了两次`mock/index.js`但是只会执行一次该文件
+
+```js
+import "./mock/index.js";
+import "./mock/index.js";
+```
+
+- import 语句是静态执行（编译时）的，不能使用表达式和变量，因为这些只能在运行时得到结果
+
+```js
+// 报错：使用了表达式
+import { 'f' + 'oo' } from 'my_module';
+
+// 报错：先赋值再import
+let module = 'my_module';
+import { foo } from module;
+
+// 报错:使用了if结构
+if (x === 1) {
+  import { foo } from 'module1';
+} else {
+  import { foo } from 'module2';
+}
+```
+
+### 模块的整体加载
+
+目录结构
+
+```
+|- data.js    向外暴露变量
+|- index.js   导入变量
+```
+
+- data.js
+
+```js
+export function area() {
+  return "10";
+}
+
+export function circumference() {
+  return "20";
+}
+```
+
+- index.js
+
+```js
+// 方法一：逐一加载
+import { area, circumference } from "./data.js";
+
+console.log("圆面积：" + area());
+console.log("圆周长：" + circumference());
+
+// 方法二：整体加载,此处相当于是把data.js文件向外暴露的对象中的方法复制到了一个新的对象身上，而该对象在index.js中可以随意命名
+import * as circle from "./circle";
+console.log("圆面积：" + circle.area(4));
+console.log("圆周长：" + circle.circumference(14));
+```
+
+## export default 命令
+
 - 一个模块只能有一个默认输出，因此`export default`命令一个模块中只能使用一次
 
-- `export default`命令其实只是输出了一个叫做 default 的变量，
+- `export default`命令本质只是输出了一个叫做 default 的变量，
 
 ```js
 /*test.js*/
@@ -1311,26 +1475,6 @@ export default a;
 export var a=1;
 ```
 
-# 模块整体加载
+## import()
 
-- 使用星号（\*）指定一个对象将所有输出值都加载在该对象上
-
-```js
-/*test.js*/
-export function printName(name) {
-  console.log(`我的名字是${name}`);
-}
-export var name_1 = "张三";
-
-/*main.js */
-//逐一加载写法
-import { name_1, printName } from "./test.js";
-printName(name_1); //我的名字是张三
-//整体加载写法
-import * as Obj from "./test.js";
-Obj.printName(Obj.name_1); //我的名字是张三
-
-//不允许对其再次赋值,下面两个赋值操作将会报错
-Obj.printName = function () {};
-Obj.name_1 = "李四";
-```
+### 引入背景
