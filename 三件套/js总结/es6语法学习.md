@@ -1442,6 +1442,88 @@ console.log("圆面积：" + circle.area(4));
 console.log("圆周长：" + circle.circumference(14));
 ```
 
+### export 与 import 混合使用
+
+在一个模块中先输入后输出同一个模块，import 语句和 export 语句可以写在一起（写在一起时，模块实际上并没有别导入当前文件，只是相当于对外转发了这两个接口）
+
+```js
+export { foo, bar } from "my_module";
+
+// 可以简单理解为
+import { foo, bar } from "my_module";
+export { foo, bar };
+```
+
+#### 有什么用：接口聚合
+
+假设当前某项目的结构如下：
+
+```
+|- 根目录
+  |- components
+    |- School.vue
+    |- Student.vue
+    |- Other.vue
+  |- App.vue
+```
+
+现在的情况是，`App.vue`想要同时引入 components 文件夹下的三个子组件，于是，App.vue 中就应该这样写
+
+```js
+import Student from './components/Student.vue',
+import School from './components/School.vue',
+import Other from './components/Other.vue'
+export default{
+  name:'App',
+  components:{
+    Student,School,Other
+  }
+}
+```
+
+当需要引入的文件较少时，这种情况还好，当需要引入更多的文件时，这里的 import 语句就会很多，这不利于项目的维护
+
+**解决该问题**
+在`components`文件夹下建立文件`index.js`,并写入下面内容
+
+- 目录结构
+
+```
+|- 根目录
+  |- components
+    |- index.js
+    |- School.vue
+    |- Student.vue
+    |- Other.vue
+  |- App.vue
+```
+
+- components/index.js
+
+```js
+export { default as Student } from "./Student";
+export { default as School } from "./School";
+export { default as Other } from "./Other";
+```
+
+于是`App.vue`中就需要用下面的方法进行`import`
+
+- App.vue
+
+```js
+import { Student, School, Other } from "./components";
+export default {
+  name: "App",
+  components: {
+    Student,
+    School,
+    Other,
+  },
+};
+```
+
+于是，components 下的子组件就能得到统一的管理，利于项目的维护
+
 ## export default 命令
 
 - 一个模块只能有一个默认输出，因此`export default`命令一个模块中只能使用一次

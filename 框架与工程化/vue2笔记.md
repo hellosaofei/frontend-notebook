@@ -383,7 +383,7 @@ export default {
 import Student from './components/Student'
 export default {
   name: "App",
-  components;{Student},
+  components:{Student},
 };
 </script>
 <style></style>
@@ -401,7 +401,6 @@ export default {
   </div>
 </template>
 <script>
-import Student from "./components/Student";
 export default {
   name: "Student",
   data() {
@@ -451,6 +450,149 @@ export default {
 - 避免使用一些特殊变量名（如 ref、key）作为 props
 - 通过 props 传递的数据将会被挂载到组件实例对象 VC 身上，所以在组件内部可以直接使用 this 关键字访问到
 - vue 会先将 props 中的数据准备好然后再渲染 data 配置项中的数据，所以可以在 data 中声明其他变量来对 props 中的数据进行一个浅拷贝
+
+## mixin 混入
+
+目的：多个组件有相同的业务逻辑，将该逻辑抽离出来放在`mixins.js`文件中
+
+> 下面的例子中，两个子组件都有函数`showName`以实现点击标签呈现自己的名字的功能，于是尝试将该函数进行剥离
+
+- 目录结构
+
+```
+|- components
+    |- Student.vue
+    |- School.vue
+|- App.vue
+|- main.js
+|- mixins.js
+```
+
+- App.vue
+
+```html
+<template>
+  <div>
+    <Student />
+  </div>
+</template>
+<script>
+  import School from "./components/School";
+  import Student from "./components/Student";
+  export default {
+    name: "App",
+    components: {
+      School,
+      Student,
+    },
+  };
+</script>
+<style></style>
+```
+
+- Student.vue
+
+```html
+<template>
+  <div>
+    <h1 @click="showName">学生姓名：{{ name }}</h1>
+    <p>性别：{{ sex }}</p>
+  </div>
+</template>
+<script>
+  export default {
+    name: "Student",
+    data() {
+      return {
+        name: "张三",
+        sex: "男",
+      };
+    },
+    methods: {
+      showName() {
+        alert("我的名字是：", this.name);
+      },
+    },
+  };
+</script>
+```
+
+- School.vue
+
+```html
+<template>
+  <div>
+    <h1 @click="showName">学校姓名：{{ name }}</h1>
+    <p>{{address}}</p>
+  </div>
+</template>
+<script>
+  export default {
+    name: "School",
+    data() {
+      return {
+        name: "第一高中",
+        address: "飞凤路与解放路交叉口",
+      };
+    },
+    methods: {
+      showName() {
+        alert("我的名字是：", this.name);
+      },
+    },
+  };
+</script>
+```
+
+**开始剥离**
+
+- mixins.js
+
+```js
+export const hunhe = {
+  methods: {
+    showName() {
+      alert(this.name);
+    },
+  },
+  mounted() {
+    console.log("组件已经挂载");
+  },
+};
+export const hunhe2 = {
+  data() {
+    return {
+      x: 100,
+      y: 200,
+    };
+  },
+};
+```
+
+**引入混合**
+
+> mixin 混合内可以配置所有的配置项，组件引入之后，会将所有配置项进行整合,数据或配置项发生冲突时，以组件中的为主
+
+- Student.vue
+
+```js
+import { hunhe, hunhe2 } from "../mixins.js";
+
+export default {
+  mixins: [hunhe, hunhe2],
+};
+```
+
+### 全局混合
+
+- 在`main.js`文件中进行引入
+
+```js
+import { hunhe, hunhe2 } from "../mixins.js";
+
+Vue.mixin(hunhe);
+Vue.mixin(hunhe2);
+```
 
 ## 过滤器
 
