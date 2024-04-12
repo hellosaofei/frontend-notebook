@@ -612,27 +612,76 @@ text-?? ， font-?? ， line-?? 、 color .....
 
 # 文本
 
-字母间距
+**颜色 color**
 
-文本间距
+```
 
-文本修饰
+```
+
+**文本对齐方式 text-align**
+
+```html
+<head>
+  <style>
+    h1 {
+      text-align: center;
+    }
+    p.date {
+      text-align: right;
+    }
+    p.main {
+      text-align: justify;
+    }
+  </style>
+</head>
+<body>
+  <h1>CSS text-align 实例</h1>
+  <p class="date">2015 年 3 月 14 号</p>
+  <p class="main">当我年轻的时候，我梦想改变这个世界；</p>
+</body>
+```
+
+<img src="../../pic/css学习/text-align属性.png">
+
+**文本修饰 text-decoration**
 
 - 控制文本的各种装饰线
-- `装饰线类型:`none：无装饰线；underline：下划线；overline：上划线；line-through：删除线
-- `装饰线样式：`dotted:虚线；wave：波浪线
-  文本缩进
+  > - 装饰线类型:none：无装饰线；underline：下划线；overline：上划线；line-through：删除线
+  > - 装饰线样式：dotted:虚线；wave：波浪线
+
+文本缩进
+
 - 控制文本首字母缩进
 - css 长度单位
 
-文本对齐
-text-align
-
 - 控制文本水平对齐方式
 - left：左对齐；right：右对齐；center：居中
-  行高
-  line-height
-  控制一行文字高度
+
+## height 与 line-height
+
+height 定义了一个盒子的高度
+line-height：定义的是每一行的高度，即为输入的内容。
+**当 height 和 line-height 相等时，即盒子的高度和行高一样，内容居中**
+
+```html
+<head>
+  <style>
+    p {
+      height: 50px;
+      line-height: 50px;
+      background-color: skyblue;
+    }
+  </style>
+</head>
+<body>
+  <p>这是一段演示内容</p>
+</body>
+```
+
+<img src="../../pic/css学习/line-height和height.png">
+
+**行高 line-height**
+用于设置多行元素的空间量，如多行文本的间距。对于块级元素，它指定元素行盒（line boxes）的最小高度
 
 ```html
 <head>
@@ -762,12 +811,21 @@ background-position:
 > 未脱离文档流的元素，包含块即父元素
 > 脱离文档流的元素：包含块是第一个拥有定位属性的祖先元素
 
-宽高在使用百分比值时，参照是其包含块
-任何元素的初始高度为 0，如果某个元素的包含块高度为 0，那么对其设置 height:100%,也不会生效
+**问题描述**：宽高在使用百分比值时，参照是其包含块。任何元素的初始高度为 0，如果某个元素的包含块高度为 0，那么对其设置 height:100%,也不会生效
 
-html 文档根元素<\html>的包含块是整个视窗，其宽高默认为整个浏览器视口，所以设置`<html>`的宽高分别为 width:100%;height:100%总能够生效
+**产生原因**：如果包含块（即父元素）的高度没有显式指定（即高度由内容决定），并且该元素不是绝对定位，则计算值为 auto（这是计算值，是指渲染之后解释的值，并不是我们设置 height: auto 所指的值）。一句话总结就是：因为解释成了 auto。要知道，auto 和百分比计算，肯定是算不了的：()
 
-因此我们也通常进行如下设置,然后再设置其他元素的宽高为百分比时就能够看到效果了
+```c
+'auto' * 100/100 = NaN
+```
+
+> 上面的计算结果是 NaN,这就是父元素没有设置高度时，子元素高度百分比不生效的原因了。
+
+**特殊情况**：html 文档根元素`<html>`的包含块是整个视窗，其宽高默认为整个浏览器视口，所以设置`<html>`的宽高分别为 width:100%;height:100%总能够生效
+
+**解决方案：**
+
+1. 显式设置包含块的宽高，或者直接进行如下设置
 
 ```css
 html,
@@ -776,6 +834,78 @@ body {
   height: 100%;
 }
 ```
+
+2. 使用绝对定位
+   为什么使用绝对定位就可以了呢？因为会使元素具有“格式化高度”。那什么又是格式化高度？
+
+> **格式化宽度/高度**仅出现在“绝对定位模型”中，也就是出现在 position 属性值为 absolute 或 fixed 的元素中。当 left/top 或 top/bottom 对立方位的属性值同时存在的时候，元素的宽度/高度表现为“格式化宽度/高度”，其宽度/高度相对于最近的具有定位特性（position 属性值不是 static）的祖先元素计算。(**简单说就是让子元素相对于父元素进行定位，而不是祖先元素)**
+
+### 真实案例 1
+
+下面的案例展示了一个 body 标签的子元素 div 撑满 body 元素本身
+
+```html
+<html lang="en">
+  <head>
+    <title>黑色主题</title>
+    <style>
+      body {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+
+      .box {
+        width: 100%;
+        height: 100%;
+        background: #000;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box"></div>
+  </body>
+</html>
+```
+
+[参考文献-深入理解 CSS 系列（二）：为什么 height:100%不生效？](https://www.cnblogs.com/yugege/p/9264319.html)
+
+### 真实案例 2
+
+```html
+<html>
+  <head>
+    <title>使用绝对定位和百分比高度示例</title>
+    <style>
+      .container {
+        width: 300px;
+        height: 300px;
+        border: 1px solid black;
+        position: relative; /* 父元素设置为相对定位 */
+      }
+      .child {
+        position: absolute; /* 子元素设置为绝对定位 */
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+        height: 50%; /* 设置子元素的高度为50% */
+        border: 1px solid red;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="child"></div>
+    </div>
+  </body>
+</html>
+```
+
+<img src="../../pic/css学习/height百分比问题-真实案例2.png">
 
 ## 显示模式
 

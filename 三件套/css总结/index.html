@@ -1,73 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <link rel="stylesheet" href="./iconfont/iconfont.css" />
-    <script src="https://cdn.bootcdn.net/ajax/libs/sass.js/0.11.1/sass.min.js"></script>
+    <title>使用绝对定位和百分比高度示例</title>
     <style>
-      body {
-        margin: 0;
-      }
-      ul {
-        padding: 0;
-        margin: 0;
-        list-style: none;
-      }
       .container {
-        width: 1000px;
-        /* height: 466px; */
-        margin: 50px auto 0;
-        position: relative;
-        /* background-color: green; */
-        ul {
-          border: 1px solid #000;
-          width: 10000px;
-          position: absolute;
-          left: 0;
-          top: 0;
-          li {
-            border: 1px solid red;
-            width: 1000px;
-            /* height: 466px; */
-            float: left;
-          }
-        }
-        .pre {
-          width: 41px;
-          height: 70px;
-          border: 1px solid red;
-          position: absolute;
-          left: 0;
-          top: 50%;
-          margin-top: -35px;
-        }
-        .next {
-          width: 41px;
-          height: 70px;
-          border: 1px solid red;
-          position: absolute;
-          right: 0;
-          top: 50%;
-          margin-top: -35px;
-        }
+        width: 300px;
+        height: 300px;
+        border: 1px solid black;
+        position: relative; /* 父元素设置为相对定位 */
+      }
+      .child {
+        position: absolute; /* 子元素设置为绝对定位 */
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+        height: 50%; /* 设置子元素的高度为50% */
+        border: 1px solid red;
       }
     </style>
   </head>
   <body>
     <div class="container">
-      <ul>
-        <li><img src="./pic/材料/轮播图/1.webp" alt="" width="1000" /></li>
-        <li><img src="./pic/材料/轮播图/2.webp" alt="" width="1000" /></li>
-        <li><img src="./pic/材料/轮播图/3.png" alt="" width="1000" /></li>
-        <li><img src="./pic/材料/轮播图/4.webp" alt="" width="1000" /></li>
-        <li><img src="./pic/材料/轮播图/1.webp" alt="" width="1000" /></li>
-        <li><img src="./pic/材料/轮播图/3.webp" alt="" width="1000" /></li>
-        <li></li>
-      </ul>
-      <div class="pre"></div>
-      <div class="next"></div>
+      <div class="child"></div>
     </div>
   </body>
 </html>
