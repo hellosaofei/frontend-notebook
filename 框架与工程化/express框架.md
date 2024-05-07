@@ -8,6 +8,74 @@
 
 包含解析数据的新 body 对象在中间件（即 req.body）之后填充到 request 对象上，如果没有要解析的主体、Content-Type 不匹配或发生错误，则填充一个空对象（{}）
 
+### express.Router
+
+使用 express.Router 类创建模块化、可挂载的路由处理程序。一个 Router 实例就是一个完整的中间件和路由系统；因此，它通常被称为 “mini-app”。
+
+- 目的：对路由进行模块化管理, 创建独立的 js 文件存储 router
+
+#### 使用案例
+
+- 目录结构
+
+```
+|- Root
+  |- routes
+    |- visitorRouter.js
+    |- adminRouter.js
+  |- index.js
+```
+
+- visitorRouter.js
+
+```js
+const express = require("express");
+
+const router = express.Router();
+
+router.get("/", (req, res) => {
+  res.send("visitor home page");
+});
+router.get("/profile", (req, res) => {
+  res.send("visitor profile page");
+});
+
+module.exports = router;
+```
+
+- adminRouter.js
+
+```js
+const express = require("express");
+
+const router = express.Router();
+
+router.get("/", (req, res) => {
+  res.send("admin home page");
+});
+router.get("/profile", (req, res) => {
+  res.send("admin profile page");
+});
+
+module.exports = router;
+```
+
+- index.js
+
+```js
+const express = require("express");
+const app = express();
+//引入子路由文件
+const visitorRouter = require("./routes/visitorRouter");
+const adminRouter = require("./routes/adminRouter");
+//设置和使用中间件
+app.use("/visitor", visitorRouter);
+app.use("/admin", adminRouter);
+app.listen(3000, () => {
+  console.log("服务器正运行在端口3000....");
+});
+```
+
 ## 中间件
 
 - 中间件本质是一个回调函数，可以像路由回调一样访问请求对象（req）和响应对象（res）
@@ -113,38 +181,52 @@ app.get("/index.html", (req, res) => {});
 npm i body-parser
 ```
 
-- 导入
+#### 简单使用
+
+- index.html
+
+```html
+<form
+  action="http://localhost:8000/upload"
+  method="post"
+  enctype="application/x-www-form-urlencoded"
+>
+  <input type="text" name="username" />
+  <input type="text" name="password" />
+  <input type="submit" value="提交" />
+</form>
+```
+
+- server.js(方式一：全局引入)
 
 ```js
 const bodyParser = require("body-parser");
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+app.post("/login", (req, res) => {
+  console.log(req.body);
+});
 ```
 
-- 获取中间件函数
+- server.js(方式二：局部引入)
 
 ```js
+const bodyParser = require("body-parser");
+
 let urlParser = bodyParser.urlencoded({ extended: false });
-//处理 JSON 格式的请求体
 let jsonParser = bodyParser.json();
-```
 
-- 设置路由中间件，使用 req.body 后去请求体数据
-
-```js
-app.post("/login", urlParser, (request, response) => {
-  //获取请求体数据
-  //console.log(request.body);
-  //用户名
-  console.log(request.body.username);
-  //密码
-  console.log(request.body.userpass);
-  response.send("获取请求体数据");
+app.post("/login", (req, res) => {
+  console.log(req.body);
 });
 ```
 
 - 得到的请求体数据为
 
 ```
-[Object: null prototype] { username: 'admin', userpass: '123456' }
+{ username: 'admin', userpass: '123456' }
 ```
 
 ### cookie-parser 中间件
@@ -276,72 +358,6 @@ const upload = multer({ storage})
 
 - dstination:上传的文件存储在哪个文件夹中。该参数也是一个字符串
 - filename:
-
-### 路由拆分
-
-- 目的：对路由进行模块化管理
-
-- 创建独立的 js 文件存储 router
-
-```
-目录结构
-|- Root
-  |- routes
-    |- homeRouter.js
-    |- adminRouter.js
-  |- index.js
-```
-
-- 前台路由
-
-```js
-// homeRouter.js
-const express = require("express");
-
-const router = express.Router();
-
-router.get("/", (req, res) => {
-  res.send("首页");
-});
-router.get("/cart", (req, res) => {
-  res.send("购物车");
-});
-
-module.exports = router;
-```
-
-- 后台路由
-
-```js
-// adminRouter.js
-const express = require("express");
-
-const router = express.Router();
-
-router.get("/admin", (req, res) => {
-  res.send("后台首页");
-});
-router.get("/setting", (req, res) => {
-  res.send("后台管理");
-});
-
-module.exports = router;
-```
-
-- 主文件
-
-```js
-// index.js
-const express = require("express");
-const app = express();
-//引入子路由文件
-const homeRouter = require("./routes/homeRouter");
-const adminRouter = require("./routes/adminRouter");
-//设置和使用中间件
-app.use(homeRouter);
-app.use(adminRouter);
-app.listen(3000);
-```
 
 ## app 对象
 
@@ -654,19 +670,43 @@ app.get("/", (req, res) => {
 
 ```js
 const express = require("express");
+const cors = require("cors");
+const bodyParser = require("body-parser");
 
-//创建app对象
 const app = express();
 
-//创建路由规则
-app.get("/home", (req, res) => {
-  res.send("hello server express");
-});
+const PORT = 8000;
 
-//监听端口，开启服务
-app.listen(3000, () => {
-  console.log("服务开启，端口监听为3000....");
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(cors());
+app.use("/", express.static("upload_video"));
+
+app.post("/upload", (req, res) => {});
+
+app.listen(PORT, () => {
+  console.log("服务器开启，8000");
 });
+```
+
+## 关于中间件的使用
+
+### 一个路由使用多个中间件
+
+在 Express 框架中，一个路由可以使用多个中间件，这些中间件会按照定义的顺序执行。每个中间件可以执行任务，例如处理请求，响应请求，终止请求-响应循环，或者调用下一个中间件。
+
+```js
+function middleware1(req, res, next) {
+    console.log('Middleware 1');
+    next();
+}, function middleware2(req, res, next) {
+    console.log('Middleware 2');
+    next();
+}, function middleware3(req, res) {
+    console.log('Middleware 3');
+    res.send('Hello World!');
+}
+app.get("/example", middleware1, middleware2, middleware3);
 ```
 
 ## 连接 mysql 数据库

@@ -419,7 +419,7 @@ function rotate(arr, k) {
 }
 ```
 
-## 数组模拟
+## 数组模拟队列、栈
 
 - 模拟栈结构,后进先出
   > pop()末尾删除，push()末尾添加
@@ -437,11 +437,481 @@ function rotate(arr, k) {
 
 ```
 
+## 求 1-10000 之间的对称数（121,1331）
+
+- 方案一：使用数组的 filter 函数
+
+```js
+[...Array(10000).keys()].filter((item) => {
+  //length>1的目的是不返回0-9
+  return (
+    item.toString().length > 0 &&
+    item === Number(item.toString().split("").reverse().join(""))
+  );
+});
+```
+
+- 方案二:普通遍历方案，会出现 0-9
+
+```js
+let res = [];
+for (let i = 0; i <= 10000; i++) {
+  let origin = "" + i;
+  let reverse = i.toString().split("").reverse().join("");
+  if (origin === reverse) {
+    res.push(i);
+  }
+}
+
+// for (let i=0;i<=10000;i++){
+//   let reverse=Number(i.toString().split('').reverse().join(''))
+//   if(i===reverse){
+//     res.push(i)
+//   }
+// }
+```
+
+## 字符串操作
+
+### 字符串匹配
+
+查找长为 n 的字符串 S 中是否存在长为 m 的字符串 T
+
+- 方法一：
+
+```js
+function find(S, T) {
+  if (S.length < T.length) {
+    return -1;
+  }
+  for (let i = 0; i < S.length; i++) {
+    if (S.slice(i, i + T.length) === T) {
+      return i;
+    }
+  }
+}
+```
+
+- 方法二:使用 search()方法
+
+```js
+var str = "Visit Runoob!";
+var n = str.search("Runoob"); // 6
+
+var find = (S, T) => S.search(T);
+```
+
+- 方法三：使用 match()方法
+
+```js
+const find = (S, T) => {
+  const matched = S.match(T);
+  return matched ? matched.index : -1;
+};
+```
+
 # 其它问题
+
+## 关于隐式类型转换
+
+**js 基本数据类型**
+
+- 字符串、数字、布尔值
+- null、undefined
+- symbol
+- bigInt
+
+**其他对象 to 字符串(toString 原则)**
+
+- null >> 0
+- undefined >> NAN
+- 布尔 >> 转换为 0 或 1
+- 字符串 >> 纯数字形式，则转为对应的数字，空字符转为 0, 否则一律按转换失败处理，转为 NaN
+- 数组 >> 首先会被转为原始类型，也就是 ToPrimitive，然后在根据转换后的原始类型按照上面的规则处理
+- 普通对象 >> 相当于直接使用 Object.prototype.toString()，返回"[object Object]
+
+**其他对象 to 数字(toNumber 原则)**
+
+- null >> 'null'
+- undefined >> undefined
+- 布尔 >> "true"或"false"
+- 字符串 >> 如果是纯数字形式，则转为对应的数字，空字符转为 0, 否则一律按转换失败处理，转为 NaN
+- 数字 >> 转换为数字对应的字符串
+- 数组 >> 将所有元素按照","连接起来，相当于调用数组的 Array.prototype.join()方法，如[1, 2, 3]转为"1,2,3"，空数组[]转为空字符串，数组中的 null 或 undefined，会被当做空字符串处理
+
+**其他对象 to 布尔值(toBoolean 原则)**
+
+- js 中除了**false、null、undefined、空字符、0 和 NaN**转换为字符串时为假，其余都为真
+
+**对象类型类型（如：对象、数组） to 原始类型**
+
+- 对象类型需要被转为原始类型时，它会先查找对象的 valueOf 方法，如果 valueOf 方法返回原始类型的值
+- 如果 valueOf 不存在或者 valueOf 方法返回的不是原始类型的值，就会尝试调用对象的 toString 方法,遵循对象的 ToString 规则
+- 如果 valueOf 和 toString 都没有返回原始类型的值，则会抛出异常
+
+```js
+Number([]); // 0     空数组 >>  空字符串  >> 0
+Number(["10"]); //10   ['10']  >>  '10' >> 10
+
+const obj1 = {
+  valueOf() {
+    return 100;
+  },
+  toString() {
+    return 101;
+  },
+};
+// 先查找对象的valueOf方法
+Number(obj1); // 100
+
+const obj2 = {
+  toString() {
+    return 102;
+  },
+};
+// 没找到对象的valueOf方法，查找对象的toString方法
+Number(obj2); // 102
+
+const obj3 = {
+  toString() {
+    return {};
+  },
+};
+//没找到对象的valueOf方法，toString方法返回的不是原始类型值
+Number(obj3); // TypeError
+```
+
+## 宽松相等(==)和严格相等(===)
+
+- 区别：宽松相等（==）会在比较中进行隐式转换
+
+### bool 类型与其他类型的相等比较
+
+- 原则：只要有 bool 类型参与比较，该 bool 类型就会首先转换为数字类型,
+- 遵循 toNumber 原则：true>1,false>0
+
+```js
+
+```
+
+### number 类型和 string 类型的相等比较
+
+- 原则：string 类型 会首先转换为 number 类型，
+- 遵循 toString 原则：纯数字形式(如'10','0')的字符串>> 数字、空字符串>>0、其余转化为 NAN
+
+```js
+0 == ""; //  ''  > 0
+1 == "1"; // '1' > 1
+1e21 == "1e21"; // '1e21'  > 1e21
+Infinity == "Infinity"; // 'Infinity'  >   Infinity
+true == "1"; // true > 1 , '1' > 1
+false == "0"; // false > 0 , '0' > 0
+false == ""; // false > 0 , '0' > 0
+```
+
+### object 类型与原始类型的相等比较
+
+- object 类型遵循**toPrimitive 原则** 转换为 原始类型
+- 数组对象的 valueOf()方法返回数组自身，toString()方法遵循**toString 原则**
+
+```js
+'[object Object]' == {} // {} > {}.valueOf()={},{}.toString()= '[object Object]'
+'1,2,3' == [1, 2, 3] // [1,2,3] > '1,2,3'
+[2] ==  2   // [2].valueOf()=[2],[2].toString()='2' > 2
+
+[null] == 0 // true
+[undefined] == 0 // true
+[] == 0 // true
+```
+
+### 面试题
+
+- 为 a 赋值使 a 满足下面的逻辑表达式
+
+```js
+let a = xxx;
+
+a == 1 && a == 2 && a == 3;
+```
+
+- 解题思路
+- 宽松相等（==）两侧有对象 a 参与，那么对象 a 就会遵循**toPrimitive 原则**先进行隐式类型转换
+- 对象 a 进行隐式类型转换时会先后调用它的**valueOf()方法和 toString()方法**,
+- 适当改写这两个方法即可达到目的
+
+```js
+let a = {
+  num: 1,
+  valueOf() {
+    return this.num++;
+  },
+  toString() {
+    return this.num++;
+  },
+};
+let bool = a == 1 && a == 2 && a == 3;
+console.log(bool); // true
+```
+
+## 关于 es6 的解构赋值语法
+
+### 剩余参数语法
+
+在 es6 以前，使用 arguments 存储传递给函数的参数，它是一个类数组对象。
+
+```js
+function add(a, b, c, d) {
+  console.log(arguments); //自行打印观察结果
+  console.log(Object.prototype.toString.call(arguments)); // [object Arguments]
+}
+
+add(1, 2, 3, 4);
+```
+
+- 可以调用 call()方法将 arguments 对象转化为数组对象
+
+es6 中的剩余参数语法允许你将一个不定数量的参数表示为一个数组。
+
+```js
+function add(...args) {
+  console.log(args);
+}
+add(1, 2, 3, 4);
+// [1,2,3,4]
+```
+
+## 函数柯里化
+
+### 应用 1：参数复用
+
+- 下面的代码要描述一件事情：
+  > - 小明在早晨吃了一碗汤面
+  > - 小明在中午吃了一碗米饭
+  > - 小明在晚上吃了一碗焖面
+- 不使用柯里化的代码如下
+
+```js
+function info(name, time, food) {
+  return `${name}在${time}吃了一碗${food}`;
+}
+const info1 = info("小明", "早晨", "汤面");
+const info2 = info("小明", "中午", "米饭");
+const info3 = info("小明", "晚上", "焖面");
+
+console.log(info1, info2, info3);
+```
+
+- 上面代码中存在的问题是：“小明”这个参数重复次数太多了，下面我们进行柯里化
+
+```js
+function info(name) {
+  return function (time, food) {
+    return `${name}在${time}吃了一碗${food}`;
+  };
+}
+const initInfo = info("小明");
+const info1 = initInfo("早晨", "汤面");
+const info2 = initInfo("中午", "米饭");
+const info3 = initInfo("晚上", "焖面");
+
+console.log(info1, info2, info3);
+```
+
+### 兼容性检测
+
+### 延迟执行
+
+对参数复用功能进行改进，实现下面功能
+
+```
+add(1)(2)(3)=6
+add(1,2,3)(4)=10
+add(1)(2)(3)()=6
+```
+
+- 我们需要定义一个 add 函数，该函数要做到下面的功能
+  > - 可以无限调用
+  > - 可传入任意数量的参数
+  > - 返回传入参数的和
+
+下面我们一点点写
+
+```js
+// 实现下面的效果
+add(1);
+add(1)(2);
+add(1)(2)(3);
+```
+
+```js
+function(x){
+  return function(y){
+    return function(z){
+      return x+y+z
+    }
+  }
+}
+```
+
+再进一步
+
+```
+实现
+add(1, 2)( 3, 4, 5,6)=21
+```
+
+```js
+function add() {
+  //实现：外层函数可传入任意数量的参数
+  let args = [...arguments];
+  function inner() {
+    args.push(...arguments);
+    return args.reduce((x, y) => x + y);
+  }
+  //实现二次调用时，将新传入的参数添加到父函数的参数列表中
+  return inner;
+}
+let a1 = add(1, 2)(3, 4, 5, 6);
+console.log(a1); //21
+```
+
+- 上面代码未完成无限调用功能
+
+```js
+function add() {
+  let args = [...arguments];
+  function inner() {
+    args.push(...arguments);
+    return inner;
+  }
+  return inner;
+}
+let a1 = add(1)(2)(3)(4);
+console.log(a1, Object.prototype.toString.call(a1));
+//f inner{...} [Object Function]
+```
+
+- 上面代码实现了无限调用，但是没有返回正确的加和结果,而是返回了一个函数，这是因为最后一次调用 inner 函数时，
+
+```js
+function add() {
+  let args = [...arguments];
+  function inner() {
+    args.push(...arguments);
+    return inner;
+  }
+  inner.toString = function () {
+    return args.reduce((x, y) => x + y);
+  };
+  return inner;
+}
+let a1 = add(1)(2)(3)(4);
+console.log(a1);
+```
+
+## call 的妙用
+
+- **call 方法的 this 指向**
+
+`Function.prototype.call(thisArg, arg1, arg2,...)`永远指向 thisArg
+
+```js
+let cat = {
+  name: "",
+  sayName() {
+    console.log(this.name);
+  },
+};
+// 此处的this指向dog
+cat.sayName.call(dog);
+```
+
+- 例子二
+
+```js
+let obj = {};
+// 此处的this指向obj
+Object.prototype.hasOwnProperty.call(obj, "toString");
+```
+
+### 最精确地数据类型判断方法
+
+- `Object.prototype.toString.call()`
+
+```js
+Object.prototype.toString.call("An"); // "[object String]"
+Object.prototype.toString.call(1); // "[object Number]"
+Object.prototype.toString.call(Symbol(1)); // "[object Symbol]"
+Object.prototype.toString.call(null); // "[object Null]"
+Object.prototype.toString.call(undefined); // "[object Undefined]"
+Object.prototype.toString.call(function () {}); // "[object Function]"
+Object.prototype.toString.call({}); // "[object Object]"
+```
+
+- 或者简写为
+
+```js
+toString.call(() => {}); // [object Function]
+toString.call({}); // [object Object]
+toString.call([]); // [object Array]
+toString.call(""); // [object String]
+toString.call(22); // [object Number]
+toString.call(undefined); // [object undefined]
+toString.call(null); // [object null]
+toString.call(new Date()); // [object Date]
+toString.call(Math); // [object Math]
+toString.call(window); // [object Window]
+```
+
+### 转换数据类型
+
+- 使用 Array.prototype.slice.call(arguments)将 arguments 类数组对象转换为数组
+  > 解读
+  >
+  > - js 中的数组对象 Array 的 slice(start,end)方法，返回一个数组切片副本，start 和 end 参数都是可选的，当不传递参数时，将会返回一个原数组的复制版本
+  > -
+
+```js
+function add(a, b, c, d) {
+  let a1 = Array.prototype.slice.call(arguments);
+  console.log(Object.prototype.toString.call(a1)); //[Object Array]
+  console.log(a1); // [1,2,3,4]
+  // 等价于
+  // console.log([...arguments]); // [1,2,3,4]
+}
+
+add(1, 2, 3, 4);
+```
+
+### 调用原生方法
+
+- 解决对象继承的方法被同名函数覆盖掉的问题
+
+```js
+var obj = {};
+obj.property1 = 22;
+obj.hasOwnProperty("property1"); // true
+obj.hasOwnProperty("toString"); // false
+
+// 覆盖掉继承的 hasOwnProperty 方法
+obj.hasOwnProperty = function (...args) {
+  return true;
+};
+
+obj.hasOwnProperty("toString"); // true
+
+//调用原生方法
+Object.prototype.hasOwnProperty.call(obj, "toString"); // false
+```
+
+> 解读
+>
+> - Object.prototype.hasOwnProperty()函数返回一个布尔值，表示调用该方法的对象自有属性（而不是继承来的属性）中是否具有指定的属性。
+> - 此处使用 call 改变了 this 指向，使得 hasOwnProperty 方法中的 this 指向了 obj 对象，由于 obj 的 toString 属性来自继承，所以最终会返回 false
 
 ## this 指向
 
-### 全局环境与全局函数
+### 全局环境与全局函数：指向 window
 
 - 全局环境下 this 为 window
 - 全局函数中的 this 也是 window（全局函数其实是 window(全局对象)的方法）
@@ -455,17 +925,24 @@ function fun() {
 fun(); //相当于window.fun()      //window
 ```
 
-### 对象方法中
+### 对象方法中:指向调用该方法的对象
 
 - 对象方法中的 this 指向调用这个方法的对象
 
 ```js
 let cat = {
+  name: "小猫",
   sayName() {
-    console.log(this);
+    console.log(this.name);
   },
 };
-cat.sayName(); // cat
+let dog = {
+  name: "小狗",
+};
+cat.sayName.bind(dog)(); // 小狗
+cat.sayName.call(dog); // 小狗
+cat.sayName.apply(dog); // 小狗
+cat.sayName(); // 小猫
 ```
 
 ### DOM 事件
@@ -520,6 +997,18 @@ let cat = {
 };
 ```
 
+### 原型链中
+
+下面的代码中
+向 Number 的原型对象上添加一个 add 方法，打印 this，发现 this 指向该原型对象
+
+```js
+Number.prototype.add = (function () {
+  console.log(this);
+  // return this.valueOf()
+})(5).add(); //将会返回Number (5)
+```
+
 ## 改变 this 指向
 
 ### Function.prototype.call()
@@ -567,35 +1056,6 @@ function add(a, b) {
 }
 
 add.call(this, 1, 2); // 3
-```
-
-#### 应用：调用对象的原生方法
-
-- 解决对象继承的方法被同名函数覆盖掉的问题
-
-```js
-var obj = {};
-obj.hasOwnProperty("toString"); // false
-
-// 覆盖掉继承的 hasOwnProperty 方法
-obj.hasOwnProperty = function () {
-  return true;
-};
-obj.hasOwnProperty("toString"); // true
-//调用原生方法
-Object.prototype.hasOwnProperty.call(obj, "toString"); // false
-```
-
-- `Object.prototype.toString.call()`判断 js 对象的数据类型
-
-```js
-Object.prototype.toString.call("An"); // "[object String]"
-Object.prototype.toString.call(1); // "[object Number]"
-Object.prototype.toString.call(Symbol(1)); // "[object Symbol]"
-Object.prototype.toString.call(null); // "[object Null]"
-Object.prototype.toString.call(undefined); // "[object Undefined]"
-Object.prototype.toString.call(function () {}); // "[object Function]"
-Object.prototype.toString.call({}); // "[object Object]"
 ```
 
 ### Function.prototype.apply()
@@ -811,6 +1271,19 @@ Btn.onclick = function () {
 setTimeout(function () {
   console.log(this);
 }, 2000); //window{...}
+```
+
+## 对 js 原型的认识
+
+### 实现 (5).add(3).minus(2) 功能
+
+```js
+Number.prototype.add = function (n) {
+  return this.valueOf() + n;
+};
+Number.prototype.minus = function (n) {
+  return this.valueOf() - n;
+};
 ```
 
 # 性能

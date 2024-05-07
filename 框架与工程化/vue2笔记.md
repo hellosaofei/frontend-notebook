@@ -1678,6 +1678,50 @@ this.$route.replace({
 });
 ```
 
+### 关于 this.$router和this.$route
+
+> this.$route：当前激活的路由的信息对象。每个对象都是局部的，可以获取当前路由的 path, name, params, query 等属性。
+
+<img src="../pic/vue学习/$route对象内容.png">
+
+其中`$route.matched`是一个数组，包含了当前路由的所有嵌套记录，即 routes 配置中的对象数组，包括 自己的信息和 children 数据。比如我的 routes 配置为：
+
+```js
+{
+  path: '/taskList',
+  component: TaskList,
+  name: '任务列表',
+  children: [
+    {
+      path: '/taskDetail',
+      component: TaskDetail,
+      name: '任务详情'
+    }
+  ]
+}
+```
+
+那么`this.$route.matched`展开解结果就是
+
+<img src="../pic/vue学习/$route的matched.png">
+
+**应用情景**
+某个项目的诸多页面，某些字段需要登录后才能使用，而有些不需要登录，这时就可以在 meta 字段配置一个变量，然后利用导航守卫就可以通过遍历 $route.matched 来检查路由记录中的 meta 字段。
+
+#### this.$router
+
+> this.$router：全局的 router 实例。通过 vue 根实例中注入 router 实例，然后再注入到每个子组件，从而让整个应用都有路由功能。其中包含了很多属性和对象（比如 history 对象），任何页面也都可以调用其 push(), replace(), go() 等方法。
+
+<img src="../pic/vue学习/$router内容.png">
+
+**options 配置项**
+
+> vue2 获取路由路径数组？
+>
+> - this.$router.options.routes 或者 this.$route.matched
+
+<img src="../pic/vue学习/$router下的options配置项.png">
+
 ## 缓存路由组件
 
 作用：让不展示的路由组件保持挂载不被销毁

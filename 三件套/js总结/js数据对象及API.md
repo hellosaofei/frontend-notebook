@@ -261,12 +261,38 @@ alert(newArr); //1000---->李四1---->张三0
 
 ## 对象方法
 
-### substring()方法
+## slice(start,end)---不改变
+
+- 使用 start（包含） 和 end（不包含） 参数来指定字符串提取的部分。
+- start(可选):可正可负
+  > - 正：从数组头部
+  > - 负：从数组尾部开始
+- end，可选
+  > - 默认值：数组最后一个元素
+  > - end 大于 string.length 时，仍然只会返回最后一个元素
+
+```js
+const str = "the lazy dog.";
+
+console.log(str.slice(1, 2)); // h
+
+console.log(str.slice(2)); //e lazy dog.
+
+console.log(str.slice(-4)); // dog.
+
+console.log(str.slice(-9, -5)); //lazy
+```
+
+## substr(start,length)
+
+- es6 标准已弃用
+
+### substring()
 
 > 语法：string.substring(from, to)
 > 描述：提取字符串中介于两个指定下标之间的字符
 > 参数：from:必需参数，非负整数，to:可选参数，非负整数
-> 注意：范围为左闭右开
+> 注意：不包含 to
 
 ```js
 var str = "Hello world!";
