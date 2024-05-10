@@ -6,67 +6,29 @@
     <title>Document</title>
   </head>
   <body>
+    <button id="myBtn">点击该按钮</button>
     <script>
-      // function add(){
-      //   let sum=0;
-      //   function accumulate(...args){
-      //     sum+=args.reduce((a,b)=>a+b)
-      //     if (arguments.length && !arguments.callee.caller) {
-      //      return sum;
-      //     }
-      //     return accumulate
-      //   }
-      //   if(arguments.length){return accumulate(...arguments)}
-      //   return accumulate
-      // }
-      // function add() {
-      //   //实现：外层函数可传入任意数量的参数
-      //   let args = [...arguments];
-      //   let inner = function () {
-      //     args.push(...arguments);
-      //     // return args;
-      //     return args.reduce((x, y) => x + y);
-      //   };
-      //   //实现二次调用时，将新传入的参数添加到父函数的参数列表中
-      //   return inner;
-      // }
-      // let a1 = add(1, 2)(3, 4, 5, 6);
-      // console.log(a1);
-      // function add() {
-      //   let args = [...arguments];
-      //   function inner() {
-      //     args.push(...arguments);
-      //     return inner;
-      //   }
-      //   return inner;
-      // }
-      // let a1 = add(1)(2)(3)(4);
-      // console.log(a1, Object.prototype.toString.call(a1));
-      // //f inner{...} [Object Function]
-      // function add() {
-      //   let args = [...arguments];
-      //   function inner() {
-      //     args.push(...arguments);
-      //     return inner;
-      //   }
-      //   inner.toString = function () {
-      //     return args.reduce((x, y) => x + y);
-      //   };
-      //   return inner;
-      // }
-      // let a1 = add(1)(2)(3)(4);
-      // console.log(+a1);
-      let a = {
-        num: 1,
-        valueOf() {
-          return this.num++;
+      // setTimeout(function () {
+      //   console.log("匿名函数的this指向", this); //window
+      // }, 100);
+      // setTimeout(() => {
+      //   console.log("箭头函数的this指向", this); //window
+      // }, 100);
+      let btn = document.querySelector("#myBtn");
+      btn.addEventListener(
+        "click",
+        function () {
+          console.log("匿名函数的指向问题：", this); // <button></button>
         },
-        toString() {
-          return this.num++;
-        },
-      };
-      let bool = a == 1 && a == 2 && a == 3;
-      console.log(bool);
+        false
+      );
+      // btn.addEventListener(
+      //   "click",
+      //   () => {
+      //     console.log("箭头函数的指向问题：", this);  //wnidow
+      //   },
+      //   false
+      // );
     </script>
   </body>
 </html>

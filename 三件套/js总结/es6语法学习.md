@@ -1,3 +1,20 @@
+# 解构赋值
+
+## 数组的解构赋值
+
+```js
+const files = {
+  chunk: [
+    {
+      name: "张三",
+    },
+  ],
+};
+const [chunk] = files.chunk;
+
+console.log(chunk); // {name:'张三'}
+```
+
 # 函数扩展
 
 ## 函数参数 的默认值

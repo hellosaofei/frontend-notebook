@@ -22,7 +22,9 @@ let a3 = [...a1, ...a2].sort().map((item) => {
 
 # 防抖和节流
 
-- 防抖：用户触发操作过于频繁，只需要最后一次事件的操作
+## 防抖
+
+- 用户触发操作过于频繁，只需要最后一次事件的操作
 
 ```js
 let input = document.querySelector("input"); //此处的场景是拿着用户的输入结果与后端服务器进行ajax交互，如果每输入一次就发送一个ajax请求将会对性能的消耗非常大
@@ -46,8 +48,6 @@ input.onchange = function () {
   }, 500);
 };
 ```
-
-## 防抖
 
 ```html
 <!--
@@ -83,8 +83,10 @@ input.onchange = function () {
 
 ## 节流
 
+- 控制比较耗费性能的代码的执行次数
+
 ```js
-//控制比较耗费性能的代码的执行次数
+// 下面代码的逻辑是，flag为true时，执行业务代码，由于setTimeout，每隔一秒只能执行一次
 let flag = true;
 window.onscroll = function () {
   if (flag) {
@@ -101,16 +103,16 @@ window.onscroll = function () {
 window.onscroll = throttle(function () {
   console.log("hello world");
 }, 1000);
-function throttle() {
+function throttle(fn, delay) {
   let flag = true;
-  return function (fn, delay) {
+  return function () {
     if (flag) {
       setTimeout(() => {
         fn();
         flag = true;
       }, delay);
     }
-    flag = flase;
+    flag = false;
   };
 }
 ```
@@ -960,7 +962,10 @@ cat.sayName(); // 小猫
 
 ```js
 setTimeout(function () {
-  console.log(this); //window
+  console.log("匿名函数的this指向", this); //window
+}, 100);
+setTimeout(() => {
+  console.log("箭头函数的this指向", this); //window
 }, 100);
 ```
 
@@ -971,10 +976,10 @@ setTimeout(function () {
 
 ```js
 function F() {
-  this.name = "小明"; //此处this指向新创建出来的对象f
+  this.name = "小明"; // 此处this指向新创建出来的对象f
 }
 let f = new F();
-console.log(f); //F{name:'小明'}
+console.log(f); // f {name:'小明'}
 ```
 
 ### 箭头函数
@@ -995,6 +1000,23 @@ let cat = {
     }, 100);
   },
 };
+```
+
+```js
+btn.addEventListener(
+  "click",
+  function () {
+    console.log("匿名函数的指向问题：", this); // <button></button>
+  },
+  false
+);
+btn.addEventListener(
+  "click",
+  () => {
+    console.log("箭头函数的指向问题：", this); //window
+  },
+  false
+);
 ```
 
 ### 原型链中
