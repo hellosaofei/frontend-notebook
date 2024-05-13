@@ -678,10 +678,7 @@ Vue.mixin(hunhe2);
 
 ## 自定义指令
 
-- 调用时机：
-
-  - 指令与元素成功绑定时
-  - 指令对应的版本被重新解析时
+### 函数式写法
 
 - 定义一个 v-big 指令
 
@@ -707,6 +704,9 @@ Vue.mixin(hunhe2);
       };
     },
     directives: {
+      // 调用时机
+      //1.  指令与元素成功绑定时（不是元素挂载到页面上）
+      //2.  指令所在的模板被重新解析时
       big(element, binding) {
         element.innerText = binding.value * 10;
       },
@@ -718,6 +718,125 @@ Vue.mixin(hunhe2);
 - 自定义指令默认传递的参数
   - element：该指令所绑定的 HTML 元素
   - binding：该指令所绑定的数据
+
+### 对象式写法
+
+- 需求
+- 进入页面后，input 输入框自动获取焦点
+
+```html
+<div id="root">
+  <h2>{{name}}</h2>
+  <h2>
+    当前n的值为：
+    <span v-text="n"></span>
+  </h2>
+  <h2>
+    放大10倍后n的值为：
+    <span v-big="n"></span>
+  </h2>
+  <button v-on:click="n++">点击n+1</button>
+  <input type="input" v-fbind="n" />
+</div>
+<script>
+  new Vue({
+    el: "root",
+    data: {
+      name: "张三",
+      n: 1,
+    },
+    directives: {
+      // 对象式写法中，bind和update钩子中的逻辑高度相似，
+      // 又由于函数式写法的两个调用时机
+      // 所以函数式写法就相当于与对象式写法的bind和update钩子
+      big(element, binding) {
+        element.innerText = "";
+      },
+      // 对象式写法相当于钩子函数，在适当的时刻被vue调用
+      fbind: {
+        bind(element, binding) {
+          element.value = binding.value;
+        },
+        inserted(element, binding) {
+          element.focus();
+        },
+        update(element, binding) {
+          element.value = binding.value;
+        },
+        unbind(element, binding) {
+          console.log("解除绑定");
+        },
+      },
+    },
+  });
+</script>
+```
+
+### 其他
+
+### 对象式写法
+
+- 自定义指令需要多个单词组成时不能写成驼峰式，
+- 全局指令使用 Vue.directive('指令名',Function/Options)
+
+```html
+<div id="root">
+  <h2>{{name}}</h2>
+  <h2>
+    当前n的值为：
+    <span v-text="n"></span>
+  </h2>
+  <h2>
+    放大10倍后n的值为：
+    <span v-big-number="n"></span>
+  </h2>
+  <button v-on:click="n++">点击n+1</button>
+  <input type="input" v-fbind:value="n" />
+</div>
+<div id="root2">
+  <input type="input" v-fbind:value="x" />
+</div>
+<script>
+  // Function回调
+  Vue.directive("big", function (element, binding) {
+    element.innerText = "";
+  });
+  // options配置
+  Vue.directive("fbind", {
+    bind(element, binding) {
+      element.value = binding.value;
+    },
+    inserted(element, binding) {
+      element.focus();
+    },
+    update(element, binding) {
+      element.value = binding.value;
+    },
+    unbind(element, binding) {
+      console.log("解除绑定");
+    },
+  });
+  new Vue({
+    el: "root",
+    data: {
+      name: "张三",
+      n: 1,
+    },
+    directives: {
+      //
+      "big-number": function (element, binding) {
+        element.innerText = "";
+      },
+    },
+  });
+  new Vue({
+    el: "root2",
+    data: {
+      x: 1,
+    },
+  });
+</script>
+```
 
 ## 配置跨域
 
