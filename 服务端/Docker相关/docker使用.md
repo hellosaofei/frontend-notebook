@@ -254,4 +254,122 @@ docker pull centos
 # -P 随机指定端口
 docker run -it centos /bin/bash
 
+# 退出启动的容器
+# 退出并停止
+exit
+# 退出不停止
+exit Ctrl+P+Q
+```
+
+- 查看正在运行的容器
+
+```sh
+docker ps
+#  默认列举当前正在运行的容器
+# -a 列举所有容器，包括之前创建过、运行过的容器
+# -n=【个数】显示最近创建的容器
+# -q 只显示容器ID
+```
+
+- 删除容器
+
+```sh
+# 删除指定ID的容器
+# 默认不能删除当前正在运行的容器
+# -f 强制删除
+docker rm 【容器ID】
+
+# 递归删除所有容器
+docker rm -f $(docker ps -aq)
+docker ps -a -q|xargs docker rm
+```
+
+- 启动和停止已有的容器
+
+```sh
+docker start 【容器ID】
+
+docker restart 【容器ID】
+
+docker stop 【容器ID】
+
+docker kill 【容器ID】
+```
+
+## 常用其他命令
+
+- 查看日志
+
+```sh
+docker logs --help
+
+# -tf 以日志的形式呈现并显示时间
+# --tail 【数字】显示日志的条数
+docker logs -f -t --tail 10 【容器ID】
+```
+
+- 查看容器中的进程信息
+
+```sh
+docker top 【容器ID】
+```
+
+- 查看镜像的元数据
+
+```sh
+docker inspect 【容器ID】
+```
+
+- 进入当前正在运行的容器
+
+```sh
+
+# 方式一
+# 进入后打开一个新的终端
+docker exec  【容器ID】
+
+# 方式二
+# 进入容器正在执行的终端，不会启动新的容器
+docker attach  【容器ID】
+```
+
+- 从容器内拷贝文件到主机
+
+```sh
+docker cp 容器ID:容器内路径 目的主机路径
+
+docker start 【centos容器ID】
+docker ps
+docker attach 【centos容器ID】
+cd /home
+ls
+touch test.java
+exit
+docker ps -a
+docker cp 【centos容器ID】:home/test.java /home
+```
+
+# 案例
+
+## 部署 nginx
+
+```shell
+# 1、搜索镜像
+# 2、拉取镜像
+# 3、查看镜像
+# 4、运行镜像
+docker run -d \
+      --name nginx01 \
+      -p 5525:80 \
+      nginx
+
+# 5、查看运行的镜像
+docker images
+
+# 6、本机测试
+curl localhost:3344
+
+# 7、进入容器
+docker exec -it nginx01
+
 ```
