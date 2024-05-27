@@ -775,7 +775,21 @@ export default function () {
 </script>
 ```
 
-# 路由
+# 路由 vueRouter
+
+## 上手使用
+
+1. 安装 vueRouter
+
+```sh
+npm install vue-router@4
+```
+
+2. 创建 vueRouter 实例
+
+```js
+
+```
 
 ## 简单的效果
 
@@ -977,3 +991,402 @@ console.log(route.params);
 2. 传递`params`参数时，若使用`to`的对象写法，必须使用`name`配置项，不能用`path`。
 
 # 状态管理 pinia
+
+## 使用步骤
+
+- 项目目录
+
+```
+|- 根目录
+  |- ...
+  |- components
+    |- Home.vue
+  |- store
+    |- modules
+      |- home.ts
+    |- index.ts
+  |- App.vue
+  |- main.ts
+```
+
+1. 安装 pinia
+
+```sh
+npm install pinia
+```
+
+2. 创建一个 pinia 实例
+
+```js
+// index.ts
+import { createPinia } from "pinia";
+
+const pinia = createPinia();
+
+export default pinia;
+```
+
+3. 在`main.ts`中引入
+
+```js
+// main.ts
+// ...其他代码
+import store from "@/store";
+
+app.use(store);
+```
+
+4. 在`pinia`中存储数据
+
+```ts
+// modules/home.ts
+import { defineStore } from "pinia";
+
+export const useCountStore = defineStore("count", {
+  state() {
+    return {
+      sum: 9,
+    };
+  },
+});
+```
+
+5. 在指定组件中使用`pinia`中存储的数据
+
+```html
+<!--components/Home.vue-->
+<script lang="ts" name="Home">
+  import { useCountStore } from "@/store";
+
+  const countStore = useCountStore();
+
+  console.log(countStore.sum);
+</script>
+```
+
+## 修改数据的三种方式
+
+```html
+<template>
+  <p class="container">"当前值为："{{countStore.cum}}</p>
+</template>
+<!--components/Home.vue-->
+<script lang="ts" name="Home">
+  import { useCountStore } from "@/store";
+
+  const countStore = useCountStore();
+
+  let n = ref(1);
+
+  function add() {
+    // 方式一：直接修改
+    countStore.sum += n;
+    // 方式二：$patch
+    countStore.$patch({
+      sum: 999,
+      name: "张三",
+      age: 10,
+    });
+    //方式三：在actions中定义一个方法并在此处调用
+    countStore.increment(n);
+  }
+</script>
+```
+
+```ts
+// modules/home.ts
+import { defineStore } from "pinia";
+
+export const useCountStore = defineStore("count", {
+  // 方式三：在actions中定义一个方法
+  actions: {
+    increment(value) {
+      this.sum += value;
+    },
+  },
+  state() {
+    return {
+      sum: 9,
+    };
+  },
+});
+```
+
+## storeToRefs
+
+- 存在问题：在上面例子中如果需要使用 countStore 中定义的值，需要带上前缀`{{countStore.sum}}`，但是如果仅使用解构的方法来提取数据又不能做到响应式
+
+```html
+<script lang="ts" name="Home">
+  import { useCountStore, storeToRefs } from "@/store";
+
+  const countStore = useCountStore();
+  // 如何在解构的同时实现响应式
+  // 方式一：toRef
+  // 存在问题：countStore对象中的所有对象 都被设置成响应式了
+  const { sum } = toRef(countStore);
+  // 方式二：从pinia中引入storeToRefs
+  // 优势：只会关注store中的数据
+  const { sum } = storeToRefs(countStore);
+
+  let n = ref(1);
+
+  function add() {
+    // ...
+  }
+</script>
+```
+
+## getters 配置项
+
+```ts
+import { defineStore } from "pinia";
+
+// 定义并暴露一个store
+export const useCountStore = defineStore("count", {
+  actions: {
+    // ...
+  },
+  state() {
+    return {
+      sum: 1,
+      school: "atguigu",
+    };
+  },
+  getters: {
+    bigSum: (state): number => state.sum * 10,
+    upperSchool(): string {
+      return this.school.toUpperCase();
+    },
+  },
+});
+```
+
+## $subscribe 监听 store 中的数据变化
+
+```html
+<script lang="ts" name="Home">
+  import { useCountStore } from "@/store";
+
+  const countStore = useCountStore();
+
+  countStore.$subscribe((mutate, state) => {
+    //...
+  });
+  let n = ref(1);
+
+  function add() {
+    // ....
+  }
+</script>
+```
+
+# 组件通信
+
+- 项目目录结构
+
+```
+|- 根目录
+  |- components
+    |- Child.vue
+    |- Child1.vue
+  |- routes
+    |- index.ts
+  |- App.vue
+  |- main.ts
+```
+
+## props：父子互传
+
+**父子通信。父组件向子组件中传递数据（变量、函数等）：子组件使用父组件中的数据、方法。父组件使用子组件的数据**
+
+- 子组件
+
+```html
+<!-- Child.vue -->
+<template>
+  <div class="person">
+    <h2>自己的玩具：{{toy}}</h2>
+    <h2>来自父亲的汽车：{{car}}</h2>
+    <button @click="fasong(toy)">点击赠送玩具</button>
+  </div>
+</template>
+<script lang="ts" name="Child">
+  import { ref } from "vue";
+
+  let toy = ref("玩具");
+
+  let props = defineProps(["car", "sendToy"]);
+  // 点击按钮触发函数，在其执行父组件中传递过来的函数，此时可以为父组件中的变量赋值以达到父组件使用子组中的数据的目的
+  function fasong(toy) {
+    props.sendToy(toy);
+  }
+</script>
+```
+
+- 父组件
+
+```html
+<!-- App.vue -->
+<template>
+  <div class="person">
+    <h2>自己的汽车：{{car}}</h2>
+    <h2>儿子的玩具：{{toy}}</h2>
+    <!-- 此处sendToy的意思是，给子组件传递一个函数数据，子组件需要使用prop进行接收 -->
+    <Child :car="car" :sendToy="getToy" />
+  </div>
+</template>
+<script lang="ts" name="App">
+  import Child from "@/components/Child.vue";
+  import { ref } from "vue";
+
+  let car = ref("奔驰");
+  let toy = ref("");
+
+  function getToy(value: string) {
+    console.log("父组件中的方法被调用了");
+    toy = value;
+  }
+</script>
+```
+
+## 自定义事件
+
+### vue 官方：defineEmits
+
+- 子组件
+
+```html
+<!-- Child.vue -->
+<template>
+  <div class="person">
+    <h2>自己的玩具：{{toy}}</h2>
+    <h2>来自父亲的汽车：{{car}}</h2>
+    <button @click="emit('haha',toy)">点击赠送玩具</button>
+    <!-- 其他写法：多单词变量 -->
+    <!-- <button @click="emit('send-toy',toy)">点击赠送玩具</button> -->
+  </div>
+</template>
+<script lang="ts" name="Child">
+  import { ref } from "vue";
+
+  let toy = ref("玩具");
+
+  const emit = defineEmits(["haha"]);
+</script>
+```
+
+- 父组件
+
+```html
+<!-- App.vue -->
+<template>
+  <div class="person">
+    <h2>自己的汽车：{{car}}</h2>
+    <h2>儿子的玩具：{{toy}}</h2>
+    <Child @haha="xyz" />
+    <!-- 其他写法：多单词变量 -->
+    <!-- <Child @send-toy="xyz" /> -->
+  </div>
+</template>
+<script lang="ts" name="App">
+  import Child from "@/components/Child.vue";
+  import { ref } from "vue";
+
+  let toy = ref("");
+
+  function xyz(value: number) {
+    console.log("父组件中的方法被调用了");
+    toy = value;
+  }
+</script>
+```
+
+### 三方库：mitt
+
+1. 安装
+
+```sh
+npm install --save mitt
+```
+
+2. 基本使用
+
+```js
+import mitt from "mitt";
+
+// 实例化一个对象，该对象可以绑定事件、触发事件
+const emitter = mitt();
+// 绑定事件
+emitter.on("test1", () => {
+  console.log("test1被调用了");
+});
+// 触发事件
+setInterval(() => {
+  emitter.emit("test1");
+}, 1000);
+
+// 解绑事件
+setTimeout(() => {
+  // emitter.off('test1')
+  emitter.all.clear();
+}, 2000);
+```
+
+3. 应用在 vue 组件中
+
+- 首先在项目的`utils/emitter.ts`中定义并向外暴露
+
+```ts
+import mitt from "mitt";
+
+// 实例化一个对象，该对象可以绑定事件、触发事件
+const emitter = mitt();
+
+export default emitter;
+```
+
+- 接下来要实现的是,把`child1.vue`中的变量传递到它的兄弟组件`child.vue`,思路就是：在发送方组件内部定义一个自定义事件，点击按钮后触发该事件，如果事件触发成功，接收方就会收到通知，然后触发相应的函数
+
+```html
+<!-- Child.vue -->
+<template>
+  <h2>来自兄弟的玩具：{{toy}}</h2>
+</template>
+<script lang="ts" name="Child">
+  import { ref, onUnmounted } from "vue";
+  import emitter from "@/utils/emitter";
+
+  let toy = ref("");
+  // 绑定一个事件
+  emitter.on("send-toy", (value) => {
+    console.log("send-toy", value);
+    toy.value = value;
+  });
+  const emit = defineEmits(["haha"]);
+
+  //组件卸载时，解绑事件
+  onUnmounted(() => {
+    emitter.off("send-toy");
+  });
+</script>
+```
+
+```html
+<!-- Child1.vue -->
+<template>
+  <h2 v-if="toy">来自兄弟的玩具：{{toy}}</h2>
+  <!-- 点击触发事件 -->
+  <button @click="emitter.emit('send-toy',toy)">点击赠送玩具</button>
+</template>
+<script lang="ts" name="Child">
+  import { ref } from "vue";
+  import emitter from "@/utils/emitter";
+
+  let toy = ref("child1的玩具");
+</script>
+```
+
+## v-model
+
+UI 组件库底层大量使用`v-model`进行通信
