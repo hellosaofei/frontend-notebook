@@ -677,6 +677,7 @@ const stopWtach = watchEffect(() => {
 
 ## 自定义 hooks
 
+引入背景：vue3 的组合式 API 的特点就是将实现相同业务的代码放在一起，而不同业务的代码拆分成块，而 hooks 就体现了这一思想
 作用：相当于 vue2 的 mixin，将涉及到某个功能的变量、函数等封装到一个单独的文件中
 
 - 目录结构
@@ -774,6 +775,9 @@ export default function () {
   let { dogList, getDog } = useDog();
 </script>
 ```
+
+观察上面的代码，如果不将相同业务逻辑拆分为 hooks 而是都写在 APP.vue 中，这只是两个逻辑，如果逻辑多了，就会非常乱。
+<img src="./images/组合式API和响应式API.png">
 
 # 路由 vueRouter
 
@@ -989,6 +993,12 @@ console.log(route.params);
 ```
 
 2. 传递`params`参数时，若使用`to`的对象写法，必须使用`name`配置项，不能用`path`。
+
+## 关于 route 和 router
+
+<img src="./images/当前路由.png">
+
+<img src="./images/全局路由router的信息.png">
 
 # 状态管理 pinia
 
