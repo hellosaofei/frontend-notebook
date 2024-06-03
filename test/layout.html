@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <style>
+    .outer,
+    .left,
+    .middle,
+    .right {
+      height: 100px;
+      margin-bottom: 5px;
+    }
+    .left {
+      background-color: tomato;
+    }
+    .middle {
+      background-color: gold;
+    }
+    .right {
+      background-color: skyblue;
+    }
+    /* 圣杯布局 */
+    .outer1 {
+      padding: 0 200px 0 100px;
+    }
+    .outer1 .middle {
+      width: 100%;
+      float: left;
+    }
+    .outer1 .left {
+      width: 100px;
+      float: left;
+      margin-left: -100%;
+      position: relative;
+      left: -100px;
+    }
+
+    .outer1 .right {
+      width: 200px;
+      float: left;
+      margin-left: -200px;
+      position: relative;
+      left: 200px;
+    }
+  </style>
+  <body>
+    <div class="outer outer1">
+      <div class="middle">圣杯布局middle</div>
+      <div class="left">圣杯布局left</div>
+      <div class="right">圣杯布局right</div>
+    </div>
+  </body>
+</html>

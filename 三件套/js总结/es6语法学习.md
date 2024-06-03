@@ -100,15 +100,28 @@ new Promise(function (resolve, reject) {
 });
 ```
 
-- resolve 函数：将 Promise 对象的状态从 pending 转化为 fulfilled，在异步操作成功时调用，并将异步操作结果作为参数传递出来
+**resolve 函数**
 
-- reject 函数：将 Promise 对象的状态从 pending 转化为 rejected，在异步操作失败时调用，并将异步操作报出的错误作为参数传递出来
+- 用于改变 Promise 对象的状态，从 pending 转化为 fulfilled
+- 可以随时调用，通常在异步操作成功时调用，并将异步操作结果作为参数传递出来
+- 传递的参数是任意的，可以是一个普通的 js 对象 或者是 一个新的 Promise 对象，传递什么，then()函数接收的参数就是什么
+
+**reject 函数**
+
+- 用于改变 Promise 对象的状态，从 pending 转化为 rejected
+- 可以随时调用，通常在异步操作失败时调用，并将异步操作报出的错误作为参数传递出来
+- 传递的参数是任意的，可以是一个普通的 js 对象 或者是 一个新的 Promise 对象，传递什么，catch()函数接收的参数就是什么
+
+> 总结：根据上面的描述我们可以看出，promise 内部的操作是随心所欲的，想在什么时候停止就在什么时候停止，想向外边传递什么参数就传递什么参数。promise 中装的一般都是异步操作，因此这种机制是非常有用的，特别是在封装 ajax 请求的时候（详见《手写代码-手写 ajax 部分》）
+
+-
 
 ```js
 const promise = new Promise((resolve, reject)=> {
   // ... some code
 
-  if (/* 异步操作成功 */){
+  if (/* 异步操作成功的标志 */){
+    // 注意：此处异步成功的标志是任意的，可以是错误的http响应码，也可以是错误的后台返回数据等等，这就是promise的强大之处
     resolve(value);       //异步操作成功，调用 resolve 函数传递成功的结果
   } else {
     reject(error);      //异步操作失败，调用 reject 函数传递失败的原因
@@ -116,7 +129,15 @@ const promise = new Promise((resolve, reject)=> {
 });
 ```
 
-- 一般来说，调用`resolve或reject`之后，Promise 的使命就完成了，后续的操作应该放在 then 方法或 catch 方法中，但是，调用`resolve或reject`并不会终结 Promise 的参数函数的执行，所以一般在两者的前面加上 return 语句
+- 一般在实际的开发过程中，调用`resolve或reject`之后，Promise 的使命就完成了，后续的操作应该放在 then 方法或 catch 方法中，但是，调用`resolve或reject`并不会终结 Promise 的执行，而是会继续往下走（做面试题时很有用），所以一般在两者的前面加上 return 语句来强制终止 promise 的执行
+
+```js
+new Promise((resolve, reject) => {
+  return resolve(1);
+  // 后面的语句不会执行
+  console.log(2);
+});
+```
 
 ```js
 new Promise((resolve, reject) => {
@@ -166,7 +187,7 @@ p2.then((result) => console.log("执行了then", result)).catch((error) =>
 
 ### then 函数
 
-实例化过的 promise 对象可调用 then 方法，为 Promise 实例添加状态改变时的回调函数
+- 指定一个回调函数，Promise 实例的状态从 pending 转换为 success 后执行（执行时机《见 事件循环 部分》）
 
 ```js
 promise.then(onFulfilled, onRejected);
@@ -177,7 +198,7 @@ promise.then(onFulfilled).catch(onRejected);
 - then()方法可接受两个回调函数作为参数
 - 第一个参数：promise 对象的状态变为 resolved（fulfilled） 状态时应执行的回调函数
 - 第二个参数：promise 对象的状态变为 rejected 状态时应执行的回调函数
-- 返回值：一个新的 Promise 实例（可以采用链式写法，即 then 方法后面再调用另一个 then 方法）
+- 返回值：一个新的 Promise 实例（这也是 then 能采用链式写法的原因，即 then 方法后面再调用另一个 then 方法）
 
 ```js
 function timeout(delay) {
@@ -198,8 +219,7 @@ timeout(100).then((value) => {
 
 ### then 指定的回调函数调用时机
 
-- Promise 新建后立即执行
-- then 方法指定的回调函数，在当前脚本所有同步任务执行完后才会执行
+- 《见 事件循环部分》
 
 ```js
 let promise = new Promise(function (resolve, reject) {
@@ -242,7 +262,7 @@ then 方法用于处理 Promise 成功状态回调函数，使用 catch 方法�
 
 ## catch 方法
 
-- 指定发生错误时(包括 Promise 对象的异步操作中的错误，then 回调方法中的错误)的回调
+- 指定
 
 ```js
 Promise.prototype.catch(callback);

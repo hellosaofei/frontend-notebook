@@ -779,7 +779,137 @@ export default function () {
 观察上面的代码，如果不将相同业务逻辑拆分为 hooks 而是都写在 APP.vue 中，这只是两个逻辑，如果逻辑多了，就会非常乱。
 <img src="./images/组合式API和响应式API.png">
 
-# 路由 vueRouter
+## 动态 class 样式
+
+可以使用`:class (v-bind:class 的缩写)`给一个 `HTML` 对象动态传递一个对象来动态切换 class：
+
+### 内联变量式写法
+
+- 非驼峰式写法需要加引号
+
+```html
+<!-- 下面代码中，给div动态绑定了一个CSS类 active,是否生效取决于isActive的值 -->
+<!-- 渲染结果为 ： <div class="active"></div> -->
+<div :class="{ active: isActive }"></div>
+<!-- 下面代码中，给div动态绑定了两个个CSS类 -->
+<!-- 渲染结果为 ： <div class="static active"></div> -->
+<div class="static" :class="{ active: isActive,'text-danger':isError }"></div>
+
+<script>
+  const isActive = ref(true);
+  const isError = ref(false);
+</script>
+
+<style>
+  .static {
+    background-color: "skyblue";
+  }
+  .active {
+    color: #fff;
+  }
+</style>
+```
+
+### 传递一个对象
+
+```html
+<div :class="{ active: isActive,'text-danger':isError }"></div>
+<!-- 上面的绑定手段也可以写成对象形式 -->
+<div :class="classObject"></div>
+
+<script>
+  const isActive = ref(true);
+  const isError = ref(false);
+
+  // 对象形式：此处的写法值是固定的
+  const classObject = reactive({
+    active: true,
+    "text-danger": false,
+  });
+  // 对象形式：动态计算布尔值
+  const classObject = computed(() => ({
+    active: isActive.value && !isError.value,
+    "text-danger": isError.value,
+  }));
+</script>
+
+<style>
+  .active {
+    color: #fff;
+  }
+  .text-danger {
+    color: red;
+  }
+</style>
+```
+
+### 传递数组
+
+```html
+<!-- 渲染结果为 ： <div class="active text-danger"></div> -->
+<div :class="[activeClass,errorClass]"></div>
+<!-- 条件渲染 -->
+<!-- 渲染结果为 ： <div class="text-danger"></div> -->
+<div :class="[isActive ? activeClass:'', errorClass]"></div>
+
+<script>
+  const isActive = ref(false);
+  const activeClass = ref("active");
+  const errorClass = ref("text-danger");
+</script>
+
+<style>
+  .active {
+    color: #fff;
+  }
+  .text-danger {
+    color: red;
+  }
+</style>
+```
+
+## 动态内联 style 样式
+
+通过`:style` 给 `HTML` 元素动态绑定样式
+
+```html
+<div :style="{ color: activeColor, fontSize: fontSize + 'px' }"></div>
+<!-- 非驼峰式写法需要加引号 -->
+<div :style="{ 'font-size': fontSize + 'px' }"></div>
+<script>
+  const activeColor = ref("red");
+  const fontSize = ref(30);
+</script>
+```
+
+### 绑定一个对象
+
+```html
+<div :style="styleObject"></div>
+<script>
+  const styleObject = reactive({
+    color: "red",
+    fontSize: "30px",
+  });
+</script>
+```
+
+### 绑定一个数组
+
+```html
+<div :style="[baseStyles, overStyles]"></div>
+<script>
+  const baseStyles = reactive({
+    color: 'red',
+    fontSize: '30px'
+  });
+  const overStyles=reactive({
+    'border-radius':'5px';
+  })
+</script>
+```
+
+## 路由 vueRouter
 
 ## 上手使用
 

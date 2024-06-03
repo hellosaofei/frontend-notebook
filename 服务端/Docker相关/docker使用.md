@@ -373,3 +373,212 @@ curl localhost:3344
 docker exec -it nginx01
 
 ```
+
+## 部署 mysql
+
+```sh
+# 1、 搜索镜像
+docker search mysql
+
+# 2. 拉取镜像
+docker pull mysql:5.6
+
+# 3. 查看镜像
+docker images
+
+#4. 运行Mysql
+#  端口映射       -p 3306:3306
+#  指定root用户密码  -e MYSQL_ROOT_PASSWORD=xxx
+#  指定容器名称      --name mysql01
+#  指定运行方式：前台/后台 -d
+#  总是运行 --restart=always
+#  数据卷映射  -v /root/data:/var/lib/mysql
+
+#  执行镜像 【镜像名】
+
+#  5. 查看运行的仓库
+docker ps
+#  6. 进入容器
+docker exec -it 【容器ID】 bash
+#  7. 登录mysql,输入密码
+mysql -u root -p
+#  8. 查看所有数据库
+show databases;
+#  9. 创建一个数据库
+create database test;
+#  10. 选中一个数据库
+use test;
+#  11. 创建一个数据表
+create table t_user(id int primary key auto_increment,name varchar(30));
+#  12. 查看所有数据表
+show tables;
+```
+
+# dockerFile
+
+用于构建 docker 镜像
+
+**构建步骤**
+
+1. 编写 dockerfile 文件
+2. docker build 构建成为一个镜像
+3. docker run 运行镜像
+4. docker push 发布镜像
+
+## dockerFile 指令
+
+```sh
+FROM    # 基础镜像
+MAINTAINER    # 容器
+RUN       # 镜像构建的时候需要运行的命令
+ADD       # tomcat镜像
+WORKDIR   # 镜像工作目录
+VOLUMN    # 挂载的目录
+EXPORT    # 保留端口配置
+CMD       # 指定该容器启动时要运行的命令
+ENTERPOINT    # 容器启动时要运行的命令
+ONBUILD     # 构建一个被继承 Dockerfile 时，触发的指令
+COPY      # 将文件copy到镜像中
+ENV   # 构建设置环境狴犴令
+```
+
+## 实战测试:一个 centos
+
+```sh
+cd dockerFile
+ls
+vim mydockerfile
+```
+
+```sh
+FROM centos
+MAINTAINER  wang<邮箱地址>
+ENV MYPATH /usr/local
+WORKDIR $MYPATH
+RUN yum -y install vim
+RUN yum -y install net-tools
+EXPOSE 80
+CMD echo $MYPATH
+CMD echo "----end----"
+CMD /bin/bash
+```
+
+```sh
+
+# docker 构建一个镜像
+docker build -f mydockerfile -t mycentos:0.1.
+
+# 测试运行
+docker images
+docker run -it mycentos:0.1
+
+
+```
+
+# docker compose
+
+对 docker 容器集群的快速编排
+
+- 有什么用
+
+  > - 当一个项目需要使用 mysql、redis 等多个 docker 容器的时候，如果我们使用 docker 命令一个一个部署，太过繁琐
+  > - 当该项目需要同时部署到多个服务器上时，有又要重复一遍上面的操作，关键是还容易出错
+  > - 总结：一个单独的容器项目，我们很容易可以使用一个 Dockerfile 模板文件。在工作中，经常会碰到需要多个容器相互配合的微服务项目来完成某项任务的情况，例如要实现一个 web 项目，除了 web 服务容器本身，往往还需要再加上后端的数据库服务容器，负载均衡容器等基础服务，还有多个微服务项目需要启动，单独手动启动肯定会相当繁琐，docker-compose 的出现就是为了解决该问题
+
+- 介绍
+  docker 官方的开源项目，将所管理的容器分为三层：
+  工程（project）：docker-compose 运行目录下的所有文件（docker-compose.yml 文件、extends 文件或环境变量等）组成一个工程
+
+服务（service）：一个工程中可以包含多个服务，每个服务中定义了容器运行的镜像、参数、依赖。
+
+容器（container）：一个服务中可以包括多个容器实例
+
+## 安装
+
+只有 linux 平台安装 docker 时没有安装 docker-compose windows、macos 安装 docker 时自动安装 docker-compose
+
+### 案例
+
+创建一个目录
+
+```sh
+# 任意在一个目录下创建一个文件夹作为根目录  并 进入该目录
+mkdir ems && cd ems
+
+# 创建一个 docker-compose.yml 文件用于管理该项目
+touch docker-compose.yml
+
+# 编辑该文件
+vim docker-compose.yml
+```
+
+```yml
+version: "3"   # docker-compose 版本号
+
+networks:
+  frontend:
+    external: true
+
+services:
+   reidis:
+      container_name: redis01
+      image: redis:5.0.12
+      ports:
+         - 6379:6379
+   mysql:
+      image: mysql:5.6
+      ports:
+         -3306:3306
+      environment:
+         - MYSQL_ROOT_PASSWORD=root
+      volumns:
+         - /root/mysqldata1:/var/lib/mysql      # 其中/root/mysqldata1 目录必须是绝对目录并且必须存在
+
+  docker_jenkins:
+    user: root       # root权限
+    restart: always  # 重启方式
+    image: jenkins/jenkins:lts   # 使用的镜像
+    container_name: jenkins      # 容器名称
+    environment:
+      - TZ=Asia/Shanghai
+      - "JENKINS_OPTS=--prefix=/jenkins_home" ## 自定义 jenkins 访问前缀（上下文context）
+
+    ports: # 对外暴露的端口定义
+      - 8080:8080
+      - 50000:50000
+
+    volumes: # 卷挂载路径
+      - /docker/jenkins_home/:/var/jenkins_home # 挂载到容器内的jenkins_home目录
+      - /usr/local/bin/docker-compose:/usr/local/bin/docker-compose
+
+  docker_nginx_dev: # nginx-dev环境
+    restart: always
+    image: nginx
+    container_name: nginx_dev
+    ports:
+      - 8001:8001
+    volumes:
+      - /docker/nginx/conf/nginx.conf:/etc/nginx/nginx.conf
+      - /docker/html:/usr/share/nginx/html
+      - /docker/nginx/logs:/var/log/nginx
+
+  docker_nginx_sit: # nginx-sit环境
+    restart: always
+    image: nginx
+    container_name: nginx_sit
+    ports:
+      - 8002:8002
+    volumes:
+      - /docker/nginx/conf/nginx.conf:/etc/nginx/nginx.conf
+      - /docker/html:/usr/share/nginx/html
+      - /docker/nginx/logs:/var/log/nginx
+```
+
+```sh
+# 启动一组服务
+docker-compose up
+
+# 注意：修改完 yml 文件之后需要使用down命令清除上次构建后的缓存
+# 否则容易出现警告WARNNING
+# docker-compose down
+```

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>该文件用于测试一些js代码</h1>
+  </body>
+  <script>
+    let promise1 = () => {
+      return new Promise((resolve, reject) => {
+        reject("出错啦！！");
+      });
+    };
+    async function getRes() {
+      let res = await promise1();
+      console.log("res", res);
+      // console.log()
+    }
+    getRes();
+  </script>
+</html>

@@ -1,19 +1,3 @@
-## Array 数组
-
-### 原型方法
-
-#### 数组常规方法：增删改查
-
-| 数组方法  | 说明                                               | 使用举例                                      |
-| --------- | -------------------------------------------------- | --------------------------------------------- | ------------------------------ |
-| pop()     | 删除并返回数组最后一个元素                         | pop()==无参数==                               |
-| shift     | 删除并返回数组的第一个元素。                       | shift()==无参数==                             |
-| unshift() | 向数组的开头添加若干元素                           |                                               | unshift(element1,...,elementn) |
-| push()    | 向数组的末尾添加若干元素                           | push(element1,...,elementn)                   |
-| splice()  | 删除数组中的若干元素并添加若干元素                 | array.splice(index,howmany,item1,.....,itemX) |
-| find      | 返回通过测试（函数内判断）的数组的第一个元素的值   |
-| findIndex | 返回通过测试（函数内判断）的数组的第一个元素的索引 |
-
 #### 其他元素转换为数组
 
 | 数组方法     | 说明                                                 | 使用举例                                   |
@@ -40,31 +24,6 @@ console.log(myArr); //[10,20,30]
 let myArr2 = Array.from(["   ss \n", "sjoa   "], (x) => x.replace(/\s+/, ""));
 console.log(myArr2); //['ss \n', 'sjoa']
 ```
-
-#### 排序与翻转
-
-| 数组方法  | 说明           | 使用举例 |
-| --------- | -------------- | -------- |
-| sort()    | 对数组进行排序 |          |
-| reverse() | 翻转数组       |
-
-#### 遍历专用
-
-| 数组方法      | 说明                                               | 使用举例 |
-| ------------- | -------------------------------------------------- | -------- |
-| forEach       | 判断一个对象是否为数组                             |          |
-| every         | 删除并返回数组最后一个元素                         |          |
-| some()        | 检测数组元素中是否有元素符合指定条件。             |          |
-| map()         | 通过指定函数处理数组的每个元素，并返回处理后的数组 |          |
-| filter()      | 检测并返回符合条件所有元素的数组。                 |
-| reduce()      | 将数组元素计算为一个值（从左到右）                 |          |
-| reduceRight() | 将数组元素计算为一个值（从右到左）                 |
-
-#### 数组转字符串
-
-| 数组方法 | 说明                                                     | 使用举例       |
-| -------- | -------------------------------------------------------- | -------------- |
-| join()   | 将数组中所有元素放到一个字符串中，并通过指定的分隔符分隔 | join(sepector) |
 
 ### 数组对象遍历
 
@@ -170,86 +129,6 @@ let newArr = myarr.reduceRight((preVal, val, index) => {
 alert(newArr); //1000---->李四1---->张三0
 ```
 
-### 数组排序
-
-> array.sort(sortfunction)
-> sort 方法可以对数字或者字母进行排序
-> 对于字母，默认按照字母顺序进行排序
-> 不生成副本，对原数组进行修改
-
-```js
-// 当对数字进行排序时，需要传递一个函数作为参数
-let arr=[2,10,3,1]
-let arr1=arr.sort()
-console.log(arr,arr1,arr===arr1)        Array(4) [ 1, 10, 2, 3 ]Array(4) [ 1, 10, 2, 3 ]true
-arr.sort((a,b)=>a-b)[ 1, 2, 3, 10 ]
-
-```
-
-## String 字符串
-
-### 对象方法
-
-#### substring()方法
-
-> 语法：string.substring(from, to)
-> 描述：提取字符串中介于两个指定下标之间的字符
-> 参数：from:必需参数，非负整数，
-> to:可选参数，非负整数
-> 注意：范围为左闭右开
-
-```js
-var str = "Hello world!";
-str.substring(3); //lo world!
-```
-
-## Set 集合
-
-Set 本身是一个构造函数，用于生成 Set 数据结构，成员值是唯一的
-
-### 原型方法
-
-| 原型方法                      | 描述                                           | 其他 |
-| ----------------------------- | ---------------------------------------------- | ---- |
-| Set.prototype.add(value)：    | 添加某个值，返回 Set 结构本身。                |
-| Set.prototype.delete(value)： | 删除某个值，返回一个布尔值，表示删除是否成功。 |
-| Set.prototype.has(value)：    | 返回一个布尔值，表示该值是否为 Set 的成员。    |
-| Set.prototype.clear()：       | 清除所有成员，没有返回值。                     |
-
-Set.prototype.keys()：|返回键名的遍历器
-Set.prototype.values()：|返回键值的遍历器
-Set.prototype.entries()：|返回键值对的遍历器
-Set.prototype.forEach()：|使用回调函数遍历每个成员
-
-### 应用：实现交集、并集、差集
-
-```js
-let a = new Set([1, 2, 3]);
-let b = new Set([2, 3, 6]);
-//并集
-let union = new Set([...a, ...b]);
-//交集
-let intersect = new Set([...a].filter((x) => b.has(x)));
-//差集
-let difference = new Set([...a].filter((x) => !b.has(x)));
-```
-
-## Map 哈希
-
-js 的对象本质上就是键值对的集合，但只能使用字符串作为键
-
-ES6 提供的 Map 数据结构，使得各种类型的值都可作为键
-
-### 原型方法
-
-| 原型方法                      | 描述 | 使用示例 |
-| ----------------------------- | ---- | -------- |
-| Map.prototype.set(key, value) |      |          |
-| Map.prototype.get(key)        |      |          |
-| Map.prototype.has(key)        |      |          |
-| Map.prototype.delete(key)     |      |          |
-| Map.prototype.clear()         |      |          |
-
 ## call、apply、bind
 
 | 函数              | 描述                     | 使用示例         |
@@ -298,8 +177,6 @@ let res = (function (a, b) {
   console.log("this is a test");
 })();
 ```
-
-<img src="../pic/正则/立即执行函数前的分号.png">
 
 #### 易错点
 

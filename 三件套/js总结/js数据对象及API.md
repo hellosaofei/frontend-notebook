@@ -9,13 +9,6 @@
 
 ## 数组常规方法：增删改查
 
-| 数组方法 | 说明 | 使用举例 |
-| -------- | ---- | -------- |
-
-| splice() | 删除数组中的若干元素并添加若干元素 | array.splice(index,howmany,item1,.....,itemX) |
-| find | 返回通过测试（函数内判断）的数组的第一个元素的值 |
-| findIndex | 返回通过测试（函数内判断）的数组的第一个元素的索引 |
-
 ### 数组末尾 删除 并返回 pop()
 
 - 语法：arr.pop()
@@ -261,7 +254,15 @@ alert(newArr); //1000---->李四1---->张三0
 
 ## 对象方法
 
-## slice(start,end)---不改变
+### substring(from,to)方法
+
+> 语法：string.substring(from, to)
+> 描述：提取字符串中介于两个指定下标之间的字符
+> 参数：from:必需参数，非负整数，
+> to:可选参数，非负整数
+> 注意：范围为左闭右开
+
+### slice()---不改变
 
 - 使用 start（包含） 和 end（不包含） 参数来指定字符串提取的部分。
 - start(可选):可正可负
@@ -286,18 +287,6 @@ console.log(str.slice(-9, -5)); //lazy
 ## substr(start,length)
 
 - es6 标准已弃用
-
-### substring()
-
-> 语法：string.substring(from, to)
-> 描述：提取字符串中介于两个指定下标之间的字符
-> 参数：from:必需参数，非负整数，to:可选参数，非负整数
-> 注意：不包含 to
-
-```js
-var str = "Hello world!";
-str.substring(3); //lo world!
-```
 
 ### replace
 
@@ -327,25 +316,20 @@ var n = str.replace(/blue/gi, "red");
 // Mr red has a red house and a red car
 ```
 
-# async/await
-
 # Set 集合
 
 Set 本身是一个构造函数，用于生成 Set 数据结构，成员值是唯一的
 
 ## 原型方法
 
-| 原型方法                      | 描述                                           | 其他 |
-| ----------------------------- | ---------------------------------------------- | ---- |
-| Set.prototype.add(value)：    | 添加某个值，返回 Set 结构本身。                |
-| Set.prototype.delete(value)： | 删除某个值，返回一个布尔值，表示删除是否成功。 |
-| Set.prototype.has(value)：    | 返回一个布尔值，表示该值是否为 Set 的成员。    |
-| Set.prototype.clear()：       | 清除所有成员，没有返回值。                     |
-
-Set.prototype.keys()：|返回键名的遍历器
-Set.prototype.values()：|返回键值的遍历器
-Set.prototype.entries()：|返回键值对的遍历器
-Set.prototype.forEach()：|使用回调函数遍历每个成员
+- add(value)
+- delete(value)
+- has(value)：
+- clear()：
+- keys()：返回键名的遍历器
+- values()：返回键值的遍历器
+- entries()：返回键值对的遍历器
+- forEach()：使用回调函数遍历每个成员
 
 ## 应用：实现交集、并集、差集
 
@@ -368,35 +352,11 @@ ES6 提供的 Map 数据结构，使得各种类型的值都可作为键
 
 ## 原型方法
 
-| 原型方法                      | 描述 | 使用示例 |
-| ----------------------------- | ---- | -------- |
-| Map.prototype.set(key, value) |      |          |
-| Map.prototype.get(key)        |      |          |
-| Map.prototype.has(key)        |      |          |
-| Map.prototype.delete(key)     |      |          |
-| Map.prototype.clear()         |      |          |
-
-## call、apply、bind
-
-| 函数              | 描述                     | 使用示例         |
-| ----------------- | ------------------------ | ---------------- |
-| call(obj,...args) |                          |
-| apply(ovj,[args]) |                          | function.apply() |
-| bind(obj,...args) | 将函数绑定到一个指定对象 | function.bind()  |
-
-```js
-var a = [12, 31, 2, 34, 6, 9, 22];
-
-//bind函数将函数绑定到一个指定对象上，
-
-var test = function (val) {
-  return "12345";
-};
-var a = {};
-var new_a = test.bind(a);
-var res = new_a(1);
-console.log(res);
-```
+- set(key, value)
+- get(key)
+- has(key)
+- delete(key)
+- clear()
 
 # 立即执行函数
 
@@ -670,9 +630,7 @@ let baseUrl = "http://www.baidu.com";
 let a = new URL(baseUrl);
 ```
 
-## 对象属性
-
-### host
+**host**
 
 - 返回主机名（带端口号）
 
@@ -686,7 +644,7 @@ var url = new URL(
 var result = url.host; // "developer.mozilla.org:4097"
 ```
 
-### hostname
+**hostname**
 
 - 仅返回主机名
 
@@ -697,7 +655,7 @@ var url = new URL(
 var result = url.hostname; // 'developer.mozilla.org'
 ```
 
-### pathname
+**pathname**
 
 - 返回网址的 URL 路径
 
@@ -708,7 +666,7 @@ var url = new URL(
 var result = url.pathname; // "/zh-CN/docs/Web/API/URL/pathname"
 ```
 
-### seacrchParams
+**seacrchParams**
 
 - 返回 URLSearchParams 对象，该对象包含当前 URL 中的 params 参数
 
