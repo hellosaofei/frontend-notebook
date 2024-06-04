@@ -919,19 +919,6 @@ setTimeout(function () {
 }, 2000); //window{...}
 ```
 
-## 对 js 原型的认识
-
-### 实现 (5).add(3).minus(2) 功能
-
-```js
-Number.prototype.add = function (n) {
-  return this.valueOf() + n;
-};
-Number.prototype.minus = function (n) {
-  return this.valueOf() - n;
-};
-```
-
 # 性能
 
 ## 数组相关

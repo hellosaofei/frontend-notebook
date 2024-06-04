@@ -292,3 +292,28 @@ function myajax(method, url) {
   });
 }
 ```
+
+# 其他手写题
+
+## 对 js 原型的认识
+
+### 实现 (5).add(3).minus(2) 功能
+
+```js
+Number.prototype.add = function (n) {
+  return this.valueOf() + n;
+};
+Number.prototype.minus = function (n) {
+  return this.valueOf() - n;
+};
+```
+
+### 手写一个 new
+
+```js
+function _new(fn, ...arg) {
+  const obj = Object.create(fn.prototype);
+  const ret = fn.apply(obj, arg);
+  return ret instanceof Object ? ret : obj;
+}
+```
