@@ -3,27 +3,14 @@
   <head>
     <title>使用绝对定位和百分比高度示例</title>
     <style>
-      .container {
-        width: 300px;
-        height: 300px;
-        border: 1px solid black;
-        position: relative; /* 父元素设置为相对定位 */
-      }
-      .child {
-        position: absolute; /* 子元素设置为绝对定位 */
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        margin: auto;
-        height: 50%; /* 设置子元素的高度为50% */
-        border: 1px solid red;
+      .parent {
+        width: 0;
+        height: 0;
+        border-bottom: 250px solid #ed1250;
       }
     </style>
   </head>
   <body>
-    <div class="container">
-      <div class="child"></div>
-    </div>
+    <div class="parent"></div>
   </body>
 </html>

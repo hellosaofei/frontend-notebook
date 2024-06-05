@@ -599,7 +599,7 @@ foo2(3); // 名字：张三,年龄：3
 ### 箭头函数
 
 > 非箭头函数的函数的 this 指向，通常是最后调用它的对象，箭头函数不遵循这一规律
-> 箭头函数的`this`指向由其外层作用域决定
+> 箭头函数的`this`指向由其外层作用域决定，也可以说箭头函数会从外部函数或全局作用域（如果在顶层调用）中捕获 this 的值
 > 作用域只有全局作用域 window 和局部函数作用域
 
 - 题目一：
@@ -623,6 +623,47 @@ obj.foo2()(); // obj  obj
 ```
 
 > `obj.foo()`在执行时，由于对象本身没有作用域，而对象则是在全局作用域 window 下，所以，this 指向为 window
+
+- 题目二
+
+```js
+var name = "window";
+var obj2 = {
+  name: "obj2",
+  foo: function () {
+    console.log(this.name);
+    return () => {
+      console.log(this.name);
+    };
+  },
+};
+var obj3 = {
+  name: "obj3",
+  foo: () => {
+    console.log(this.name);
+    return function () {
+      console.log(this.name);
+    };
+  },
+};
+var obj4 = {
+  name: "obj4",
+  foo: () => {
+    console.log(this.name);
+    return () => {
+      console.log(this.name);
+    };
+  },
+};
+
+obj2.foo()(); // 'obj2' 'obj2'
+obj3.foo()(); // 'window' 'window'
+obj4.foo()(); // 'window' 'window'
+```
+
+> `obj2.foo()`不是箭头函数，它遵循 this 指向的一般规律，即 this 总是指向最后调用它的那个对象，即`obj2`，然后它返回了一个箭头函数，`obj2.foo()()`调用该箭头函数时，该箭头函数捕获了外部函数（即 foo 函数）的`this` 值，所以其内部的 this 指向是 obj2
+> `obj3.foo()`是箭头函数，其 this 指向由外层作用域决定（同题目一），因此为 window，内层普通函数由调用者决定，调用它的是 window，因此也为 window
+> `obj4.foo()`两层都是箭头函数，第一个箭头函数的 this 由外层作用域决定，因此为 window，第二个箭头函数的 this 也由外层作用域决定，它的外层作用域是第一个箭头函数，而第一个箭头函数的 this 是 window，因此内层的 this 也是 window
 
 # js 设计模式
 
