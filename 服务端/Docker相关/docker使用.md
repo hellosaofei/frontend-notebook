@@ -150,7 +150,14 @@ rm -rf /var/lib/docker
 ## 配置阿里云镜像加速服务
 
 ```sh
-
+sudo mkdir -p /etc/docker
+sudo tee /etc/docker/daemon.json <<-'EOF'
+{
+  "registry-mirrors": ["【镜像加速地址】"]
+}
+EOF
+sudo systemctl daemon-reload
+sudo systemctl restart docker
 
 ```
 
@@ -413,6 +420,88 @@ create table t_user(id int primary key auto_increment,name varchar(30));
 #  12. 查看所有数据表
 show tables;
 ```
+
+、
+
+## 部署 redis
+
+**redis 持久化方式**
+
+- rgb 持久化：快照 Redis 服务将某一时刻数据以快照文件形式写入磁盘
+- aof 持久化：将所有 redis 客户端的写操作以命令式方式记录到日志文件当中（**更安全**）
+
+```sh
+# 1、 搜索镜像
+docker search redis
+
+# 2. 拉取镜像
+docker pull redis:5.0.12
+
+# 3. 查看镜像
+docker images
+
+#4. 运行redis
+#  端口映射       -p 6379:6379
+#  指定容器名称      --name redis01
+#  指定运行方式：前台/后台 -d
+#  总是运行 --restart=always
+#  指定redis持久化方式 aof/rdb  redis-server --appendonly yes
+#  数据卷映射 -v /root/redisdata:/data
+docker run -p 6379:9003 --name redis01 -d --restart=always -v /root/redisdata:/data redis:5.0.12 redis-server --appendonly yes
+
+#  5. 查看运行的仓库
+docker ps
+#  6. 查看数据卷映射情况
+cd /root/redisdata
+# >>> appendonly.aof
+
+#  7. 进入redis容器
+docker exec -it redis01 bash
+# >>> root@xxx:/data# 【命令】
+
+#  8. 查看当前目录下的文件
+ls
+# >>> appendonly.aof
+
+#  9. 使用redis-cli操作redis
+redis-cli
+# >>> 127.0.0.1:6379> 【命令】
+
+#  10. 存一条数据
+set age 19
+# >>> OK
+
+#  11. 取一条数据
+get age
+
+#  12. 退出cli
+exit
+# >>> root@xxx:/data# 【命令】
+
+#  13. 再次查看appendonly.aof 内容
+# *2
+# $6
+# SELECT
+# $1
+# 0
+# *3
+# $3
+# set
+# $3
+# age
+# $2
+# 19
+```
+
+使用自定义 redis 配置文件启动
+
+1. 完整 redis 配置文件：下载 redis 服务，找到配置文件，并简单修改（不建议使用完整的配置文件）
+2. 自定义配置文件
+   > - 新建 redif.conf 文件
+   > - 编辑该文件，输入下面两行内容`appendonly yes`,`appendfilename "【自定义aof文件名】.aof"`
+   > - 在服务器`/root`目录下新建文件夹`/redisconf`，将该文件移动到该目录下
+   > - 重新启动一个容器，启动命令如下
+   >   `docker run -d -p 6379:6379 --restart=always -v /root/redisconf:/data redis:5.0.12 redis-server /data/redis.conf`
 
 # dockerFile
 

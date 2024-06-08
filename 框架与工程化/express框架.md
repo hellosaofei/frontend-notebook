@@ -691,6 +691,81 @@ app.listen(PORT, () => {
 
 ## 关于中间件的使用
 
+**使用流程**
+
+1. 定义一个中间件
+
+```js
+function middleWare(req, res, next) => {
+  // 中间件处理逻辑
+  next();
+}
+```
+
+2. 全局使用
+
+```js
+app.use(middleWare);
+```
+
+3. 局部使用
+
+```js
+app.get("/test", middleWare, (req, res, next) => {
+  // 路由处理逻辑
+});
+```
+
+**中间件分类**
+
+- 应用级别中间件(全局路由) `app.use`
+- 路由级别中间件（局部路由） `router.use`
+- express 内置中间件  `express.static,express.json,express.urlencoded`
+- 错误处理中间件 `app.use(err,req,res,next)`
+- 第三方中间件 `bodyparser,cookieparser`
+
+### 全局中间件
+
+```js
+const LoggerMiddleware = (req, res, next) => {
+  console.log(`Logged  ${req.url}  ${req.method} -- ${new Date()}`);
+  next();
+};
+
+app.use(LoggerMiddleware);
+```
+
+### express 内置中间件
+
+```js
+var options = {
+  dotfiles: "ignore",
+  etag: false,
+  extensions: ["htm", "html"],
+  index: false,
+  maxAge: "1d",
+  redirect: false,
+  setHeaders: function (res, path, stat) {
+    res.set("x-timestamp", Date.now());
+  },
+};
+
+app.use(express.static("public", options));
+```
+
+### 三方中间件
+
+```js
+import cors from "cors";
+app.use(cors());
+```
+
+```js
+const bodyParser = require("body-parser");
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+```
+
 ### 一个路由使用多个中间件
 
 在 Express 框架中，一个路由可以使用多个中间件，这些中间件会按照定义的顺序执行。每个中间件可以执行任务，例如处理请求，响应请求，终止请求-响应循环，或者调用下一个中间件。
