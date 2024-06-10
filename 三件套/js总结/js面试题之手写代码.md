@@ -271,6 +271,8 @@ function myajax(method, url, next) {
 
 ### 基于 promise 的封装
 
+- 封装方式一：
+
 ```js
 let res = myajax("get", url).then((res) => {
   console.log(res);
@@ -292,6 +294,83 @@ function myajax(method, url) {
   });
 }
 ```
+
+- 封装方式二：
+  > 来源于 《阮一峰 es6 入门》
+
+```js
+const getJSON = function (url) {
+  const promise = new Promise(function (resolve, reject) {
+    const handler = function () {
+      if (this.readyState !== 4) {
+        return;
+      }
+      if (this.status === 200) {
+        resolve(this.response);
+      } else {
+        reject(new Error(this.statusText));
+      }
+    };
+    const client = new XMLHttpRequest();
+    client.open("GET", url);
+    client.onreadystatechange = handler;
+    client.responseType = "json";
+    client.setRequestHeader("Accept", "application/json");
+    client.send();
+  });
+
+  return promise;
+};
+
+getJSON("/posts.json").then(
+  function (json) {
+    console.log("Contents: " + json);
+  },
+  function (error) {
+    console.error("出错了", error);
+  }
+);
+```
+
+- 封装方式三：
+  > 来源于：掘金 《https://juejin.cn/post/6844904046436843527》
+
+```js
+myajax({ url = "", method = "post", data, headers = {}, requestList }) {
+  return new Promise((resolve, reject) => {
+    let xhr = new XMLHttpRequest();
+    xhr.open(method, url);
+    Object.keys(headers).forEach((key) => {
+      xhr.setRequestHeader(key, headers[key]);
+    });
+    xhr.send(data);
+    xhr.onload = (e) => {
+      resolve({
+        data: e.target.response,
+      });
+    };
+  });
+},
+```
+
+```js
+// 调用
+// 后端返回示例
+//res.json({
+// code: 2000,
+// message: "请求成功！！！",
+// })
+myajax({
+  url: "http://localhost:8000/hello",
+  method: "get",
+}).then((res) => {
+  console.log("请求返回结果为：", res);
+  // 使用jSON.parse解码
+  console.log("请求返回结果为：", JSON.parse(res.data));
+});
+```
+
+<img src="./imgs/js相关/myajax请求示例.png">
 
 # 其他手写题
 

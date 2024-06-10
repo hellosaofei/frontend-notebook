@@ -8,27 +8,21 @@
   <body>
     <button id="myBtn">点击该按钮</button>
     <script>
-      // setTimeout(function () {
-      //   console.log("匿名函数的this指向", this); //window
-      // }, 100);
-      // setTimeout(() => {
-      //   console.log("箭头函数的this指向", this); //window
-      // }, 100);
-      let btn = document.querySelector("#myBtn");
-      btn.addEventListener(
-        "click",
-        function () {
-          console.log("匿名函数的指向问题：", this); // <button></button>
-        },
-        false
-      );
-      // btn.addEventListener(
-      //   "click",
-      //   () => {
-      //     console.log("箭头函数的指向问题：", this);  //wnidow
-      //   },
-      //   false
-      // );
+      function test(...args) {
+        console.log("传递过来的参数为:", args);
+      }
+      test(1, { name: "张三", age: 12 }, [1, 2], "hahhaha");
+      function add(...args) {
+        console.log(args);
+        const { name, age, sex = "女" } = args[0];
+        console.log(name, age);
+      }
+      add({
+        name: "张三",
+        age: 19,
+        sex: "男",
+        other: "ssssss",
+      });
     </script>
   </body>
 </html>
