@@ -152,14 +152,26 @@ app.get("/路径", "中间件函数1", "中间件函数2", (req, res) => {});
 ```js
 // index.js
 
-app.use(express.static(__dirname + "/public"));
+app.use(express.static("public"));
 
 app.listen(3000);
 ```
 
-> 上面代码中，public 目录下存放静态资源如 css/image/html 等文件
+> 上面代码中，public 目录下存放静态资源如 css/image/html 等文件访问网址即可得到 public 下的静态文件
 
-- 访问网址即可得到 public 下的静态文件
+```
+http://127.0.0.1:3000/css/app.css
+
+http://127.0.0.1:3000/images/1.png
+```
+
+- 挂载路径前缀
+
+```js
+app.use("/public", express.static("public"));
+```
+
+> 访问下面网址即可得到 public 下的静态文件
 
 ```
 http://127.0.0.1:3000/css/app.css

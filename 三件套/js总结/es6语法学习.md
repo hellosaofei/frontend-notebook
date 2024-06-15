@@ -2,17 +2,70 @@
 
 ## 数组的解构赋值
 
-```js
-const files = {
-  chunk: [
-    {
-      name: "张三",
-    },
-  ],
-};
-const [chunk] = files.chunk;
+- 变量赋值简化
 
-console.log(chunk); // {name:'张三'}
+```js
+let a = 1;
+let b = 2;
+let c = 3;
+// 相当于
+let [a, b, c] = [1, 2, 3];
+```
+
+- 从数组解构出数据
+
+```js
+let arr = [1, 2, 3];
+let [item1] = arr; // 1
+
+let [item1, item2] = arr; // 1,2
+```
+
+- 解构失败时，变量的值为`undefined`
+
+```js
+let [a] = [];
+// a:undefined
+
+let [a, b] = [1];
+// a:1
+// b :undefined
+```
+
+- 只要某种数据结构具有 `Iterator` 接口，那么就可以采用数组形式的解构赋值
+
+```js
+let [x, y, z] = new Set(["a", "b", "c"]);
+// x:'a'
+```
+
+### 实际运用：求斐波那契数列第 n 项
+
+```js
+function fibs(n) {
+  let cur = 0;
+  let a = 0;
+  let b = 1;
+  while (cur < n) {
+    [a, b] = [b, a + b];
+    cur++;
+  }
+  return a;
+}
+```
+
+### 实际运用：拿到文件对象
+
+- 使用 `input` 输入框选择文件时，
+
+```js
+handleChange(e){
+  // 索引写法
+  const file=e.target.files[0];
+  // 解构赋值写法
+  const [file]=e.target.files;
+}
+
 ```
 
 # 函数扩展

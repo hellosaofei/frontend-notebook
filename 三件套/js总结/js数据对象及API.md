@@ -79,22 +79,92 @@ let myArr = Array.from([1, 2, 3], (x) => x * 10); //[10,20,30]
 let arr1 = Array.from({ length: 4 }); //[undefined,undefined,undefined,undefined]
 ```
 
-## 排序与翻转
+## sort([sortFn])函数
 
-| 数组方法  | 说明           | 其他       |
-| --------- | -------------- | ---------- |
-| sort()    | 对数组进行排序 | 改变原数组 |
-| reverse() | 翻转数组       |
-
-- sort()方法默认按照字典顺序进行比较，即将数值转成字符串，再按照字典顺序比较。比如`[101,11].sort()`数组中的两个元素都将会被转为字符串，故 101 最终会在 11 的前面
-
-- sort(sortFunction)可接受一个函数作为参数，`sortFunction(a,b)`接受两个参数分别表示两个数组成员，如果其返回值大于 0，表示第一个成员排在后面，否则，第一个成员排在前面
+作用：对数组进行排序，改变原数组
+原理：将数组元都转换位字符串，按照它们的 UTF-16 码元值升序排序
+举例：`[101,11].sort()`数组中的两个元素都将会被转为字符串，故 101 最终会在 11 的前面
 
 ```js
 let arr = [2, 10, 3, 1];
 let arr1 = arr.sort();
 console.log(arr, arr1, arr === arr1); // [ 1, 10, 2, 3 ] [ 1, 10, 2, 3 ] true
 arr.sort((a, b) => a - b); //[ 1, 2, 3, 10 ]
+```
+
+**关于排序函数 sortFn(a,b)**
+规则：该函数返回一个数字（`正数、负数、0`），根据这个数字决定排序后数组中`a,b`两个数字的相对顺序
+
+- `a-b>0`,则`a`大于`b`，返回`正数`,排序后的数组中两者的相对顺序为`[b,a]`
+- `a-b<0`,则`a`小于`b`，返回`负数`，排序后的数组中两者的相对顺序为`[a,b]`
+- `a-b=0`,则`a`等于`b`，排序后的数组中两者的相对顺序保持不变
+
+```js
+let arr = [1, 4, 2, 7, 5, 3, 8, 6];
+arr.sort((a, b) => a - b);
+// 相当于
+arr.sort((a, b) => {
+  if (a > b) {
+    return 1;
+  } else if (a < b) {
+    return -1;
+  } else {
+    return 0;
+  }
+});
+```
+
+### 实际运用 1
+
+- 在大文件上传的项目实践中，需要对文件进行切片上传，后端每接收一个切片都将其保存在一个目录下，当前端的文件切片全部上传成功后，发送一个合并请求。后端收到请求后，从指定的目录下读取所有文件进行合并，但可能顺序是乱的（废话）
+- 直接看这样一个目录
+
+```
+|- uploadDir-video
+  |- video-1
+  |- video-5
+  |- video-4
+  |- video-7
+  |- video-2
+  |- video-8
+  |- video-3
+```
+
+使用`fs.readdir()`函数读取该目录下的所有文件，得到的结果就是：原目录中的文件顺序
+但是我们需要，文件的顺序，要按照`1-8`的顺序，这时候就需要`sort()`函数了
+
+```js
+const dirPath = path.resolve(__dirname);
+let fileList = fs.readdir(dirPath, (err, files) => {
+  if (err) {
+    return;
+  }
+  return files;
+});
+
+fileList.sort((a, b) => {
+  return a.split("-")[1] - b.split("-")[1];
+});
+console.log(fileList);
+```
+
+### 实际运用 2
+
+- 根据对象的属性值进行排序
+
+```js
+const items = [
+  { name: "Edward", value: 21 },
+  { name: "Sharpe", value: 37 },
+  { name: "And", value: 45 },
+  { name: "The", value: -12 },
+  { name: "Magnetic", value: 13 },
+  { name: "Zeros", value: 37 },
+];
+
+// 根据 value 排序
+items.sort((a, b) => a.value - b.value);
+console.log(items);
 ```
 
 ## 其他方法
@@ -1006,6 +1076,113 @@ addEventListener("dragleave", (event) => {});
 ondragleave = (event) => {};
 ```
 
-# 生成二维码 QRcode 库
+# Worker
 
-- 好的博客：https://juejin.cn/post/6844903719255932936
+创建出一个独立于主线程的后台线程，用来执行费时的处理任务
+通常的调用结构如下：
+
+```
+|- root
+  |- main.js
+  |- worker.js
+```
+
+- `main.js`
+
+```js
+const myWorker = new Worker("worker.js", options);
+// 向worker 发送一个消息
+myWorker.postMessage();
+// 监听消息
+myWorker.onmessage();
+```
+
+- `worker.js`
+
+```js
+// 向父组件发送一个消息
+self.postMessgae();
+// 监听消息
+self.onmessage();
+```
+
+## postMessgae(message,transfer)
+
+发送消息，
+
+- 在`main.js`中,使用`myWorker.postMessage()`发送消息
+- 在`worker.js`中，使用`self.postMessage()`发送消息
+
+## 事件
+
+### message
+
+监听传递过来的消息，并定义相应的事件处理函数
+
+- 在`main.js`中,使用`myWorker.onmessage()`接收事件
+- 在`worker.js`中，使用`self.onmessage()`接收事件
+
+```js
+addEventListener("message", (event) => {});
+
+onmessage = (event) => {};
+```
+
+**Event 对象属性**
+
+- `event.data`
+  跟随事件传递过来的数据
+- `event.source`
+  消息的发送者
+
+## 一个案例
+
+- `index.html`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>web workers examples</title>
+  </head>
+
+  <body>
+    <div>
+      <input type="text" placeholder="请输入一个数字" />
+      <p>输入数字查看其平方值</p>
+    </div>
+    <script src="main.js"></script>
+  </body>
+</html>
+```
+
+- `main.js`
+
+```js
+const inputContainer = document.querySelector("input");
+const resContainer = document.querySelector("p");
+const myWorker = new Worker("worker.js");
+
+inputContainer.onchange = function () {
+  myWorker.postMessage(inputContainer.value);
+  console.log("消息发送给了workerJS");
+};
+myWorker.onmessage = function (e) {
+  resContainer.innerText = e.data;
+  console.log("从workerJS接收到了数据");
+};
+```
+
+- `worker.js`
+
+```js
+self.onmessage = function (e) {
+  console.log("workerJS接收到了来自mainJS的消息");
+  const calculateRes = e.data ** 2;
+  self.postMessage(calculateRes);
+  console.log("计算结果发送给了mainJS");
+};
+```
+
+# FileReader

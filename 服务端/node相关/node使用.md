@@ -150,24 +150,27 @@ fs.appendFile("./座右铭.txt", "择其善者而从之，其不善者而改之�
   console.log("追加成功");
 });
 fs.appendFileSync("./座右铭.txt", "\r\n温故而知新, 可以为师矣");
+```
 
-/*流式写入:适用于大文件写入或频繁写入的场景*/
+### 流式写入:fs.createWriteStream(path[, options])
 
-let ws = fs.createWriteStream('./观书有感.txt');//创建一个流式写入对象
-ws.write('半亩方塘一鉴开\r\n');
-ws.write('天光云影共徘徊\r\n');
-ws.write('问渠那得清如许\r\n');
-ws.write('为有源头活水来\r\n');
-ws.end()//ws.close()
+- 适用于大文件写入或频繁写入的场景
+
+```js
+let ws = fs.createWriteStream("./观书有感.txt"); //创建一个流式写入对象
+ws.write("半亩方塘一鉴开\r\n");
+ws.write("天光云影共徘徊\r\n");
+ws.write("问渠那得清如许\r\n");
+ws.write("为有源头活水来\r\n");
+ws.end(); //ws.close()
 ```
 
 ## 读取文件
 
-| 方法             | 说明     |
-| ---------------- | -------- |
-| readFile         | 异步读取 |
-| readFileSync     | 同步读取 |
-| createReadStream | 流式读取 |
+| 方法         | 说明     |
+| ------------ | -------- |
+| readFile     | 异步读取 |
+| readFileSync | 同步读取 |
 
 ```js
 /*
@@ -193,14 +196,11 @@ options 选项配置
 */
 let data = fs.readFileSync("./座右铭.txt");
 let data2 = fs.readFileSync("./座右铭.txt", "utf-8");
+```
 
-/*
-语法： fs.createReadStream(path[, options])
-参数说明：
-path 文件路径
-options 选项配置（可选）
-返回值：Object
-*/
+### 流式读取:fs.createReadStream(path[, options])
+
+```js
 let rs = fs.createReadStream("./观书有感.txt"); //创建读取流对象
 //每次取出 64k 数据后执行一次 data 回调
 rs.on("data", (data) => {
@@ -210,6 +210,31 @@ rs.on("data", (data) => {
 //读取完毕后, 执行 end 回调
 rs.on("end", () => {
   console.log("读取完成");
+});
+```
+
+### 流式操作文件的例子
+
+- 接下来我们要复制一个文件。也就是先要从一个文件中读取内容，在写入另外一个文件。
+- 当读流和写流同时存在时，怎么控制好流速保证写流完了再读流呢？我们可以使用管道 pipe 来实现这个效果
+- 当读取流完成后，流式内容流入写入流，后者完成写操作
+
+```js
+const fs = require("fs");
+const path = require("path");
+
+// 两个文件名
+const fileName1 = path.resolve(__dirname, "data.txt");
+const fileName2 = path.resolve(__dirname, "data-bak.txt");
+// 读取文件的 stream 对象
+const readStream = fs.createReadStream(fileName1);
+// 写入文件的 stream 对象
+const writeStream = fs.createWriteStream(fileName2);
+// 通过 pipe执行拷贝，数据流转
+readStream.pipe(writeStream);
+// 数据读取完成监听，即拷贝完成
+readStream.on("end", function () {
+  console.log("拷贝完成");
 });
 ```
 
@@ -265,6 +290,19 @@ fs.unlinkSync("./test2.txt");
 
 ## 文件夹操作
 
+- 假设有这样一个目录
+
+```
+|- root
+  |- root1
+    |- a.js
+  |- index1.js
+  |- index2.js
+  |- index3.js
+  |- index4.js
+  |- app.js
+```
+
 ### 创建
 
 ```js
@@ -286,20 +324,57 @@ fs.mkdirSync("./x/y/z", { recursive: true });
 
 ### 读取
 
+- API（详细见 node 官网）
+
 ```js
-/*
-语法：
 fs.readdir(path[, options], callback)
 fs.readdirSync(path[, options])
-参数说明：
-path 文件夹路径
-options 选项配置（ 可选 ）
-callback 操作后的回调
-*/
-//异步读取
-fs.readdir("./论语", (err, data) => {});
-//同步读取
-let data = fs.readdirSync("./论语");
+// options可选项包括
+// recursive:false, 是否递归读取。
+```
+
+- 需求：假设现在在`app.js`中写文件，想要获取 `root` 目录下的所有文件
+
+```js
+const fs = require("fs");
+
+fs.readdir(__dirname, (err, files) => {
+  if (err) {
+    return;
+  }
+  console.log(files);
+});
+```
+
+结果
+
+```js
+["root1", "index1.js", "index2.js", "index3.js", "index4.js", "app.js"];
+```
+
+- 开启递归读取
+
+```js
+fs.readdir(__dirname, { recursive: true }, (err, files) => {
+  if (err) {
+    return;
+  }
+  console.log(files);
+});
+```
+
+结果
+
+```js
+[
+  "root1",
+  "root1/a.js",
+  "index1.js",
+  "index2.js",
+  "index3.js",
+  "index4.js",
+  "app.js",
+];
 ```
 
 ### 删除
@@ -346,13 +421,84 @@ isDirectory 检测是否为文件夹
 */
 ```
 
-## \_\_dirname
+## \_\_dirname \_\_filename
 
-\_\_dirname 保存着 当前文件所在目录的绝对路径
+在 CommonJS 中，有两个全局变量，分别保存
+
+`__dirname` :动态获取当前文件模块所属目录的绝对路径
+`__filename`：动态获取当前文件的绝对路径
+
+- 举个例子:假设有一个 js 文件，其目录结构是：
+
+```
+|- NODE_CODE
+  |- ...
+  |- 17_fileUpload_juejin
+    |- version2
+      |- test.js
+```
+
+```js
+// test.js
+console.log(__dirname);
+// E:\test_code\node_code\17_fileUpload_juejin_2\version2
+console.log(__filename);
+// E:\test_code\node_code\17_fileUpload_juejin_2\version2/test.js
+```
 
 # path 模块
 
-path.resolve 拼接规范的绝对路径 常用
+## path.resolve()
+
+用于路径拼接:`path.resolve( [from...], to )`
+
+- 将路径转成绝对路径，就是将参数 `to`拼接成一个绝对路径，
+- `[from...]`为选填项，可以设置多个路径，如 `path.resolve('./aaa', './bbb', './ccc')`
+
+**注意参数 to 的写法**
+
+- 若`to` 以`/` 开头，不会拼接到前面的路径；
+- 若 `to` 以 `../` 开头，拼接前面的路径，且不含最后一节路径；
+- 若 `to` 以 `./` 开头或者没有符号，则拼接前面路径。
+
+**举个例子**
+假设有这样一个目录结构
+
+```
+|- NODE_CODE
+  |- ...
+  |- 17_fileUpload_juejin
+    |- version2
+      |- public
+        |- images
+        |- videos
+      |- test.js
+      |- app.js
+```
+
+```js
+console.log(path.resolve(__dirname, `public/images`));
+console.log(path.resolve(__dirname, `./public/images`));
+// E:\test_code\node_code\17_fileUpload_juejin_2/template/form
+
+console.log(path.resolve(__dirname, `/public/images`));
+// 因为`to` 以 '/' 开头，所以输出为  /public/images
+
+console.log(path.resolve(__dirname, `../public/images`));
+console.log(path.resolve(__dirname, `..`, `public/images`));
+console.log(path.resolve(__dirname, `..`, `./public/images`));
+// E:\test_code\node_code\17_fileUpload_juejin_2\public\images
+console.log(path.resolve(__dirname, `..`, `/public/images`));
+// 因为`to` 以 '/' 开头，所以输出为  /public/images
+
+console.log(__dirname,'..')
+console.log(__dirname,'..''./')
+// 获取到当前js文件父目录的父目录：E:\test_code\node_code
+
+console.log(path.resolve(__dirname, `app.js`));
+// test.js文件中，获取一个同级js文件的路径:// E:\test_code\node_code\17_fileUpload_juejin_2\app.js
+```
+
 path.sep 获取操作系统的路径分隔符
 path.parse 解析路径并返回对象
 path.basename 获取路径的基础名称

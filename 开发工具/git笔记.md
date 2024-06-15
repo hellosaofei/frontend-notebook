@@ -45,13 +45,13 @@ git reset --hard 版本号
 ```shell
 git add .       #将工作区代码都上传到暂存区
 git commit -m '一些描述性内容'          # 讲暂存区内容提交到分支
-git push origin 分支名      //提交到远程仓库
+git push 【远程仓库】 分支名      //提交到远程仓库
 ```
 
 ### git 拉取
 
 ```shell
-git pull origin 分支名
+git pull 【远程仓库】 分支名
 ```
 
 ## git 分支管理
@@ -60,7 +60,7 @@ git pull origin 分支名
 git branch      #查看分支
 git branch 分支名称         # 创建分支
 git checkout 分支名称       #切换分支
-git push origin 分支名称:分支名称        #本地分支同步到远程分支
+git push 【远程仓库】 分支名称:分支名称        #本地分支同步到远程分支
 git merge 分支名称          #将分支合并到master
 ```
 
@@ -81,11 +81,12 @@ $ git branch  # 列出所有分支
 # git 日常使用
 
 ```bash
-git status
-# 拉取远程仓库内容以进行同步
-git pull origin master
 # 上传文件
 git add .
 git commit -m '本次修改的描述'
 git push origin master
 ```
+
+# git 删除本地仓库数据
+
+# git 工作流程

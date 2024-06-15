@@ -9,21 +9,18 @@
     <h1>该文件用于测试一些js代码</h1>
   </body>
   <script>
-    var name = "window";
-    var obj = {
-      name: "obj",
-      foo1() {
-        console.log(this.name);
-      },
-      foo2: function () {
-        console.log(this.name);
-      },
-      foo3: () => {
-        console.log(this.name);
-      },
-    };
-    obj.foo1();
-    obj.foo2();
-    obj.foo3();
+    const file_list = [
+      "video-1",
+      "video-5",
+      "video-4",
+      "video-7",
+      "video-2",
+      "video-8",
+      "video-3",
+    ];
+
+    file_list.sort((a, b) => {
+      return a.split("-")[1] - b.split("-")[1];
+    });
   </script>
 </html>

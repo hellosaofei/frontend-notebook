@@ -4,34 +4,17 @@
 
 # 用法
 
-```js
-var multiparty = require("multiparty");
-var http = require("http");
-var util = require("util");
+## 一个例子
 
-http
-  .createServer(function (req, res) {
-    if (req.url === "/upload" && req.method === "POST") {
-      var form = new multiparty.Form();
+> 本示例见：
+> `form` 表单数据
+> <img src='../images/技术文档/multiparty/表单对象.png'>
 
-      form.parse(req, function (err, fields, files) {
-        res.writeHead(200, { "content-type": "text/plain" });
-        res.write("received upload:\n\n");
-        res.end(util.inspect({ fields: fields, files: files }));
-      });
+后端使用`multiparty` 进行解析，并使用`json` 形式，返回解析结果
 
-      return;
-    }
+前端收到数据，通过`console.log`打印出来，结果如下
 
-    // show a file upload form
-    res.writeHead(200, { "content-type": "text/html" });
-    res.end(
-      '<form action="/upload" enctype="multipart/form-data" method="post">' +
-        '<input type="text" name="title"><br>' +
-        '<input type="file" name="upload" multiple="multiple"><br>' +
-        '<input type="submit" value="Upload">' +
-        "</form>"
-    );
-  })
-  .listen(8080);
-```
+<img src='../images/技术文档/multiparty/multiparty模块解析结果.png'>
+
+经过`multiparty` 处理后的文件对象内部属性为
+<img src='../images/技术文档/multiparty/multiparty解析得到的文件对象.png'>

@@ -9,6 +9,17 @@ http请求头与请求体
 session、cookie、token
 ```
 
+## 跨域问题及解决方案
+
+- CORS
+  在后端设置几个响应头
+  如 `Access-Control-Allow-Origin: *`
+
+- 反向代理
+  在 nginx/traefik/haproxy 等反向代理服务器中设置为同一域名
+- JSONP
+  详解见 JSONP 的原理是什么，如何实现
+
 ## 事件循环
 
 ### 浏览器中

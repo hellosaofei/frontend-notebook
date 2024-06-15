@@ -120,7 +120,9 @@ verifyToken(token, secret)
   });
 ```
 
-# 关于函数传参
+# 解构赋值
+
+## 关于函数传参
 
 在 es6 之前，函数内部都有一个 `arguments` 作为隐藏的属性，表示了向函数内部传递参数
 
@@ -143,3 +145,59 @@ test(1, { name: "张三", age: 12 }, [1, 2], "hahhaha");
 ```
 
 <img src="./imgs/js相关/解构赋值传参.png">
+
+# 工具函数
+
+## 一个随机数函数
+
+```js
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  if (min > max) return;
+
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+```
+
+## 关于 ASCII 码的转换
+
+## ASCII 码与数字 之间的转换
+
+- `Number`>`ASCII`
+
+```js
+String.fromCharCode(num1, num2, /* …, */ numN);
+```
+
+- `ASCII`>`Number`
+
+```js
+String.prototype.charCodeAt(index);
+```
+
+## 随机字符串
+
+- 生成一个
+
+```js
+function generateRandomString(length) {
+  var result = "";
+  var characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_";
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
+```
+
+- 生成一个时间戳
+
+```js
+function getTime() {
+  const date = new Date();
+  return date.getTime().toString();
+}
+```
