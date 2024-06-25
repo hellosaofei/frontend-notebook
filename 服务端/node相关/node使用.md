@@ -152,19 +152,6 @@ fs.appendFile("./座右铭.txt", "择其善者而从之，其不善者而改之�
 fs.appendFileSync("./座右铭.txt", "\r\n温故而知新, 可以为师矣");
 ```
 
-### 流式写入:fs.createWriteStream(path[, options])
-
-- 适用于大文件写入或频繁写入的场景
-
-```js
-let ws = fs.createWriteStream("./观书有感.txt"); //创建一个流式写入对象
-ws.write("半亩方塘一鉴开\r\n");
-ws.write("天光云影共徘徊\r\n");
-ws.write("问渠那得清如许\r\n");
-ws.write("为有源头活水来\r\n");
-ws.end(); //ws.close()
-```
-
 ## 读取文件
 
 | 方法         | 说明     |
@@ -198,64 +185,6 @@ let data = fs.readFileSync("./座右铭.txt");
 let data2 = fs.readFileSync("./座右铭.txt", "utf-8");
 ```
 
-### 流式读取:fs.createReadStream(path[, options])
-
-```js
-let rs = fs.createReadStream("./观书有感.txt"); //创建读取流对象
-//每次取出 64k 数据后执行一次 data 回调
-rs.on("data", (data) => {
-  console.log(data);
-  console.log(data.length);
-});
-//读取完毕后, 执行 end 回调
-rs.on("end", () => {
-  console.log("读取完成");
-});
-```
-
-### 流式操作文件的例子
-
-- 接下来我们要复制一个文件。也就是先要从一个文件中读取内容，在写入另外一个文件。
-- 当读流和写流同时存在时，怎么控制好流速保证写流完了再读流呢？我们可以使用管道 pipe 来实现这个效果
-- 当读取流完成后，流式内容流入写入流，后者完成写操作
-
-```js
-const fs = require("fs");
-const path = require("path");
-
-// 两个文件名
-const fileName1 = path.resolve(__dirname, "data.txt");
-const fileName2 = path.resolve(__dirname, "data-bak.txt");
-// 读取文件的 stream 对象
-const readStream = fs.createReadStream(fileName1);
-// 写入文件的 stream 对象
-const writeStream = fs.createWriteStream(fileName2);
-// 通过 pipe执行拷贝，数据流转
-readStream.pipe(writeStream);
-// 数据读取完成监听，即拷贝完成
-readStream.on("end", function () {
-  console.log("拷贝完成");
-});
-```
-
-### 文件复制
-
-```js
-//两种写入方式占用的内存容量有很大差别
-const fs = require("fs");
-
-//同步写入
-let data = fs.readFileSync("./笑傲江湖.txt");
-fs.writeFileSync("./张三.txt", data);
-
-//流式操作
-let rs = fs.createReadStream("./笑傲江湖.txt");
-let ws = fs.createWriteStream("张三.txt");
-rs.on("data", (chunk) => {
-  ws.write(chunk);
-});
-```
-
 ## 文件移动与重命名
 
 ```js
@@ -270,155 +199,6 @@ callback 操作后的回调
 */
 fs.rename("./观书有感.txt", "./论语/观书有感.txt", (err) => {});
 fs.renameSync("./座右铭.txt", "./论语/我的座右铭.txt");
-```
-
-## 文件删除
-
-```js
-/*
-语法
-fs.unlink(path, callback)
-fs.unlinkSync(path)
-参数说明：
-path 文件路径
-callback 操作后的回调
-*/
-const fs = require("fs");
-fs.unlink("./test.txt", (err) => {});
-fs.unlinkSync("./test2.txt");
-```
-
-## 文件夹操作
-
-- 假设有这样一个目录
-
-```
-|- root
-  |- root1
-    |- a.js
-  |- index1.js
-  |- index2.js
-  |- index3.js
-  |- index4.js
-  |- app.js
-```
-
-### 创建
-
-```js
-/*
-语法：
-fs.mkdir(path[, options], callback)
-fs.mkdirSync(path[, options])
-参数说明：
-path 文件夹路径
-options 选项配置（ 可选 ）
-callback 操作后的回调
-*/
-fs.mkdir("./page", (err) => {});
-//递归异步创建
-fs.mkdir("./1/2/3", { recursive: true }, (err) => {});
-//递归同步创建文件夹
-fs.mkdirSync("./x/y/z", { recursive: true });
-```
-
-### 读取
-
-- API（详细见 node 官网）
-
-```js
-fs.readdir(path[, options], callback)
-fs.readdirSync(path[, options])
-// options可选项包括
-// recursive:false, 是否递归读取。
-```
-
-- 需求：假设现在在`app.js`中写文件，想要获取 `root` 目录下的所有文件
-
-```js
-const fs = require("fs");
-
-fs.readdir(__dirname, (err, files) => {
-  if (err) {
-    return;
-  }
-  console.log(files);
-});
-```
-
-结果
-
-```js
-["root1", "index1.js", "index2.js", "index3.js", "index4.js", "app.js"];
-```
-
-- 开启递归读取
-
-```js
-fs.readdir(__dirname, { recursive: true }, (err, files) => {
-  if (err) {
-    return;
-  }
-  console.log(files);
-});
-```
-
-结果
-
-```js
-[
-  "root1",
-  "root1/a.js",
-  "index1.js",
-  "index2.js",
-  "index3.js",
-  "index4.js",
-  "app.js",
-];
-```
-
-### 删除
-
-```js
-/*
-语法：
-fs.rmdir(path[, options], callback)
-fs.rmdirSync(path[, options])
-参数说明：
-path 文件夹路径
-options 选项配置（ 可选 ）
-callback 操作后的回调
-*/
-fs.rmdir("./page", (err) => {});
-//异步递归删除文件夹
-fs.rmdir("./1", { recursive: true }, (err) => {});
-//同步递归删除文件夹
-fs.rmdirSync("./x", { recursive: true });
-```
-
-## 查看文件状态
-
-```js
-/*
-语法：
-fs.stat(path[, options], callback)
-fs.statSync(path[, options])
-参数说明：
-path 文件夹路径
-options 选项配置（ 可选 ）
-callback 操作后的回调
-*/
-fs.stat("./data.txt", (err, data) => {});
-//同步获取状态
-let data = fs.statSync("./data.txt");
-
-/*文件状态
-size 文件体积
-birthtime 创建时间
-mtime 最后修改时间
-isFile 检测是否为文件
-isDirectory 检测是否为文件夹
-*/
 ```
 
 ## \_\_dirname \_\_filename
@@ -448,7 +228,66 @@ console.log(__filename);
 
 # path 模块
 
-## path.resolve()
+## path.sep
+
+```js
+console.log(path.sep);
+// 返回值：/
+```
+
+## path.parse(path)
+
+- 作用：解析一个路径，并返回解析得到的结果
+- 示例
+
+```js
+path.parse("/home/user/dir/file.txt");
+// 返回值
+// {
+//   root: '/',
+//   dir: '/home/user/dir',
+//   base: 'file.txt',
+//   ext: '.txt',
+//   name: 'file'
+// }
+```
+
+## path.basename(path[,suffix])
+
+- 作用:返回路径的最后一部分
+- 参数：
+  > - suffix：指定要删除的后缀名。
+- 示例
+
+```js
+console.log(path.basename("/foo/bar/baz/asdf/quux"));
+// 返回值：quux
+console.log(path.basename("/foo/bar/baz/asdf/quux.txt"));
+// 返回值：quux.txt
+console.log(path.basename("/foo/bar/baz/asdf/quux.txt", "txt"));
+// 返回值： quux
+```
+
+## path.dirname(path)
+
+- 作用：返回 文件的目录名
+- 示例
+
+```js
+console.log(path.dirname("C://hello/1.txt"));
+// 返回值：C://hello
+```
+
+## path.extname(path)
+
+- 作用：返回文件的扩展名
+
+```js
+console.log(path.extname("hello.html"));
+// .html
+```
+
+## path.resolve(...paths)
 
 用于路径拼接:`path.resolve( [from...], to )`
 
