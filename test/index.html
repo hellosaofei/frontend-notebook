@@ -4,23 +4,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
+    <style>
+      .info {
+        width: 200px;
+        height: 300px;
+        border-radius: 0.5rem;
+        background-color: aquamarine;
+      }
+      p {
+        height: 100%;
+        line-height: 300px;
+        color: #fff;
+      }
+    </style>
   </head>
   <body>
-    <h1>该文件用于测试一些js代码</h1>
+    <div class="info">
+      <p>hello</p>
+    </div>
   </body>
-  <script>
-    const file_list = [
-      "video-1",
-      "video-5",
-      "video-4",
-      "video-7",
-      "video-2",
-      "video-8",
-      "video-3",
-    ];
-
-    file_list.sort((a, b) => {
-      return a.split("-")[1] - b.split("-")[1];
-    });
-  </script>
+  <script></script>
 </html>

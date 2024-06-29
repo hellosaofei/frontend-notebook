@@ -678,6 +678,69 @@ obj4.foo()(); // 'window' 'window'
 
 # js 设计模式
 
+## 单例模式
+
+单例模式（Singleton Pattern）是一种创建型设计模式，它确保一个类只有一个实例，并提供一个全局访问点来访问这个唯一实例。
+
+- 示例
+  > - 下面将通过一个具体的场景来说明单例模式的优点
+  > - 假设我们有一个 AuthManager 类，它负责管理用户的登录状态，包括存储用户的令牌（token）、检查用户是否已登录以及执行登录和注销操作。
+  > - 此时，使用单例模式可以确保在整个应用程序中只有一个 AuthManager 实例，这样我们就可以在整个应用程序中共享和管理用户的登录状态，而无需担心在不同地方创建多个实例导致的状态不一致问题
+  > - 具体来说，下面代码中，提供了一个静态的 getInstance 方法来获取单例实例。这样，无论我们在应用程序的哪个部分需要访问或管理用户的登录状态，我们都可以使用 AuthManager.getInstance()来获取同一个 AuthManager 实例，并确保状态的一致性
+
+```js
+class AuthManager {
+    // 私有静态变量来保存单例实例
+    private static instance = null;
+
+    // 私有构造函数，防止从外部使用 new 关键字创建实例
+    private constructor() {
+        this.token = null; // 存储用户令牌的属性
+        // ... 其他属性和方法
+    }
+
+    // 静态方法用于获取单例实例
+    static get getInstance() {
+        if (!AuthManager.instance) {
+            AuthManager.instance = new AuthManager();
+        }
+        return AuthManager.instance;
+    }
+
+    setToken(token) {
+        this.token = token;
+    }
+
+    isLoggedIn() {
+        return this.token !== null;
+    }
+
+    logout() {
+        this.token = null;
+    }
+}
+
+// 使用示例
+// 获取AuthManager的实例
+const authManager = AuthManager.getInstance;
+
+// 设置用户令牌（登录）
+authManager.setToken('user-token-123');
+
+// 检查用户是否已登录
+console.log(authManager.isLoggedIn()); // 输出: true
+
+// 注销用户
+authManager.logout();
+
+// 再次检查用户是否已登录
+console.log(authManager.isLoggedIn()); // 输出: false
+
+// 尝试使用new关键字创建新的AuthManager实例（失败，因为构造函数是私有的）
+// const anotherAuthManager = new AuthManager(); // 这会抛出错误
+
+```
+
 ## 观察者模式
 
 **问题引入**

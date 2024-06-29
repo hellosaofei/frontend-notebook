@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Responsive Scrollbar Example</title>
+    <style>
+      /* 设置 body 的最小宽度和水平滚动条 */
+      body {
+        min-width: 1000px; /* 设置一个合适的最小宽度 */
+        margin: 0;
+        padding: 0;
+        overflow-x: auto; /* 当内容超出容器宽度时显示水平滚动条 */
+      }
+
+      /* 设置内容容器的样式 */
+      .content-container {
+        width: 100%; /* 容器宽度设置为视口宽度 */
+        /* max-width: 1200px; 设置最大宽度以限制内容过宽 */
+        margin: 0 auto; /* 水平居中 */
+        padding: 20px; /* 添加一些内边距 */
+        box-sizing: border-box; /* 确保 padding 不会增加容器的实际宽度 */
+      }
+
+      /* 示例内容样式 */
+      .content {
+        background-color: #f5f5f5;
+        padding: 20px;
+      }
+
+      /* 响应式媒体查询（可选） */
+      @media (max-width: 999px) {
+        body {
+          /* 在小屏幕上，你可能想要调整最小宽度或禁用水平滚动条 */
+          /* min-width: auto; */
+          /* overflow-x: hidden; */
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="content-container">
+      <div class="content">
+        <!-- 这里是页面内容 -->
+        <h1>Responsive Scrollbar Example</h1>
+        <p>
+          当浏览器窗口宽度小于1000px时，页面将出现水平滚动条，而不是压缩内容。
+        </p>
+        <!-- 添加更多内容以测试滚动条 -->
+        <!-- ... -->
+      </div>
+    </div>
+  </body>
+</html>

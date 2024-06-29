@@ -612,13 +612,13 @@ text-?? ， font-?? ， line-?? 、 color .....
 
 # 文本
 
-**颜色 color**
+## 颜色 color
 
 ```
 
 ```
 
-**文本对齐方式 text-align**
+## 文本对齐方式 text-align
 
 ```html
 <head>
@@ -643,7 +643,7 @@ text-?? ， font-?? ， line-?? 、 color .....
 
 <img src="../../pic/css学习/text-align属性.png">
 
-**文本修饰 text-decoration**
+## 文本修饰 text-decoration
 
 - 控制文本的各种装饰线
   > - 装饰线类型:none：无装饰线；underline：下划线；overline：上划线；line-through：删除线
@@ -657,52 +657,54 @@ text-?? ， font-?? ， line-?? 、 color .....
 - 控制文本水平对齐方式
 - left：左对齐；right：右对齐；center：居中
 
-## height 与 line-height
+## 行高 line-height
+
+- 说明：设置一行文字的高度
+- 可选值：
+  > - Normal：浏览器自动设置一个默认值
+  > - px
+  > - **数字（如 1.5）**：参考元素自身的`font-size`，倍数
+  > - 百分比（如 150%）：参考元素自身的`font-size`，百分比
+  >   用于设置多行元素的空间量，如多行文本的间距。对于块级元素，它指定元素行盒（line boxes）的最小高度
+
+```html
+<head>
+  <style>
+    p:nth-child(1) {
+      background-color: skyblue;
+      font-size: 40px;
+      line-height: 40px;
+    }
+    p:nth-child(2) {
+      background-color: skyblue;
+      font-size: 40px;
+      line-height: normal;
+    }
+    p:nth-child(3) {
+      background-color: skyblue;
+      font-size: 40px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <p>font-size 等于line-height的情况(等同于line-height的值设置为1)</p>
+  <p>设置line-height为normal</p>
+  <p>line-height的值大于1，也就是行高大于font-size</p>
+</body>
+```
+
+<img src="./pic/css学习/line-height和font-size的取值.png"/>
+
+- 应用：
+  > - 调整**多行文字**上下间距
+  > - 设置**单行文字**水平竖直居中，设置`height=line-height`且`text-align:center`
+
+### height 与 line-height
 
 height 定义了一个盒子的高度
 line-height：定义的是每一行的高度，即为输入的内容。
 **当 height 和 line-height 相等时，即盒子的高度和行高一样，内容居中**
-
-```html
-<head>
-  <style>
-    p {
-      height: 50px;
-      line-height: 50px;
-      background-color: skyblue;
-    }
-  </style>
-</head>
-<body>
-  <p>这是一段演示内容</p>
-</body>
-```
-
-<img src="../../pic/css学习/line-height和height.png">
-
-**行高 line-height**
-用于设置多行元素的空间量，如多行文本的间距。对于块级元素，它指定元素行盒（line boxes）的最小高度
-
-```html
-<head>
-  <style>
-    p {
-      color: red;
-      letter-spacing: ;
-      word-spacing: ;
-      font-style: normal;
-      font-weight: 300;
-    }
-    p:nth-child(2) {
-      /*后两位必须是字体大小和字体样式*/
-      font: bold italic 200px "华文彩云";
-    }
-  </style>
-</head>
-<body>
-  <p>张三吃豆芽</p>
-</body>
-```
 
 # 列表 ul 属性
 
@@ -1495,6 +1497,52 @@ input {
 | vh   | 视窗高度                                     | 10vh 就是视口高度的 10% |
 | vmax | 视口宽高中大的那个的百分之多少。（了解即可） |
 | vmin | 视口宽高中小的那个的百分之多少。             |
+
+**em**
+
+- 说明：相对于当前元素或其父元素的`font-size`的倍数
+- 注意：如果元素本身没有 `font-size`，会继续从其父元素中找，直到`<html>`标签，如果还没有，就使用浏览器默认`font-size`=`16px`
+- 缺陷：从上面可以看出，如果将某个元素的某个 css 样式的值设置为 em 为单位，那就要计算好元素本身的`font-size`并且不能随意设置值，否则会导致该元素的所有后代元素的 css 长度发生混乱，这往往是很麻烦的，因为没有一个基准,任意元素的`font-size`都可能影响其他元素的 css 样式
+- 示例
+
+```css
+#item {
+  font-size: 20px;
+  width: 10em; /*200px*/
+  height: 10em; /* 200px*/
+}
+```
+
+**rem**
+
+- 说明：相对于根元素`html`的`font-size`的倍数
+- 注意：如果`<html>`元素本身没有 `font-size`，会使用浏览器默认`font-size`=`16px`
+- 示例:假设`html`未设置`font-size`
+
+```css
+#item {
+  font-size: 20px;
+  width: 10em; /*160px*/
+  height: 10em; /* 160px*/
+}
+```
+
+**百分比**
+
+- 说明：通常情况下（未设置定位），参考其父元素的长度值
+
+```scss
+.parent {
+  width: 200px;
+  height: 200px;
+  font-size: 20px;
+  .item {
+    width: 50%; /*100px*/
+    height: 10%; /* 20px*/
+    font-size: 150%; /*30px*/
+  }
+}
+```
 
 # 盒子模型
 

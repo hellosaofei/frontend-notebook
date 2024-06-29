@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style></style>
+  </head>
+  <body>
+    <script>
+      const htmlEle = document.documentElement;
+      // 可通过浏览器调试工具调整不同的分辨率，并获得宽高分辨率的值
+      window.addEventListener("resize", () => {
+        console.log(
+          "当前屏幕宽为",
+          htmlEle.clientWidth,
+          "当前屏幕高为",
+          htmlEle.clientHeight
+        );
+      });
+    </script>
+  </body>
+</html>
