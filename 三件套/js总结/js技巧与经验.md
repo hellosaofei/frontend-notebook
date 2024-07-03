@@ -201,3 +201,15 @@ function getTime() {
   return date.getTime().toString();
 }
 ```
+
+- 从数组中随机获取一个元素
+
+```js
+function getRandomElement(array) {
+  if (array.length === 0) {
+    throw new Error("数组不能为空");
+  }
+  const index = Math.floor(Math.random() * arr.length);
+  return arr[index];
+}
+```

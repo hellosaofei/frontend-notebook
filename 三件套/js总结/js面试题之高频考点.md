@@ -895,6 +895,8 @@ corp.emit("前端", 10000);
 corp.emit("端茶和倒水", "足球");
 ```
 
+### 实现一个发布订阅
+
 ```js
 class EventEmitter {
   constructor() {

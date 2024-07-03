@@ -503,6 +503,21 @@ exit
    > - 重新启动一个容器，启动命令如下
    >   `docker run -d -p 6379:6379 --restart=always -v /root/redisconf:/data redis:5.0.12 redis-server /data/redis.conf`
 
+```sh
+# 其他安装方式
+docker run \
+--restart-always \
+--log-opt max-size=100m \
+--log-opt max-file=2 \
+-p 6379:6379 \
+--name redis \
+-v /home/redis/myredis/myredis.conf:/etc/redis/redis/conf \
+-v /home/redis/myredis/data:/data \
+-d redis:5.0.8 redis-server /etc/redis/redis.conf \
+--appendonly yes \
+--requirepass helloMyRedis
+```
+
 # dockerFile
 
 用于构建 docker 镜像

@@ -105,17 +105,17 @@ div.child {
 
 **什么是盒模型**：HTML 页面中所有元素都可以看做盒子
 **盒模型组成**：内容、内边距、外边距、边框
+**如何设置盒模型**：通过 box-sizing 属性进行设置
 **盒模型类型：**
 
-- 标准盒模型：
-  width 和 height 设置盒子内容区大小，整体向外扩张（**width 和 height 设置的是内容区（content）大小**）
-- 怪异盒模型(IE 盒模型)：
-  内容区将会被压缩(**width 和 height 设置的是盒子（content+padding+border）的总大小**)
+- 标准盒模型（content-box,默认值）：
 
-**如何设置盒模型**：通过 box-sizing 属性进行设置
+  > - 整体向外扩张（**width 和 height 设置的是内容区（content）大小**）
+  > - 设置一个元素宽高为 100px，该元素内容区就一定是 100px；任何边框和边距都会额外体现到最终的元素的大小上
 
-> content-box：标准盒模型（默认值）
-> border-box：怪异盒模型
+- 怪异盒模型(border-box)：
+  > - 内容区将会被压缩(**width 和 height 设置的是盒子（content+padding+border）的总大小**)
+  > - 设置一个元素宽高为 100px，不设置 margin 时，该元素的大小就一定是 100px，任何边框和边距都会压缩 content 区域
 
 <img src="./pic/面试题相关/css盒模型.png">
 
@@ -288,8 +288,6 @@ el.style.top = offTop + "px";
 # margin 重叠以及解决
 
 对于块级元素，其父元素的第一个子元素的 margin-top 或者最后一个子元素的 margin-bottom 会被其父元素剥夺
-
-# 画一个三角形
 
 # 哪些可以继承
 
