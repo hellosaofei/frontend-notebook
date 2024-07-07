@@ -1,27 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <style>
-      .info {
-        width: 200px;
-        height: 300px;
-        border-radius: 0.5rem;
-        background-color: aquamarine;
-      }
-      p {
-        height: 100%;
-        line-height: 300px;
-        color: #fff;
-      }
-    </style>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Vue3 demo</title>
   </head>
   <body>
-    <div class="info">
-      <p>hello</p>
+    <div id="app">
+      <button @click="count++">点击+1：{{count}}</button>
     </div>
+    <script type="module">
+      import {
+        createApp,
+        ref,
+        onMounted,
+      } from "https://cdn.bootcdn.net/ajax/libs/vue/3.4.29/vue.esm-browser.js";
+
+      const app = createApp({
+        setup() {
+          const count = ref(0);
+          onMounted(() => {
+            console.log("hello,Vue!!!");
+          });
+
+          return {
+            count,
+          };
+        },
+      });
+      app.mount("#app");
+    </script>
   </body>
-  <script></script>
 </html>
