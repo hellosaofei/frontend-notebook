@@ -49,6 +49,16 @@
         <!-- 添加更多内容以测试滚动条 -->
         <!-- ... -->
       </div>
+
+      <script>
+        let name = "window";
+        (function () {
+          let name = "小张";
+          setTimeout(() => {
+            console.log(this.name);
+          }, 200);
+        })();
+      </script>
     </div>
   </body>
 </html>
