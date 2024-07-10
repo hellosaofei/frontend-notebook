@@ -1,3 +1,7 @@
+# html 语义化
+
+从代码上展示页面结构，使用不同的标签来展示页面中不同的部分，比如`<header>、<section>,<footer>`
+
 # form 标签
 
 **action**

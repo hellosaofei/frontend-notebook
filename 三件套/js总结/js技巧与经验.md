@@ -213,3 +213,11 @@ function getRandomElement(array) {
   return arr[index];
 }
 ```
+
+# 数组
+
+## 删除一个数组中的指定元素
+
+### splice()函数
+
+### filter()方法

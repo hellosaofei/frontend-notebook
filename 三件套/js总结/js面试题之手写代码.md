@@ -127,6 +127,30 @@ Function.prototype.myCall = function (thisArg, ...args) {
 };
 ```
 
+#### 实现方案二
+
+- 搭个架子
+
+```js
+Function.prototype.myCall = function (target, ...args) {};
+```
+
+> - 进阶
+
+```js
+Function.prototype.myCall = function (target, ...args) {
+  target = target || window;
+  // 给target对象绑定一个对象
+  const symbolKey = Symbol();
+  target[symbolKey] = this;
+  // 返回函数执行结果
+  const res = target[symbolKey](...args);
+  // 删除
+  delete target[symbolKey];
+  return res;
+};
+```
+
 ### Function.prototype.apply()
 
 - 语法：func.apply(thisArg, argsArray)
@@ -157,10 +181,48 @@ Function.prototype.myCall = function (thisArg, ...thisArgs) {
 };
 ```
 
+#### 实现方案二
+
+```js
+Function.prototype.myApply = function (target, args) {
+  // 区别就是这里第二个参数直接就是个数组
+  target = target || window;
+  const symbolKey = Symbol();
+  target[symbolKey] = this;
+  const res = target[symbolKey](...args); // args本身是个数组，所以我们需要解构后一个个传入函数中
+  delete target[symbolKey]; // 执行完借用的函数后，删除掉，留着过年吗？
+  return res;
+};
+```
+
 ### Function.prototype.bind()
 
 - 语法：func.bind(thisArg, arg1, arg2,....)
 - 作用：创建一个新函数，当调用该新函数时，它会调用原始函数并将其 this 关键字设置为给定的值
+
+- 先搭个架子
+  > - 绑定一个对象，返回一个函数
+
+```js
+Function.prototype.myBind=function(target,...outerArgs){
+  target=target||{};
+  return function(){}
+```
+
+- 进阶
+  > - 给 target 对象绑定一个方法，由于 bind 本身是一个函数，一般都是由另外一个函数对象（要改变`this`指向的函数）调用，所以 bind 函数内部的 this 指向就是想要改变 `this`指向那个函数
+  > - 另外，返回的函数要能够接受参数
+
+```js
+Function.prototype.myBind=function(target,...outerArgs){
+  target=target||{};
+  const symbolKey=Symbol();
+  target[symbolKey]=this;
+  return function(...innerArgs){
+    target[symbolKey](...outerArgs,...innerArgs);
+    delete target[symbolKey]    // 执行完毕，删除借用的函数
+  }
+```
 
 ## 实现一个 Promise.finally
 

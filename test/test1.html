@@ -51,13 +51,79 @@
       </div>
 
       <script>
-        let name = "window";
-        (function () {
-          let name = "小张";
-          setTimeout(() => {
-            console.log(this.name);
-          }, 200);
-        })();
+        var crop = {};
+        crop.list = [];
+
+        // 订阅事件
+        crop.on = function (fn) {
+          this.list.push(fn);
+        };
+
+        // 发布事件
+        crop.emit = function (...args) {
+          this.list.forEach((cb) => {
+            console.log("this指向问题：", this, arguments);
+            // cb.apply(this, args);
+            cb.apply(this, arguments);
+          });
+        };
+
+        // 测试
+        crop.on((...args) => {
+          // console.log("你的职位是：" + position);
+          // console.log("期望薪水：" + salary);
+          console.log("on函数中的this指向", this);
+          console.log("这是第一个订阅函数,接收到的参数为：", args);
+        });
+        crop.on(function (...args) {
+          // console.log("你的职位是：" + position);
+          // console.log("期望薪水：" + salary);
+          console.log("on函数中的this指向", this);
+          console.log("这是第二个订阅函数,接收到的参数为：", args);
+        });
+        // crop.on(function (skill, hobby) {
+        //   console.log("这是第二个订阅函数",skill,hobby);
+        //   // console.log("你的技能有： " + skill);
+        //   // console.log("爱好： " + hobby);
+        // });
+
+        crop.emit("前端", 10000);
+        // crop.emit("端茶和倒水", "足球");
+        // var name = "张三";
+        // const bb = () => {
+        //   console.log(this.name);
+        // };
+        // const obj = {
+        //   name: "李四",
+        // };
+        // bb.call(obj);
+        // bb.apply(obj);
+        // bb.bind(obj)();
+
+        var obj = {
+          foo() {
+            console.log("普通函数回调", this);
+          },
+          foo2: () => {
+            console.log("箭头回调", this);
+          },
+        };
+
+        function doFoo(fn) {
+          fn();
+        }
+        // 此处相当于 window.doFoo(obj.foo)，也就是doFoo内部指向了window,
+        doFoo(obj.foo); // window
+        doFoo(obj.foo2); // window
+
+        function xx() {
+          const a1 = () => {
+            console.log(this);
+          };
+          function doFoo(fn) {
+            fn();
+          }
+        }
       </script>
     </div>
   </body>

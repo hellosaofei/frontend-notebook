@@ -8,16 +8,35 @@
   </head>
   <body>
     <script>
-      const htmlEle = document.documentElement;
-      // 可通过浏览器调试工具调整不同的分辨率，并获得宽高分辨率的值
-      window.addEventListener("resize", () => {
-        console.log(
-          "当前屏幕宽为",
-          htmlEle.clientWidth,
-          "当前屏幕高为",
-          htmlEle.clientHeight
-        );
+      var myMitt = {};
+
+      // 一个列表，用于存储
+      myMitt.list = [];
+
+      // 订阅
+      myMitt.on = function (fn) {
+        this.list.push(fn);
+      };
+
+      // 发布
+      myMitt.emit = function (...args) {
+        this.list.forEach((fn) => {
+          fn.apply(this, args);
+        });
+      };
+
+      // 订阅两个函数
+      myMitt.on(function (...args) {
+        // 订阅函数的功能
+        console.log("这是第一个订阅函数,接收到的参数为：", args);
       });
+      myMitt.on(function (...args) {
+        // 订阅函数的功能
+        console.log("这是第二个订阅函数,接收到的参数为：", args);
+      });
+
+      myMitt.emit("触发器一！！！", "张三！！");
+      myMitt.emit("触发器二！！！", "李四！！");
     </script>
   </body>
 </html>
