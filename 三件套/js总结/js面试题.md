@@ -306,135 +306,6 @@ add(1, 2, 3, 4);
 // [1,2,3,4]
 ```
 
-## 函数柯里化
-
-### 应用 1：参数复用
-
-- 下面的代码要描述一件事情：
-  > - 小明在早晨吃了一碗汤面
-  > - 小明在中午吃了一碗米饭
-  > - 小明在晚上吃了一碗焖面
-- 不使用柯里化的代码如下
-
-```js
-function info(name, time, food) {
-  return `${name}在${time}吃了一碗${food}`;
-}
-const info1 = info("小明", "早晨", "汤面");
-const info2 = info("小明", "中午", "米饭");
-const info3 = info("小明", "晚上", "焖面");
-
-console.log(info1, info2, info3);
-```
-
-- 上面代码中存在的问题是：“小明”这个参数重复次数太多了，下面我们进行柯里化
-
-```js
-function info(name) {
-  return function (time, food) {
-    return `${name}在${time}吃了一碗${food}`;
-  };
-}
-const initInfo = info("小明");
-const info1 = initInfo("早晨", "汤面");
-const info2 = initInfo("中午", "米饭");
-const info3 = initInfo("晚上", "焖面");
-
-console.log(info1, info2, info3);
-```
-
-### 兼容性检测
-
-### 延迟执行
-
-对参数复用功能进行改进，实现下面功能
-
-```
-add(1)(2)(3)=6
-add(1,2,3)(4)=10
-add(1)(2)(3)()=6
-```
-
-- 我们需要定义一个 add 函数，该函数要做到下面的功能
-  > - 可以无限调用
-  > - 可传入任意数量的参数
-  > - 返回传入参数的和
-
-下面我们一点点写
-
-```js
-// 实现下面的效果
-add(1);
-add(1)(2);
-add(1)(2)(3);
-```
-
-```js
-function(x){
-  return function(y){
-    return function(z){
-      return x+y+z
-    }
-  }
-}
-```
-
-再进一步
-
-```
-实现
-add(1, 2)( 3, 4, 5,6)=21
-```
-
-```js
-function add() {
-  //实现：外层函数可传入任意数量的参数
-  let args = [...arguments];
-  function inner() {
-    args.push(...arguments);
-    return args.reduce((x, y) => x + y);
-  }
-  //实现二次调用时，将新传入的参数添加到父函数的参数列表中
-  return inner;
-}
-let a1 = add(1, 2)(3, 4, 5, 6);
-console.log(a1); //21
-```
-
-- 上面代码未完成无限调用功能
-
-```js
-function add() {
-  let args = [...arguments];
-  function inner() {
-    args.push(...arguments);
-    return inner;
-  }
-  return inner;
-}
-let a1 = add(1)(2)(3)(4);
-console.log(a1, Object.prototype.toString.call(a1));
-//f inner{...} [Object Function]
-```
-
-- 上面代码实现了无限调用，但是没有返回正确的加和结果,而是返回了一个函数，这是因为最后一次调用 inner 函数时，
-
-```js
-function add() {
-  let args = [...arguments];
-  function inner() {
-    args.push(...arguments);
-    return inner;
-  }
-  inner.toString = function () {
-    return args.reduce((x, y) => x + y);
-  };
-  return inner;
-}
-let a1 = add(1)(2)(3)(4);
-console.log(a1);
-```
-
 ## call 的妙用
 
 - **call 方法的 this 指向**
@@ -1012,3 +883,117 @@ console.log(test);
 ### Array.isArray()
 
 - 只能判断对象是否为数组
+
+# 关于事件循环
+
+## 一道明星题
+
+[【掘金-王仕军】](https://juejin.cn/post/6844903470466629640)
+
+```js
+for (var i = 0; i < 5; i++) {
+  setTimeout(function () {
+    console.log(i);
+  }, 1000);
+}
+console.log(i);
+```
+
+> 上面代码的执行结果是：`5,5,5,5,5,5`,原因就不说了
+
+### 需求一:代码的输出结果变为：5 -> 0,1,2,3,4
+
+- 方案一：使用立即执行函数解决闭包造成的问题
+
+```js
+for (var i = 0; i < 5; i++) {
+  (function (j) {
+    // j = i
+    setTimeout(function () {
+      console.log(j);
+    }, 1000);
+  })(i);
+}
+
+console.log(i);
+```
+
+- 方案二：使用函数进行传参
+
+```js
+var output = function (i) {
+  setTimeout(function () {
+    console.log(i);
+  }, 1000);
+};
+
+for (var i = 0; i < 5; i++) {
+  output(i); // 这里传过去的 i 值被复制了
+}
+
+console.log(i);
+```
+
+### 需求二：代码的输出结果变为： 0,1,2,3,4,5
+
+- 方案一：暴力方案
+
+```js
+for (var i = 0; i < 5; i++) {
+  (function (j) {
+    setTimeout(function () {
+      console.log(new Date(), j);
+    }, 1000 * j);
+  })(i);
+}
+
+setTimeout(function () {
+  console.log(new Date(), i);
+}, 1000 * i);
+```
+
+- 方案二：ES6 + Promise
+
+```js
+const tasks = []; // 这里存放异步操作的 Promise
+
+const output = (i) =>
+  new Promise((resolve) => {
+    setTimeout(() => {
+      console.log(new Date(), i);
+      resolve();
+    }, 1000 * i);
+  });
+
+// 生成全部的异步操作
+for (var i = 0; i < 5; i++) {
+  tasks.push(output(i));
+}
+
+// 异步操作完成之后，输出最后的 i
+Promise.all(tasks).then(() => {
+  setTimeout(() => {
+    console.log(new Date(), i);
+  }, 1000);
+});
+```
+
+- 方案三：封装 sleep 函数
+
+```js
+const sleep = (delay) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, delay);
+  });
+
+(async () => {
+  // 声明即执行的 async 函数表达式
+  for (var i = 0; i < 5; i++) {
+    await sleep(1000);
+    console.log(i);
+  }
+
+  await sleep(1000);
+  console.log(i);
+})();
+```

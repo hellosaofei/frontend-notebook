@@ -95,12 +95,16 @@ function throttle(fn, delay) {
 }
 ```
 
+# this 指向相关
+
 ## 手写实现 call apply bind
 
 ### Function.prototype.call()
 
 - 语法：func.call(thisArg, arg1, arg2,...)
 - 作用：指定函数内部 this 指向（函数执行作用域），然后在该作用域中调用该函数
+
+- 实现方案一（不推荐）
 
 ```js
 function foo(name, age) {
@@ -129,6 +133,8 @@ Function.prototype.myCall = function (thisArg, ...args) {
 
 #### 实现方案二
 
+> 参考：[【掘金-麻不烧】](https://juejin.cn/post/7128233572380442660)
+
 - 搭个架子
 
 ```js
@@ -145,8 +151,9 @@ Function.prototype.myCall = function (target, ...args) {
   target[symbolKey] = this;
   // 返回函数执行结果
   const res = target[symbolKey](...args);
-  // 删除
+  // 删除以释放内存
   delete target[symbolKey];
+  // 返回函数的指向结果
   return res;
 };
 ```
@@ -155,6 +162,8 @@ Function.prototype.myCall = function (target, ...args) {
 
 - 语法：func.apply(thisArg, argsArray)
 - 作用：==同 call 方法==
+
+#### 实现方式一（不推荐）
 
 ```js
 function foo(name, age) {
@@ -183,14 +192,21 @@ Function.prototype.myCall = function (thisArg, ...thisArgs) {
 
 #### 实现方案二
 
+> 参考：[【掘金-麻不烧】](https://juejin.cn/post/7128233572380442660)
+
 ```js
 Function.prototype.myApply = function (target, args) {
   // 区别就是这里第二个参数直接就是个数组
   target = target || window;
+  // 为target对象赋值一个属性，属性值为函数对象
   const symbolKey = Symbol();
+  // 由于call()函数被一个函数对象所调用，所以此处的this指向是该函数对象
   target[symbolKey] = this;
-  const res = target[symbolKey](...args); // args本身是个数组，所以我们需要解构后一个个传入函数中
-  delete target[symbolKey]; // 执行完借用的函数后，删除掉，留着过年吗？
+  // 在call()函数内部直接调用该函数并得到返回结果
+  const res = target[symbolKey](...args);
+  // 执行完借用的函数后，删除以释放内存空间
+  delete target[symbolKey];
+  // 返回函数执行结果
   return res;
 };
 ```
@@ -213,16 +229,26 @@ Function.prototype.myBind=function(target,...outerArgs){
   > - 给 target 对象绑定一个方法，由于 bind 本身是一个函数，一般都是由另外一个函数对象（要改变`this`指向的函数）调用，所以 bind 函数内部的 this 指向就是想要改变 `this`指向那个函数
   > - 另外，返回的函数要能够接受参数
 
+> 参考：[【掘金-麻不烧】](https://juejin.cn/post/7128233572380442660)
+
 ```js
-Function.prototype.myBind=function(target,...outerArgs){
-  target=target||{};
-  const symbolKey=Symbol();
-  target[symbolKey]=this;
-  return function(...innerArgs){
-    target[symbolKey](...outerArgs,...innerArgs);
-    delete target[symbolKey]    // 执行完毕，删除借用的函数
-  }
+Function.prototype.myBind = function (target, ...outerArgs) {
+  // 定义target对象
+  target = target || {};
+  // 为target对象赋值一个属性，属性值为函数对象
+  const symbolKey = Symbol();
+  target[symbolKey] = this;
+  // 返回一个函数，用于接收剩余参数
+  return function (...innerArgs) {
+    // 在返回的函数中进行调用
+    target[symbolKey](...outerArgs, ...innerArgs);
+    // 执行完毕，删除借用的函数，释放内存空间
+    delete target[symbolKey];
+  };
+};
 ```
+
+# Promise 相关
 
 ## 实现一个 Promise.finally
 
@@ -247,23 +273,7 @@ Promise.prototype.finally = function (callback) {
 
 ## 实现一个 sleep 函数
 
-- Promise 实现
-
-```js
-
-```
-
-- async/await 实现
-
-```js
-
-```
-
-- Generator 实现
-
-```js
-
-```
+- 见《js 面试题之手写代码》
 
 ## 手写 ajax
 
@@ -457,4 +467,21 @@ function _new(fn, ...arg) {
   const ret = fn.apply(obj, arg);
   return ret instanceof Object ? ret : obj;
 }
+```
+
+# js 类型互转
+
+## 对象 Obj 转化成一个二维数组
+
+```js
+const obj = {
+  a: [1, 2, 3],
+  b: [4, 5, 6],
+  c: [7, 8, 9],
+};
+
+const objToArr = Object.values(obj).reduce((acc, currentValue) => {
+  acc.push(currentValue);
+  return acc;
+}, []);
 ```

@@ -195,6 +195,28 @@ const handlerClick = () => {
 </script>
 ```
 
+#### vue3.4 引入的宏 defineModel
+
+- 父组件
+
+```vue
+<UserName v-model:first-name="first" v-model:last-name="last" />
+```
+
+- 子组件
+
+```vue
+<script setup>
+const firstName = defineModel("firstName");
+const lastName = defineModel("lastName");
+</script>
+
+<template>
+  <input type="text" v-model="firstName" />
+  <input type="text" v-model="lastName" />
+</template>
+```
+
 ### provide/inject
 
 **概述**

@@ -221,3 +221,170 @@ function getRandomElement(array) {
 ### splice()函数
 
 ### filter()方法
+
+# js 语法相关
+
+## 标签语句
+
+**概述**
+标记语句是任何带有标识符前缀的语句。你可以使用嵌套在标记语句中的 break 或 continue 语句跳转到对应标记。
+
+### 应用 1
+
+两个 for 循环想从最内层循环跳出整个循环怎么处理？跳出最内层循环怎么处理？
+
+- 跳出整个循环
+
+```js
+outer: for (var i = 0; i < 10; i++) {
+  inter: for (var j = 0; j < 10; j++) {
+    if (i > 5) {
+      console.log(i);
+      break outer; // 返回外层
+    }
+  }
+}
+```
+
+- 跳出内层循环
+
+```js
+outer: for (var i = 0; i < 10; i++) {
+  inner: for (var j = 0; j < 10; j++) {
+    if (i > 5) {
+      console.log(i);
+      break inner; // 返回内层
+    }
+  }
+}
+```
+
+### 应用二：
+
+```js
+let str = "";
+
+loop1: for (let i = 0; i < 5; i++) {
+  if (i === 1) {
+    continue loop1;
+  }
+  str = str + i;
+}
+
+console.log(str);
+// Expected output: "0234"
+```
+
+## 数据运算操作
+
+### 取整
+
+- Math.floor(): 向下取整。
+
+- Math.ceil(): 向上取整。
+
+- Math.round(): 四舍五入到最接近的整数。
+
+#### 特殊的取整
+
+- 使用位运算符
+  > - 奇数右移 1 位：相当于`Math.floor()`
+  > - 偶数右移 1 位：相当于`除2`
+
+```js
+6 >> 1; // 3
+13 >> 1; //6
+```
+
+### 取余
+
+```js
+13 % 2; //1
+7 % 2; //1
+```
+
+### promise 的妙用
+
+#### 实现一个 sleep 函数
+
+```js
+let sleep = (delay) => {
+  return new Promise((resolve) => {
+    return setTimeout(resolve, delay, "done");
+  });
+};
+
+sleep(1000).then((value) => {
+  console.log(value);
+  // 其他业务代码
+});
+```
+
+**番外篇**
+
+- Generator 函数实现
+
+```js
+function* sleepGenerator(time) {
+  yield new Promise(function (resolve, reject) {
+    setTimeout(resolve, time);
+  });
+}
+sleepGenerator(1000)
+  .next()
+  .value.then(() => {
+    console.log(1);
+  });
+```
+
+#### 封装一个 ajax 函数（其余见《手写代码部分》）
+
+- 该案例来自 《阮一峰 es6 教程》
+
+```js
+const getJSON = function (url) {
+  const promise = new Promise((resolve, reject) => {
+    const handler = function () {
+      if (this.readyState !== 4) {
+        return;
+      }
+      if (this.status === 200) {
+        resolve(this.response);
+      } else {
+        reject(new Error(this.statusText));
+      }
+    };
+    const client = new XMLHttpRequest();
+    client.open("GET", url);
+    client.onreadystatechange = handler;
+    client.responseType = "json";
+    client.setRequestHeader("Accept", "application/json");
+    client.send();
+  });
+  return promise;
+};
+
+getJSON("/posts.json").then(
+  function (json) {
+    console.log("Contents: " + json);
+  },
+  function (error) {
+    console.error("出错了", error);
+  }
+);
+```
+
+#### 每隔一秒打印数组中的一个元素
+
+```js
+let arr = [11, 22, 33, 44, 55];
+arr.reduce((total, current) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(console.log(x));
+    }, 1000);
+  });
+}, Promise.resolve());
+
+// Promise.
+```

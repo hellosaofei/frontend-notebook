@@ -48,7 +48,7 @@ session、cookie、token
 
 ### promise.then/catch/finally
 
-### 经典题目
+### 事件循环经典题目
 
 - promise/setTimeout/async/await
 
@@ -80,7 +80,23 @@ new Promise((resolve) => {
   });
 ```
 
--
+- 题目二（**明星题**）：很诡异的一道题，但原理很简单
+
+```js
+for (var i = 0; i < 5; i++) {
+  setTimeout(function () {
+    console.log(i);
+  }, 1000);
+}
+console.log(i);
+
+// 输出：5 5 5 5 5 5
+```
+
+> 代码解释：为什么上面代码执行后打印了六次 5？？？
+>
+> - 当 setTimeout 被调用时，它并不会立即执行其回调函数，而是将这个回调函数放入宏任务队列，等待当前执行栈清空且事件循环到达下一个事件循环迭代时，才会被调用。
+> - 很明显，setTimeout 设置了延时为 1 秒，而在这 1 秒之内，**变量 i**已经完成多次赋值，并且最终的值为 5，所以得到了“诡异的结果”
 
 ### 同步异步及代码执行顺序
 
@@ -328,92 +344,6 @@ async1 end
 promise2
 setTimeout
 */
-```
-
-### promise 的妙用
-
-#### 实现一个 sleep 函数
-
-```js
-let sleep = (delay) => {
-  return new Promise((resolve) => {
-    return setTimeout(resolve, delay, "done");
-  });
-};
-
-sleep(1000).then((value) => {
-  console.log(value);
-  // 其他业务代码
-});
-```
-
-**番外篇**
-
-- Generator 函数实现
-
-```js
-function* sleepGenerator(time) {
-  yield new Promise(function (resolve, reject) {
-    setTimeout(resolve, time);
-  });
-}
-sleepGenerator(1000)
-  .next()
-  .value.then(() => {
-    console.log(1);
-  });
-```
-
-#### 封装一个 ajax 函数（其余见《手写代码部分》）
-
-- 该案例来自 《阮一峰 es6 教程》
-
-```js
-const getJSON = function (url) {
-  const promise = new Promise((resolve, reject) => {
-    const handler = function () {
-      if (this.readyState !== 4) {
-        return;
-      }
-      if (this.status === 200) {
-        resolve(this.response);
-      } else {
-        reject(new Error(this.statusText));
-      }
-    };
-    const client = new XMLHttpRequest();
-    client.open("GET", url);
-    client.onreadystatechange = handler;
-    client.responseType = "json";
-    client.setRequestHeader("Accept", "application/json");
-    client.send();
-  });
-  return promise;
-};
-
-getJSON("/posts.json").then(
-  function (json) {
-    console.log("Contents: " + json);
-  },
-  function (error) {
-    console.error("出错了", error);
-  }
-);
-```
-
-#### 每隔一秒打印数组中的一个元素
-
-```js
-let arr = [11, 22, 33, 44, 55];
-arr.reduce((total, current) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(console.log(x));
-    }, 1000);
-  });
-}, Promise.resolve());
-
-// Promise.
 ```
 
 # this 指向问题
