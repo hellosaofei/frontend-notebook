@@ -51,21 +51,11 @@
       </div>
 
       <script>
-        const sleep = (delay) =>
-          new Promise((resolve) => {
-            setTimeout(resolve, delay);
-          });
+        const person = { name: "李四" };
 
-        (async () => {
-          // 声明即执行的 async 函数表达式
-          for (var i = 0; i < 5; i++) {
-            await sleep(1000);
-            console.log(i);
-          }
-
-          await sleep(1000);
-          console.log(i);
-        })();
+        Object.seal(person);
+        person.name = "张三";
+        console.log(person);
       </script>
     </div>
   </body>

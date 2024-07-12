@@ -271,6 +271,66 @@ Promise.prototype.finally = function (callback) {
 > 上面代码，为什么需要 Promise.resolve(callback()).then(() => value)，而不能直接执行 callback, return value？
 > 因为 callback 如果是个异步操作，返回 promise 呢.希望等 callback 执行完再接着执行
 
+## 手写 Promise.all()
+
+**技术要点**
+
+- 返回一个新的`Promise`实例
+- 接受一个可遍历的容器，容器中的每个元素 都是 `Promise`实例
+- 传入的每个`Promise`实例都成功时，Promise.all 才成功，然后通过 resolve 返回一个数组，数组中的元素是每一个`Promise`的结果，要按照顺序
+- 传入的`Promise`实例中只要有一个失败，Promise.all 就会失败，并通过`.catch`捕获到这个错误
+
+**要点（精简版）**
+
+- 返回 Promise
+- 传入的数组，每个元素都应该是 Promise 实例
+- 返回的数组，保证顺序
+- 有一个失败，整个 Promise.all 就失败
+
+```js
+Promise.myAll = (promises) => {
+  // 用于存放传入的Promise的执行结果
+  let result = [];
+  // 计数，用于判断所有Promise是否都成功了
+  let count = 0;
+  return new Promise((resolve, reject) => {
+    promises.forEach((item, index) => {
+      // 如果传入的数据不是promise，强行转成Promise实例
+      Promise.resolve(item)
+        .then((res) => {
+          // 记录结果
+          result[index] = res;
+
+          count++;
+          // 所有Promise都成功，当前Promise状态变为resolve，并抛出数组
+          if (count === promises.length) {
+            resolve(result);
+          }
+        })
+        // 对于每个Promise，都使用catch进行错误捕获，保证了有一个不成功整个Promise.all就不成功的机制
+        .catch(reject);
+    });
+  });
+};
+```
+
+## 手写 Promise.race()
+
+- 返回 Promise
+- 传入的数组，每个元素都应该是 Promise 实例
+- 最快的那个 Promise 成功，整个`Promise.race`就成功
+- 最快的那个 Promise 失败，整个`Promise.race`就失败
+
+```js
+Promise.myRace = (promises) => {
+  return new Promise((resolve, reject) => {
+    promises.forEach((item, index) => {
+      Promise.resolve(item).then(resolve, reject);
+    });
+  });
+};
+```
+
 ## 实现一个 sleep 函数
 
 - 见《js 面试题之手写代码》
@@ -448,7 +508,9 @@ myajax({
 
 ## 对 js 原型的认识
 
-### 实现 (5).add(3).minus(2) 功能
+## 柯里化
+
+实现 (5).add(3).minus(2) 功能
 
 ```js
 Number.prototype.add = function (n) {
@@ -484,4 +546,80 @@ const objToArr = Object.values(obj).reduce((acc, currentValue) => {
   acc.push(currentValue);
   return acc;
 }, []);
+```
+
+# js 设计模式相关
+
+## 手写发布订阅
+
+- 实现一个`EventEmitter类`
+  > - 存在的问题：对于某一个事件，可能绑定多个回调函数，并且这些回调放在了一个列表内部，但是取消订阅时，不能够指定到底要删除哪一个回调
+
+```js
+class EventEmitter {
+  constructor() {
+    this.events = {};
+  }
+
+  // 订阅事件
+  on(eventName, callback) {
+    if (!this.events[eventName]) {
+      this.events[eventName] = [];
+    }
+    this.events[eventName].push(callback);
+  }
+
+  // 取消订阅事件
+  off(eventName, callback) {
+    if (this.events[eventName]) {
+      const index = this.events[eventName].indexOf(callback);
+      if (index > -1) {
+        this.events[eventName].splice(index, 1);
+      }
+    }
+  }
+
+  // 触发事件
+  emit(eventName, ...args) {
+    if (this.events[eventName]) {
+      this.events[eventName].forEach((callback) => {
+        callback(...args);
+      });
+    }
+  }
+}
+```
+
+- 使用该类：订阅与发布
+
+```js
+const eventEmitter = new EventEmitter();
+
+// 事件A的订阅函数
+eventEmitter.on("eventA", (message) => {
+  console.log(`Event A: ${message}`);
+});
+// 事件A的另一个订阅函数
+eventEmitter.on("eventA", (message) => {
+  console.log(`Another Event A callback: ${message}`);
+});
+// 事件B的订阅函数
+eventEmitter.on("eventB", (data) => {
+  console.log(`Event B: ${data}`);
+});
+
+// 事件 触发器
+eventEmitter.emit("eventA", "Hello, Event A!");
+eventEmitter.emit("eventB", "Hello, Event B!");
+```
+
+- 取消订阅
+
+```js
+// 自定义一个取消订阅的回调
+const callbackToRemove = (message) => {
+  console.log(`Another Event A callback: ${message}`);
+};
+// 取消订阅
+eventEmitter.off("eventA", callbackToRemove);
 ```

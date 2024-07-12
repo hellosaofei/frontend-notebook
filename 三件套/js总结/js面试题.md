@@ -136,18 +136,16 @@ for (let i = 0; i <= 10000; i++) {
 // }
 ```
 
-# 其它问题
-
 ## 关于隐式类型转换
 
-**js 基本数据类型**
+### js 基本数据类型
 
 - 字符串、数字、布尔值
 - null、undefined
 - symbol
 - bigInt
 
-**其他对象 to 字符串(toString 原则)**
+### 其他对象 to 字符串(toString 原则)
 
 - null >> 0
 - undefined >> NAN
@@ -156,7 +154,7 @@ for (let i = 0; i <= 10000; i++) {
 - 数组 >> 首先会被转为原始类型，也就是 ToPrimitive，然后在根据转换后的原始类型按照上面的规则处理
 - 普通对象 >> 相当于直接使用 Object.prototype.toString()，返回"[object Object]
 
-**其他对象 to 数字(toNumber 原则)**
+### 其他对象 to 数字(toNumber 原则)
 
 - null >> 'null'
 - undefined >> undefined
@@ -165,11 +163,11 @@ for (let i = 0; i <= 10000; i++) {
 - 数字 >> 转换为数字对应的字符串
 - 数组 >> 将所有元素按照","连接起来，相当于调用数组的 Array.prototype.join()方法，如[1, 2, 3]转为"1,2,3"，空数组[]转为空字符串，数组中的 null 或 undefined，会被当做空字符串处理
 
-**其他对象 to 布尔值(toBoolean 原则)**
+### 其他对象 to 布尔值(toBoolean 原则)\*\*
 
 - js 中除了**false、null、undefined、空字符、0 和 NaN**转换为字符串时为假，其余都为真
 
-**对象类型类型（如：对象、数组） to 原始类型**
+### 对象类型类型（如：对象、数组） to 原始类型\*\*
 
 - 对象类型需要被转为原始类型时，它会先查找对象的 valueOf 方法，如果 valueOf 方法返回原始类型的值
 - 如果 valueOf 不存在或者 valueOf 方法返回的不是原始类型的值，就会尝试调用对象的 toString 方法,遵循对象的 ToString 规则
@@ -205,6 +203,37 @@ const obj3 = {
 };
 //没找到对象的valueOf方法，toString方法返回的不是原始类型值
 Number(obj3); // TypeError
+```
+
+## 不同数据类型运算以及
+
+### 转字符串
+
+任何数据与**字符串**加减都会得到字符串
+
+```js
+true + ""; // "true"
+new Object() + ""; // "[object Object]"
+3 + ""; // "3"
+[1, 3, 4] + ""; // '1,3,4'
+```
+
+### 转 Number
+
+```js
++{} = NaN
++'20' = 20
+-'20' = -20
++[] = 0;
++[1] = 1;
++[1, 2] = NaN
++true=1
+```
+
+### 转 Boolean
+
+```js
+
 ```
 
 ## 宽松相等(==)和严格相等(===)
@@ -996,4 +1025,39 @@ const sleep = (delay) =>
   await sleep(1000);
   console.log(i);
 })();
+```
+
+# js 原生语法相关
+
+## 例题一
+
+```js
+let c = { greeting: "Hey!" };
+let d;
+
+d = c;
+console.log(d.greeting); // 'Hey!'
+```
+
+> 注意：
+>
+> - 上面代码中，变量 c 是一个对象，令`d=c`，那么两者将会引用同一个对象，而内存中，仅有一个对象存在、
+
+## 复杂的箭头函数
+
+```js
+const add = (x) => (y) => (z) => {
+  console.log(x, y, z);
+  return x + y + z;
+};
+
+// 相当于
+function add(x) {
+  return function (y) {
+    return function (z) {
+      console.log(x, y, z);
+      return x + y + z;
+    };
+  };
+}
 ```

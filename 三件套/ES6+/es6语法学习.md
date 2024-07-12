@@ -19,6 +19,8 @@ let arr = [1, 2, 3];
 let [item1] = arr; // 1
 
 let [item1, item2] = arr; // 1,2
+let [item3, ...itemArr] = arr;
+console.log(item3, itemArr); // 1,[2,3]
 ```
 
 - 解构失败时，变量的值为`undefined`
@@ -66,6 +68,29 @@ handleChange(e){
   const [file]=e.target.files;
 }
 
+```
+
+## 对象的解构赋值
+
+- 对象的属性没有次序，变量必须与属性同名，才能取到正确的值。
+
+```js
+let { bar, foo } = { foo: "aaa", bar: "bbb" };
+foo; // "aaa"
+bar; // "bbb"
+
+let { baz } = { foo: "aaa", bar: "bbb" };
+baz; // undefined
+```
+
+### 题目一：
+
+```js
+const myFunc = ({ x, y, z }) => {
+  console.log(x, y, z);
+};
+
+myFunc(1, 2, 3); // undefined undefined undefined
 ```
 
 # 函数扩展
@@ -136,6 +161,8 @@ console.log(obj); //{str:'hello world'}
 ```
 
 # Promise 对象
+
+## 概述
 
 - promise 对象实质上是一个容器，代表一个异步操作，其具有三种状态：pending（进行中）、fulfilled（已成功）、rejected（已失败），异步操作的结果，决定当前状态，其他任何操作都不能改变该状态
 
@@ -291,7 +318,9 @@ console.log("Hi!");
 // resolved
 ```
 
-## Promise 实现 ajax
+## 原型方法
+
+### Promise.then()
 
 ```js
 getJSON("./post/1.json")
@@ -313,7 +342,7 @@ getJSON("./post/1.json")
 
 then 方法用于处理 Promise 成功状态回调函数，使用 catch 方法处理 Prmoise 失败状态的回调函数
 
-## catch 方法
+### Promise.catch()
 
 - 指定
 
@@ -347,7 +376,7 @@ Promise().catch((error)=>console.log('rejected'，error))
 Promise().then(null,(error)=>console.log('rejected',error))
 ```
 
-## Promise.all
+### Promise.all()
 
 - 将多个 Promise 实例包装成一个新的 Promise 实例
 
@@ -360,7 +389,6 @@ p 的状态变化：
 （2）只要 p1、p2、p3 之中有一个被 rejected，p 的状态就变成 rejected，此时第一个被 reject 的实例的返回值，会传递给 p 的回调函数
 
 - 语法：const p = Promise.all([p1, p2, p3]);
-  > - 参数：
   > - all()方法接受一个类数组（具有 Iterator 接口）作为参数，类数组中的每个元素都是 Promise 实例
 
 ```js
@@ -376,7 +404,67 @@ Promise.all(promises)
   });
 ```
 
+### Promise.race()
+
+#### 实际应用
+
+- 背景：当调用后端接口时，由于网络延迟、服务器处理速度等原因，接口可能无法在预期时间内返回结果。为了避免无限期地等待接口响应，可以设置一个超时时间。
+
+- 实操：通过使用 Promise.race，可以将**对接口的调用**与一个**设置了超时时间的 Promise**进行比较。如果接口在超时时间之前返回了结果，则使用接口返回的结果；如果接口在超时时间之后仍未返回结果，则使用超时 Promise 的结果，从而触发超时处理逻辑。
+
+```js
+function fetchData() {
+  const url = "https://example.com/api/data";
+  return axios.get(url);
+}
+
+function timeout(ms) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      reject(new Error("请求超时"));
+    }, ms);
+  });
+}
+
+Promise.race([fetchData(), timeout(2000)])
+  .then((response) => {
+    console.log("接口返回:", response);
+  })
+  .catch((error) => {
+    console.log("接口调用失败:", error);
+  });
+```
+
+### Promise.resolve()
+
+- 返回值：一个状态为`resolved`的 Promise 实例
+- **作用：常用于将现有对象转为`Promise`对象**
+- 相当于：
+
+```js
+Promise.resolve("异步操作已经完成！！");
+// 等价于
+new Promise((resolve, reject) => {
+  reject("异步操作已经完成！！");
+});
+```
+
+### Promise.reject()
+
+- 返回值：返回一个状态为`rejected`的 Promise 实例
+- 相当于：
+
+```js
+Promise.reject("出错了！！！");
+// 相当于
+new Promise((resolve, reject) => {
+  reject("出错了！！！");
+});
+```
+
 # class 类
+
+## 概述
 
 - es6 以前，生成实例对象的方法是通过构造函数，这与传统面向对象语言的差异很大，于是 es6 引入了 class 类的概念作为对象模板
 
@@ -413,6 +501,89 @@ var p = new Point(1, 2);
 
 - class 类必须使用 new 调用，但普通构造函数不需要 new 就可以执行
 
+## super
+
+- 概述：子类继承父类时，必须在构造函数中
+- 作用：形成子类的 `this` 对象，将父类的实例属性和方法都放在这个对象上面
+- 注意：子类在调用 `super()` 函数之前，不可以使用 `this` 关键字
+
+```js
+class A {}
+
+class B extends A {
+  constructor() {
+    this.name = ""; // 这里将会报错，调用super之前不能访问this
+    super();
+  }
+}
+```
+
+## 静态方法
+
+- 使用关键字 `static` 关键字进行修饰，静态方法只能被类本身调用，类实例调用会报错：`TypeError`
+
+```js
+class Foo {
+  static sayHello() {
+    return "hello";
+  }
+}
+
+var foo = new Foo();
+foo.sayHello(); // TypeError: foo.sayHello is not a function
+```
+
+- 父类的静态方法可以被子类继承
+
+```js
+class Foo {
+  static classMethod() {
+    return "hello";
+  }
+}
+
+class Bar extends Foo {}
+
+Bar.classMethod(); // 'hello'
+```
+
+## 静态属性
+
+- 使用关键字 `static` 关键字进行修饰
+
+```js
+class Foo {
+  static prop = 1;
+}
+```
+
+## 私有属性
+
+早期的 `ES6`是不提供私有方法和私有属性的
+
+## getter、setter
+
+- 作用:用于拦截对某个属性的存取行为
+
+- 示例：
+
+```js
+class MyClass {
+  get prop() {
+    return "得到了prop值值";
+  }
+  set prop(newVal) {
+    console.log("正在设置prop的值: " + newVal);
+  }
+}
+
+let inst = new MyClass();
+
+// 存取属性值
+inst.prop = 123;
+inst.prop;
+```
+
 ## 实例属性
 
 - es2022 规定，实例属性除了可以写在`coustructor()`的`this`上面，也可以定义在类内部的最顶层
@@ -443,8 +614,6 @@ class IncreasingCounter {
 - 引入 symbol 数据结构之后，js 对象的属性名现在可以有两种类型：字符串或 symbol 类型
 
 - js 原生数据类型：undefined、null、boolean、string、Number、BigInt、Object、Symbol
-
-# 实例属性
 
 # 作为属性名
 
@@ -547,6 +716,36 @@ let obj = {
       },
     };
   },
+};
+```
+
+## 例题 1
+
+给`person`对象添加什么是属性，才能得到下面的结果
+
+```js
+const person = {
+  name: "Lydia Hallie",
+  age: 21
+}
+
+[...person] // ["Lydia Hallie", 21]
+```
+
+> 解答：
+
+```js
+const person = {
+  // 方案一：
+  [Symbol.iterator]: function* () {
+    for (let x in this) {
+      yield this[x];
+    }
+  },
+  // 方案二：
+  // [Symbol.iterator]: function* () {
+  //     yield* Object.values(this)
+  // }
 };
 ```
 

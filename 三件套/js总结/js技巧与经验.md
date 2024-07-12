@@ -275,6 +275,30 @@ console.log(str);
 // Expected output: "0234"
 ```
 
+## 立即执行函数
+
+- 简称：IIFE（immeidately invoked function expression）
+- 作用：可强行改变作用域，避免变量名的全局污染
+
+```js
+(function () {
+  /* code */
+})(); // 推荐使用这个
+(function () {
+  /* code */
+})(); // 但是这个也是可以用的
+```
+
+- 注意：立即执行函数直接返回结果， 其本身不再是一个 function，例题如下
+
+```js
+function sayHi() {
+  return (() => 0)();
+}
+
+console.log(typeof sayHi()); // 'number'
+```
+
 ## 数据运算操作
 
 ### 取整
@@ -387,4 +411,14 @@ arr.reduce((total, current) => {
 }, Promise.resolve());
 
 // Promise.
+```
+
+# 一些宏函数
+
+## eval 函数
+
+- 概述：将传入的字符串当做 js 代码执行
+
+```js
+eval("1+1");
 ```

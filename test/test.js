@@ -4,3 +4,4 @@ try {
 } catch (err) {
   console.error("删除文件时发生错误", err);
 }
+// const p=new Promise.race()
