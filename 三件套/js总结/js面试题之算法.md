@@ -75,6 +75,41 @@ class Queue {
 
 ## 数组
 
+## 数组去重
+
+- 方案一：使用`Set`数据结构
+
+```js
+function dedupe(arr) {
+  return Array.from(new Set(arr));
+}
+// 或者
+function dedupe(arr) {
+  return [...new Set(arr)];
+}
+```
+
+## 数据的并集、交集、差集
+
+- 方案一：使用`Set`数据结构
+
+```js
+let a = new Set([1, 2, 3]);
+let b = new Set([4, 3, 2]);
+
+// 并集
+let union = new Set([...a, ...b]);
+// Set {1, 2, 3, 4}
+
+// 交集:两者都有的元素
+let intersect = new Set([...a].filter((x) => b.has(x)));
+// set {2, 3}
+
+// （a 相对于 b 的）差集：a含有b不含
+let difference = new Set([...a].filter((x) => !b.has(x)));
+// Set {1}
+```
+
 ### 数组扁平化（一）
 
 - 实现 flatten 函数

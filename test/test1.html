@@ -51,11 +51,8 @@
       </div>
 
       <script>
-        const person = { name: "李四" };
-
-        Object.seal(person);
-        person.name = "张三";
-        console.log(person);
+        const obj = Object.create({});
+        console.log(obj);
       </script>
     </div>
   </body>

@@ -386,21 +386,6 @@ var n = str.replace(/blue/gi, "red");
 // Mr red has a red house and a red car
 ```
 
-# Set 集合
-
-Set 本身是一个构造函数，用于生成 Set 数据结构，成员值是唯一的
-
-## 原型方法
-
-- add(value)
-- delete(value)
-- has(value)：
-- clear()：
-- keys()：返回键名的遍历器
-- values()：返回键值的遍历器
-- entries()：返回键值对的遍历器
-- forEach()：使用回调函数遍历每个成员
-
 ## 应用：实现交集、并集、差集
 
 ```js
@@ -413,20 +398,6 @@ let intersect = new Set([...a].filter((x) => b.has(x)));
 //差集
 let difference = new Set([...a].filter((x) => !b.has(x)));
 ```
-
-# Map 哈希
-
-js 的对象本质上就是键值对的集合，但只能使用字符串作为键
-
-ES6 提供的 Map 数据结构，使得各种类型的值都可作为键
-
-## 原型方法
-
-- set(key, value)
-- get(key)
-- has(key)
-- delete(key)
-- clear()
 
 # 立即执行函数
 

@@ -160,6 +160,115 @@ const obj = { str };
 console.log(obj); //{str:'hello world'}
 ```
 
+# Set 集合
+
+Es6 提供的新的数据结构，成员的值都是唯一的，没有重复的值。
+
+## 原型上的属性或方法
+
+- size：返回成员总数
+- add(value)：添加某个值。**返回 Set 结构本身**
+- delete(value)：删除某个值。**返回布尔值**
+- has(value)：判断某个值是否为`Set`成员。**返回布尔值**
+- clear()：清空所有成员。**无返回值**
+- keys()：返回键名的遍历器
+- values()：返回键值的遍历器
+- entries()：返回键值对的遍历器
+- forEach()：使用回调函数遍历每个成员
+
+## 遍历方案
+
+```js
+let set = new Set(["red", "green", "blue"]);
+
+for (let item of set.keys()) {
+  console.log(item);
+}
+// red
+// green
+// blue
+
+for (let item of set.values()) {
+  console.log(item);
+}
+// red
+// green
+// blue
+
+for (let item of set.entries()) {
+  console.log(item);
+}
+```
+
+## 实际应用
+
+### 数组去重
+
+- 《见 js 面试题之算法》
+
+### 数据的并集、交集、差集
+
+- 《见 js 面试题之算法》
+
+## WeakSet
+
+### 原型上的方法
+
+- add(value):
+- delete(value):
+- has(value):
+
+WeakSet 结构与 Set 类似，也是不重复的值的集合，但是与`Set`结构主要存在如下区别
+
+### 区别一
+
+WeakSet 的成员只能是对象和 Symbol 值，而不能是其他类型的值
+
+```js
+const ws = new WeakSet();
+ws.add(1); // 报错
+```
+
+### 区别二
+
+WeakSet 中的对象都是弱引用，垃圾回收机制不考虑 WeakSet 对该对象的引用。也就是说，如果没有其他对象引用该对象，即使该对象仍然存在于 WeakSet 数据结构中，垃圾回收机制也会自动回收该对象占用的内存。
+
+- 下面看一段在 node 环境中运行的代码
+
+```js
+let obj = { name: "张三" };
+let weak_set = new WeakSet();
+weak_set.add(obj);
+obj = null;
+console.log(weak_set);
+```
+
+> 上面代码中，obj 被设置为 null 后，没有其他强引用指向原本存储在 weak_set 中的对象，那么该对象就可以被垃圾回收机制回收
+
+### 区别三
+
+WeakSet 结构不可遍历。因为成员都是弱引用，随时可能消失，遍历机制无法保证成员的存在，很可能刚刚遍历结束，成员就取不到了。
+
+### 实际应用
+
+- 参考[【掘金-一只大蜗牛】](https://juejin.cn/post/7041574685363945479)
+
+WeakSet 的一个用处，是储存 DOM 节点，而不用担心这些节点从文档移除时，会引发内存泄漏。意思也就说，WeakSet 中存储的 DOM 节点，能在 DOM 节点被移除的时候，同步的从 WeakSet 中移除
+
+# Map 哈希
+
+js 的对象本质上就是键值对的集合，但只能使用字符串作为键
+
+ES6 提供的 Map 数据结构，使得各种类型的值都可作为键
+
+## 原型上的属性或方法
+
+- set(key, value)
+- get(key)
+- has(key)
+- delete(key)
+- clear()
+
 # Promise 对象
 
 ## 概述

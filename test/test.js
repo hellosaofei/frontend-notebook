@@ -1,7 +1,7 @@
-try {
-  await rm("./1.txt");
-  console.log("文件已经被删除");
-} catch (err) {
-  console.error("删除文件时发生错误", err);
-}
-// const p=new Promise.race()
+let obj = { name: "张三" };
+let weak_set = new WeakSet();
+let set = new Set();
+// weak_set.add(obj);
+set.add(obj);
+obj = null;
+console.log(weak_set, set);
