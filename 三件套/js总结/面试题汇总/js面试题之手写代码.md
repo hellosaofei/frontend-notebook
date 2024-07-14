@@ -504,6 +504,78 @@ myajax({
 
 <img src="./imgs/js相关/myajax请求示例.png">
 
+# async/await
+
+原理：await 后面跟随一个 Promise 对象，并且会等待 Promise 的`resolve/reject`
+
+## 循序渐进
+
+### 使用示例
+
+```js
+function getData(val) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve(val);
+    }, 2000);
+  });
+}
+
+async function hello() {
+  const data1 = await getData(1);
+  const data2 = await getData(data1);
+  return `成功得到数据：${data2}`;
+}
+
+hello().then((res) => {
+  console.log(res);
+});
+```
+
+- 特征：能暂停执行、恢复执行
+
+### Generator 函数
+
+```js
+function* gen() {
+  yield 1;
+  yield 2;
+  yield 3;
+  return 4;
+}
+const g = gen();
+console.log(g.next()); // {value:1, done:false }
+console.log(g.next()); // {value:2, done:false }
+console.log(g.next()); // {value:3, done:false }
+console.log(g.next()); // {value:4, done:true }
+```
+
+### 使用 Generator 函数改造示例代码
+
+```js
+function* hello() {
+  const data1 = yield getData(1);
+  const data2 = yield getData(data1);
+  return `成功得到数据：${data2}`;
+}
+const gh = hello();
+const next1 = h.next();
+next1.value.then((data1) => {
+  console.log("data1", data1);
+  const next2 = h.next(data1);
+  next2.value.then((data2) => {
+    console.log("data2", data2);
+    const next2 = h.next(data2);
+  });
+});
+```
+
+### 封装一个 generatorAsync
+
+```js
+
+```
+
 # 其他手写题
 
 ## 对 js 原型的认识

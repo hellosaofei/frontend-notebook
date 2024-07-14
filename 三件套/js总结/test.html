@@ -8,21 +8,17 @@
   <body>
     <button id="myBtn">点击该按钮</button>
     <script>
-      function test(...args) {
-        console.log("传递过来的参数为:", args);
+      function* gen() {
+        yield 1;
+        yield 2;
+        yield 3;
+        return 4;
       }
-      test(1, { name: "张三", age: 12 }, [1, 2], "hahhaha");
-      function add(...args) {
-        console.log(args);
-        const { name, age, sex = "女" } = args[0];
-        console.log(name, age);
-      }
-      add({
-        name: "张三",
-        age: 19,
-        sex: "男",
-        other: "ssssss",
-      });
+      const g = gen();
+      console.log(g.next());
+      console.log(g.next());
+      console.log(g.next());
+      console.log(g.next());
     </script>
   </body>
 </html>

@@ -571,6 +571,42 @@ new Promise((resolve, reject) => {
 });
 ```
 
+# async/await
+
+## 概述
+
+用同步的方式、执行异步操作，看下面的例子
+
+我们要先后进行两次接口请求，仅仅使用 Promise ，写法如下
+
+```js
+function request(num) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(num * 2);
+    }, 1000);
+  });
+}
+
+request(1).then((res1) => {
+  /* 操作... */
+  request(2).then((res2) => {
+    /* 操作... */
+  });
+});
+```
+
+使用`async/await`进行改写
+
+```js
+async function fn() {
+  const res1 = await request(1);
+  const res2 = await request(2);
+  console.log(res2);
+}
+fn();
+```
+
 # class 类
 
 ## 概述
