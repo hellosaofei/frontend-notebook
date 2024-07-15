@@ -61,32 +61,15 @@ input.onchange = function () {
 
 ## 节流
 
-- 控制比较耗费性能的代码的执行次数
+- 规定一个单位时间内，只能触发一次函数。如果在这个时间内触发多次函数，只有一次生效。
 
 ```js
-// 下面代码的逻辑是，flag为true时，执行业务代码，由于setTimeout，每隔一秒只能执行一次
-let flag = true;
-window.onscroll = function () {
-  if (flag) {
-    setTimeout(() => {
-      console.log("hello world");
-      flag = true;
-    }, 1000);
-  }
-  flag = false;
-};
-
-//封装
-
-window.onscroll = throttle(function () {
-  console.log("hello world");
-}, 1000);
-function throttle(fn, delay) {
+function throttle(fn, delay = 1000) {
   let flag = true;
-  return function () {
+  return function (...args) {
     if (flag) {
       setTimeout(() => {
-        fn();
+        fn.apply(this, args);
         flag = true;
       }, delay);
     }

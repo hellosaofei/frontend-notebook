@@ -226,12 +226,6 @@ new Object() + ""; // "[object Object]"
 +true=1
 ```
 
-### 转 Boolean
-
-```js
-
-```
-
 ## 宽松相等(==)和严格相等(===)
 
 - 区别：宽松相等（==）会在比较中进行隐式转换
@@ -896,8 +890,7 @@ console.log(test);
 
 <img src="../../pic/js学习/原型链示例.png">
 
-- instanceof 的内部机制是通过判断对象的原型链中是不是能找到类型的 prototype
-
+- instanceof 的内部机制是
 - instanceof 只能用来判断对象类型，原始类型不可以。`所有对象类型 instanceof Object` 都是 true。
 
 ```js

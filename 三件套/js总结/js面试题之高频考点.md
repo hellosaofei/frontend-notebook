@@ -346,6 +346,75 @@ setTimeout
 */
 ```
 
+# 判断数据类型的方法
+
+## typeof
+
+- 缺点：仅可以判断基本的数据类型（null 除外）,对于引用数据类型，除了 Function 类型之外，其余均返回 object
+
+```js
+typeof 1; // 'number'
+typeof "1"; // 'string'
+typeof undefined; // 'undefined'
+typeof true; // 'boolean'
+typeof Symbol(); // 'symbol'
+typeof []; // 'object'
+typeof {}; // 'object'
+typeof console; // 'object'
+typeof console.log; // 'function'
+```
+
+### 一个 bug
+
+- 这是一个存在时间悠久的 bug
+
+```js
+typeof null; // 'object'
+```
+
+## instanceof
+
+- 语法：【实例对象】 instanceof 【构造函数】
+
+- 原理：判断**构造函数的 prototype（原型）**是否在实例对象的**原型链**上
+
+- 特点：可以准确地判断复杂引用数据类型，但是不能正确判断基础数据类型
+
+- 示例 1
+  下面代码返回 false，是因为 `'str'`是一个基本的数据类型：字符串，基本数据类型（如字符串、数字、布尔值等）不是对象，它们没有原型链
+
+```js
+"str" instanceof String;
+```
+
+- 示例 2
+
+```js
+let Car = function () {};
+let benz = new Car();
+benz instanceof Car; // true
+let car = new String("xxx");
+car instanceof String; // true
+```
+
+## toString.call()
+
+- 原理：
+- 特点：最精准的判断数据类型的方法
+
+```js
+toString.call(() => {}); // [object Function]
+toString.call({}); // [object Object]
+toString.call([]); // [object Array]
+toString.call(""); // [object String]
+toString.call(22); // [object Number]
+toString.call(undefined); // [object undefined]
+toString.call(null); // [object null]
+toString.call(new Date()); // [object Date]
+toString.call(Math); // [object Math]
+toString.call(window); // [object Window]
+```
+
 # this 指向问题
 
 - 《见 this 指向总结》
@@ -477,19 +546,19 @@ main();
 
 -《见 js 面试题之手写代码》
 
-## js 事件机制
+# js 事件机制
 
 - 事件传播过程：捕获、目标、冒泡
 - 默认情况下，事件处理程序在冒泡阶段执行
 -
 
-### 事件冒泡
+## 事件冒泡
 
-### 事件捕获
+## 事件捕获
 
-### 事件委托
+## 事件委托
 
-### addEventListener
+## addEventListener
 
 ```js
 element.addEventListener(event, function, useCapture);
@@ -500,7 +569,7 @@ element.addEventListener(event, function, useCapture);
 - 描述：事件执行的阶段
 - 默认值：false,表示事件在冒泡阶段执行
 
-#### 一个面试题
+### 一个面试题
 
 - 下面代码，点击 p 标签会输出什么？
 - 答案：p div
@@ -510,3 +579,17 @@ element.addEventListener(event, function, useCapture);
   <p onclick="console.log('p')">Click here!</p>
 </div>
 ```
+
+# 闭包
+
+```js
+var arr=[]
+for (var i=0;i<3;i++){
+  arr[i]=function(){
+    console.log(i)
+  }
+}
+arr.forEach(function(item)=>{item()})   // 3 3 3
+```
+
+> 乍一看打印结果很出乎意料，但实际上仔细一想是正确的，因为循环内部只是定义了函数，没有传递参数，也没有执行，函数执行时会从全局作用域中寻找使用到的参数

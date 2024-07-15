@@ -14,6 +14,22 @@
 - 解决：
   `Object.create(null)`可以有效的避免原型链的污染，该函数将会返回一个原型为`null`的对象，他没有原型链，也意味着他不会继承任何原型对象，包括`Object.prototype`，因此也就不会被 `Object.prototype `或其他任何原型链上的对象所影响。
 
+# getPrototypeOf()
+
+- 语法：`Object.getPrototypeOf(obj)`
+
+- 描述：返回指定对象的原型（即内部 [[Prototype]] 属性的值）
+
+- 使用示例：
+
+```js
+const prototype1 = {};
+const object1 = Object.create(prototype1);
+
+console.log(Object.getPrototypeOf(object1) === prototype1);
+// Expected output: true
+```
+
 # Object.assign()
 
 - 语法：`Object.assign(target, ...sources)`

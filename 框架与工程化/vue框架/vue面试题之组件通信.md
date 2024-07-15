@@ -296,12 +296,12 @@ onUnmounted(()=>{
 
 **兄弟组件**
 
-- 全局事件总线:`EventBus`
-- **子传父**
+**子传父**
 
-  **其他**
+**全局**
 
 - `vuex`
+- 全局事件总线:`EventBus`
 - `$root`：可以拿到`APP.vue`中的数据和方法
 
 ### props + async
