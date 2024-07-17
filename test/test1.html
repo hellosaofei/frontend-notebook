@@ -49,10 +49,80 @@
         <!-- 添加更多内容以测试滚动条 -->
         <!-- ... -->
       </div>
-
+      <button>点击触发防抖</button>
+      <button>点击触发节流</button>
       <script>
-        const obj = Object.create({});
-        console.log(obj);
+        let myBtn = document.querySelector("button");
+        myBtn.addEventListener("click", debounce(sayHello));
+        let myBtn2 = document.querySelectorAll("button")[1];
+        myBtn2.addEventListener("click", throttle(sayHello));
+        function sayHello() {
+          console.log("hello！！");
+        }
+        function debounce(fn, delay = 1000) {
+          let timer;
+          return function (...args) {
+            if (timer) {
+              clearTimeout(timer);
+            }
+            timer = setTimeout(() => {
+              console.log(this);
+              fn.apply(this, args);
+            }, delay);
+          };
+        }
+        // function throttle(fn, wait = 1000) {
+        //   // 记录上次调用的时间
+        //   let lastTime;
+        //   // 返回一个普通函数，该函数最终的调用者决定该函数内部的this指向
+        //   return function (...args) {
+        //     // 记录本次函数调用的时间
+        //     let now = Date.now();
+        //     //
+        //     if (lastTime && now - lastTime < wait) {
+        //       console.log("函数被限流");
+        //       fn.apply(this, args); // 应用func，并传入this和参数
+        //       lastTime = now; // 更新上次执行func的时间
+        //     } else {
+        //       // 如果lastTime没有被赋值，说明是首次被调用，直接调用函数即可
+        //       lastTime = now;
+        //       fn.apply(this, args);
+        //       console.log("函数首次执行");
+        //     }
+        //   };
+        // }
+        function throttle(fun, delay = 1000) {
+          // 定义一个计时器和最后执行时间
+          let last, timer;
+          return function (...args) {
+            //
+            let now = Date.now();
+            clearTimeout(timer);
+            // now-last小于1秒，说明
+            if (last && now - last < delay) {
+              timer = setTimeout(function () {
+                last = now;
+                fun.apply(this, args);
+              }, delay);
+            } else {
+              // 函数执行到这
+              last = now;
+              fun.apply(this, args);
+            }
+          };
+        }
+
+        /**
+         * 0s时触发一次，last为空，没有timer，走else逻辑:函数执行一次，更新last为0
+         * 0-1s之间又触发一次，没有timer。last不为空且now-last小于1s，走if逻辑。生成一个timer
+         * 0-1s之间触发第二次，清除上一个timer。last不为空且now-last小于1s，走if逻辑。生成一个timer
+         * 0-1s不再触发，1s之后timer执行
+         * 看一个具体的情况：假设0.9s触发一次，清空timer,再次生成一个延时1s的timer,之后不再触发
+         * 由于0-0.9s内肯定不会执行，而通过timer执行的逻辑在1s之后，也就是1.9s触发，
+         * 等到1s那一刻，now-last<1s 的逻辑不再成立，走else逻辑：函数执行一次，再次更新last
+         * 1-2s内触发一次，清除上一个timer。last不为空且now-last小于1s，走if逻辑。生成一个timer
+         * 上面代码将会这样一直重复下去
+         */
       </script>
     </div>
   </body>

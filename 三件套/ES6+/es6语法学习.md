@@ -1568,6 +1568,77 @@ g.next(true); // { value: 0, done: false }
 > 上面代码中，如果 next 方法没有参数，每次运行到 yield 表达式，变量 reset 的值总是 undefined。
 > 当 next 方法带一个参数 true 时，变量 reset 就被重置为这个参数（即 true）执行 i=-1，下一轮循环就会从-1 开始递增。
 
+## yield\* 表达式
+
+### 背景
+
+如果在一个 Generator 函数函数内部，调用另一个 Generator 函数，需要自己完成手动遍历，如果有多个 Generator 函数嵌套，这样做将会很麻烦
+
+```js
+function* foo() {
+  yield "a";
+  yield "b";
+}
+
+function* bar() {
+  yield "x";
+  // 手动遍历 foo()
+  for (let i of foo()) {
+    console.log(i);
+  }
+  yield "y";
+}
+for (let v of bar()) {
+  console.log(v);
+}
+```
+
+### 问题的解决
+
+- 在一个 Generator 函数中，执行另外一个 Generator 函数
+
+```js
+function* bar() {
+  yield "x";
+  yield* foo();
+  yield "y";
+}
+
+// 等同于
+function* bar() {
+  yield "x";
+  yield "a";
+  yield "b";
+  yield "y";
+}
+
+// 等同于
+function* bar() {
+  yield "x";
+  for (let v of foo()) {
+    yield v;
+  }
+  yield "y";
+}
+for (let v of bar()) {
+  console.log(v);
+}
+```
+
+### 其他应用()
+
+- 遍历一个数组(面试宝典 66 题)
+
+```js
+function* generatorTwo() {
+  yield* ["a", "b", "c"];
+}
+
+const two = generatorTwo();
+
+console.log(two.next().value); // a
+```
+
 # for...of 循环
 
 - 使用 for...of 循环自动遍历 Generator 函数运行时生成的 Iterator 对象，且此时不再需要调用 next 方法
@@ -1575,12 +1646,6 @@ g.next(true); // { value: 0, done: false }
 - 一旦 next 方法的返回对象的 done 属性为 true，for...of 循环就会终止且不包含返回对象，
 
 - 利用 Generator 函数可以对任意对象完成遍历。原生 js 对象没有遍历接口，无法使用`for...of`循环
-
-```js
-function* objEntries(obj){
-  let propKeys=
-}
-```
 
 # 异步
 
@@ -1989,6 +2054,21 @@ export default a;
 
 //export语句正确写法
 export var a=1;
+```
+
+## 一些面试题
+
+- 题目一
+
+```js
+// module.js
+export default () => "Hello world";
+export const name = "Lydia";
+
+// index.js
+import * as data from "./module";
+
+console.log(data); // { default: function default(), name: "Lydia" }
 ```
 
 ## import()

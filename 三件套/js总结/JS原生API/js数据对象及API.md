@@ -12,7 +12,7 @@
 ### 数组末尾 删除 并返回 pop()
 
 - 语法：arr.pop()
-- 返回值：被删除的元素
+- 返回值：**被删除的元素**
 
 ### 数组末尾 添加 push()
 
@@ -34,7 +34,7 @@
 - 语法：arr.slice(start, end)，不包含 end
   > start:开始位置，负数表示从倒数位置开始提取
   > end:结束位置，
-- 作用：返回原数组指定区间内的子数组，即数组切片
+- 作用：返回**原数组指定区间内的子数组**，即数组切片
 
 > 注意：
 >
@@ -52,23 +52,19 @@ arr.slice(-2, -1);
 
 ## 其他元素转换为数组
 
-| 数组方法     | 说明                                                 | 使用举例                                   |
-| ------------ | ---------------------------------------------------- | ------------------------------------------ |
-| Array.of()   | 将一组值转换为数组，不考虑参数的数量或类型。         | Array.of(element1,...,elementn)            |
-| Array.from() | 将一个拥有 length 属性的对象或可迭代的对象转化为数组 | Array.from(object, mapFunction, thisValue) |
+### Array.of()
+
+- 作用：将一组值转换为数组，不考虑参数的数量或类型。
+- 语法：`Array.of(element1,...,elementn)`
 
 ```js
-/*
-Array.of(e1,...,en)
-  e1..,en为要放在一个数组中的若干个元素
-*/
 let myArr = Array.of("张三", 11, "李四", [], { 名字: "王五" });
 console.log(myArr); // ['张三', 11, '李四', Array(0), {…}]
 ```
 
 ### Array.from()
 
-- 语法：Array.from(obj,mapFunction,thisValue)
+- 语法：`Array.from(obj,mapFunction,thisValue)`
 - 作用：通过拥有 length 属性的对象或可迭代的对象来返回一个数组
 - 参数：obj：要转化为数组的可迭代对象，mapFunction:数组中每个元素要调用的函数
 

@@ -299,6 +299,16 @@ function sayHi() {
 console.log(typeof sayHi()); // 'number'
 ```
 
+## JSON
+
+### JSON.stringify
+
+将字符串（普通、对象）等转化为 JSON 对象
+
+### JSON.parse
+
+将 JSON 字符串转化为 JS 对象
+
 ## 数据运算操作
 
 ### 取整
@@ -327,9 +337,9 @@ console.log(typeof sayHi()); // 'number'
 7 % 2; //1
 ```
 
-### promise 的妙用
+## promise 的妙用
 
-#### 实现一个 sleep 函数
+### 实现一个 sleep 函数
 
 ```js
 let sleep = (delay) => {
@@ -361,7 +371,7 @@ sleepGenerator(1000)
   });
 ```
 
-#### 封装一个 ajax 函数（其余见《手写代码部分》）
+### 封装一个 ajax 函数（其余见《手写代码部分》）
 
 - 该案例来自 《阮一峰 es6 教程》
 
@@ -398,7 +408,7 @@ getJSON("/posts.json").then(
 );
 ```
 
-#### 每隔一秒打印数组中的一个元素
+### 每隔一秒打印数组中的一个元素
 
 ```js
 let arr = [11, 22, 33, 44, 55];
@@ -422,3 +432,12 @@ arr.reduce((total, current) => {
 ```js
 eval("1+1");
 ```
+
+# 关于运算符的优先级
+
+```js
+var ss = "hello";
+console.log("say:" + `${ss === "hello"}` ? "1" : "2");
+```
+
+> 上面代码中，由于三元运算符的优先级高于 **字符串拼接**，所以最终只会输出 1

@@ -78,6 +78,44 @@ function throttle(fn, delay = 1000) {
 }
 ```
 
+### 时间戳写法
+
+```js
+function throttle(fun, delay = 1000) {
+  // 定义一个计时器和最后执行时间
+  let last, timer;
+  return function (...args) {
+    let now = Date.now();
+    clearTimeout(timer);
+    if (last && now - last < delay) {
+      timer = setTimeout(function () {
+        last = now;
+        fun.apply(this, args);
+      }, delay);
+    } else {
+      last = now;
+      fun.apply(this, args);
+    }
+  };
+}
+```
+
+- 下面我们看一下具体的执行过程
+
+```js
+/**
+ * 0s时触发一次，last为空，没有timer，走else逻辑:函数执行一次，更新last为0
+ * 0-1s之间又触发一次，没有timer。last不为空且now-last小于1s，走if逻辑。生成一个timer
+ * 0-1s之间触发第二次，清除上一个timer。last不为空且now-last小于1s，走if逻辑。生成一个timer
+ * 0-1s不再触发，1s之后timer执行
+ * 看一个具体的情况：假设0.9s触发一次，清空timer,再次生成一个延时1s的timer,之后不再触发
+ * 由于0-0.9s内肯定不会执行，而通过timer执行的逻辑在1s之后，也就是1.9s触发，
+ * 等到1s那一刻，now-last<1s 的逻辑不再成立，走else逻辑：函数执行一次，再次更新last
+ * 1-2s内触发一次，清除上一个timer。last不为空且now-last小于1s，走if逻辑。生成一个timer
+ * 上面代码将会这样一直重复下去
+ */
+```
+
 # this 指向相关
 
 ## 手写实现 call apply bind

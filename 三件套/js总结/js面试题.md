@@ -325,6 +325,18 @@ add(1, 2, 3, 4);
 // [1,2,3,4]
 ```
 
+> 注意：剩余参数只能作为函数的最后一个参数
+
+```js
+function getItems(fruitList, ...args, favoriteFruit) {
+  return [...fruitList, ...args, favoriteFruit]
+}
+
+getItems(["banana", "apple"], "pear", "orange")
+```
+
+> 上面代码的执行结果将会报错：SyntaxError
+
 ## call 的妙用
 
 - **call 方法的 this 指向**
